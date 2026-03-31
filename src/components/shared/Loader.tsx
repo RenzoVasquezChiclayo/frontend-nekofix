@@ -14,7 +14,7 @@ export function Loader({ className, label = "Cargando…" }: Props) {
       aria-label={label}
     >
       <span
-        className="h-10 w-10 animate-spin rounded-full border-2 border-zinc-200 border-t-emerald-600"
+        className="h-10 w-10 animate-spin rounded-full border-2 border-zinc-200 border-t-primary-600"
         aria-hidden
       />
       <span className="text-sm text-zinc-500">{label}</span>

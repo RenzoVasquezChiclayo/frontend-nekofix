@@ -15,7 +15,7 @@ export function AuthCard({ title, subtitle, children, footer }: Props) {
         <div className="text-center">
           <Link
             href="/"
-            className="inline-flex rounded-lg bg-emerald-600 px-1.5 py-0.5 text-xs font-bold text-white"
+            className="inline-flex rounded-lg bg-primary-600 px-1.5 py-0.5 text-xs font-bold text-white"
           >
             NF
           </Link>

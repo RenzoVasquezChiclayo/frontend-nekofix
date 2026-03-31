@@ -9,7 +9,7 @@ export default function ProductNotFound() {
       </p>
       <Link
         href="/catalogo"
-        className="mt-8 inline-block rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-500"
+        className="mt-8 inline-block rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-500"
       >
         Ir al catálogo
       </Link>

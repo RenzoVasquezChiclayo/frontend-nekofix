@@ -17,7 +17,7 @@ export default function CarritoPage() {
         </p>
         <Link
           href="/catalogo"
-          className="mt-8 inline-block rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-500"
+          className="mt-8 inline-block rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-500"
         >
           Ver catálogo
         </Link>
@@ -45,7 +45,7 @@ export default function CarritoPage() {
             <div className="min-w-0 flex-1">
               <Link
                 href={`/producto/${line.slug}`}
-                className="font-semibold text-zinc-900 hover:text-emerald-700"
+                className="font-semibold text-zinc-900 hover:text-primary-700"
               >
                 {line.name}
               </Link>
@@ -100,7 +100,7 @@ export default function CarritoPage() {
         </p>
         <Link
           href="/checkout"
-          className="rounded-full bg-zinc-900 px-8 py-3 text-sm font-semibold text-white hover:bg-zinc-800"
+          className="rounded-full bg-primary-800 px-8 py-3 text-sm font-semibold text-white hover:bg-primary-900"
         >
           Ir al checkout
         </Link>

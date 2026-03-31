@@ -86,7 +86,7 @@ export function CheckoutForm() {
     return (
       <p className="text-zinc-600">
         No hay artículos en el carrito.{" "}
-        <a href="/catalogo" className="text-emerald-700 underline">
+        <a href="/catalogo" className="text-primary-700 underline">
           Ir al catálogo
         </a>
       </p>
@@ -182,7 +182,7 @@ export function CheckoutForm() {
             <span>{formatPrice(subtotal)}</span>
           </div>
           {discount > 0 ? (
-            <div className="flex justify-between text-emerald-700">
+            <div className="flex justify-between text-primary-700">
               <span>Descuento</span>
               <span>-{formatPrice(discount)}</span>
             </div>
@@ -196,7 +196,7 @@ export function CheckoutForm() {
         <button
           type="submit"
           disabled={pending}
-          className="mt-8 w-full rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
+          className="mt-8 w-full rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white hover:bg-primary-500 disabled:opacity-60"
         >
           {pending ? "Enviando…" : "Confirmar pedido"}
         </button>

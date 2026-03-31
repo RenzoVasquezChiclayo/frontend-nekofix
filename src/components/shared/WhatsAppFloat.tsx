@@ -8,7 +8,7 @@ export function WhatsAppFloat() {
       href={whatsappHref()}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-900/20 transition hover:scale-105 hover:shadow-xl"
+      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-primary-900/25 transition hover:scale-105 hover:shadow-xl"
       aria-label="Contactar por WhatsApp"
     >
       <svg className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

@@ -26,9 +26,9 @@ export default function NosotrosPage() {
       <AboutSchedule />
       <AboutContactCards />
       <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
-        <div className="flex flex-col items-center justify-between gap-6 rounded-3xl border border-zinc-200 bg-gradient-to-r from-emerald-600 to-teal-700 px-8 py-10 text-center text-white shadow-lg sm:flex-row sm:text-left">
+        <div className="flex flex-col items-center justify-between gap-6 rounded-3xl border border-primary-700/30 bg-gradient-to-r from-primary-600 to-primary-900 px-8 py-10 text-center text-white shadow-lg sm:flex-row sm:text-left">
           <div>
-            <p className="text-sm font-medium text-emerald-100">¿Listo para el siguiente paso?</p>
+            <p className="text-sm font-medium text-white/85">¿Listo para el siguiente paso?</p>
             <p className="mt-1 text-lg font-semibold">
               Cotiza una reparación o revisa equipos certificados en tienda.
             </p>
@@ -36,7 +36,7 @@ export default function NosotrosPage() {
           <div className="flex shrink-0 flex-wrap justify-center gap-3">
             <Link
               href="/contacto"
-              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary-900 shadow-sm transition hover:bg-accent-cool/15"
             >
               Contacto
             </Link>

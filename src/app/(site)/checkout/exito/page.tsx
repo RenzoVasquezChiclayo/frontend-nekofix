@@ -10,7 +10,7 @@ export default async function CheckoutExitoPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-lg px-4 py-24 text-center">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent-cool/25 text-2xl">
         ✓
       </div>
       <h1 className="mt-6 text-2xl font-bold text-zinc-900">Pedido registrado</h1>
@@ -21,7 +21,7 @@ export default async function CheckoutExitoPage({ searchParams }: Props) {
       </p>
       <Link
         href="/catalogo"
-        className="mt-10 inline-block rounded-full bg-zinc-900 px-8 py-3 text-sm font-semibold text-white hover:bg-zinc-800"
+        className="mt-10 inline-block rounded-full bg-primary-800 px-8 py-3 text-sm font-semibold text-white hover:bg-primary-900"
       >
         Seguir comprando
       </Link>

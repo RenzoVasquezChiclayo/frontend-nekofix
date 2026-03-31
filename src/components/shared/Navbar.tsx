@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
+import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { CartBadge } from "@/components/shared/CartBadge";
+import { BrandLogoWithTitle } from "@/components/shared/BrandLogo";
 import { useAuth } from "@/store/auth-context";
 
 type Props = { className?: string };
@@ -70,16 +71,16 @@ export function Navbar({ className }: Props) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 border-b border-zinc-200/80 bg-white/90 backdrop-blur-md",
+        "sticky top-0 z-40 border-b border-primary-900/10 bg-white/90 backdrop-blur-md",
         className
       )}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-zinc-900">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-sm text-white">
-            NF
-          </span>
-          <span>{SITE_NAME}</span>
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-black tracking-tight text-zinc-900"
+        >
+          <BrandLogoWithTitle />
         </Link>
         <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
           {NAV_LINKS.map((l) => (
@@ -103,7 +104,7 @@ export function Navbar({ className }: Props) {
           <CartBadge />
           <Link
             href="/catalogo"
-            className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800"
+            className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700"
           >
             Tienda
           </Link>

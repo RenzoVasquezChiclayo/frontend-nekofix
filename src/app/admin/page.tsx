@@ -62,7 +62,7 @@ export default function AdminHomePage() {
                 Enlace cuando exista la ruta en el backend
               </span>
             ) : (
-              <Link href={s.href} className="mt-4 inline-block text-sm text-emerald-700">
+              <Link href={s.href} className="mt-4 inline-block text-sm text-primary-700">
                 Abrir →
               </Link>
             )}

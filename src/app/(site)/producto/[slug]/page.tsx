@@ -51,7 +51,7 @@ export default async function ProductoPage({ params }: Props) {
           />
         </div>
         <div>
-          <p className="text-sm font-medium text-emerald-700">
+          <p className="text-sm font-medium text-primary-700">
             {PRODUCT_KIND_LABELS[product.kind]}
             {product.wearGrade
               ? ` · ${WEAR_GRADE_LABELS[product.wearGrade]}`

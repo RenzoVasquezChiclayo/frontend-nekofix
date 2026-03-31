@@ -21,7 +21,7 @@ export default function CuentaPage() {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href="/iniciar-sesion"
-            className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
+            className="rounded-full bg-primary-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-900"
           >
             Iniciar sesión
           </Link>

@@ -39,8 +39,8 @@ export function MissionVision() {
     <section className="border-b border-zinc-200 bg-white py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
-          <article className="group relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-8 shadow-sm transition hover:border-emerald-200/80 hover:shadow-md">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-900/15">
+          <article className="group relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-8 shadow-sm transition hover:border-primary-200/80 hover:shadow-md">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600 text-white shadow-lg shadow-primary-900/20">
               <IconMission className="h-6 w-6" />
             </div>
             <h2 className="mt-6 text-xl font-bold tracking-tight text-zinc-900">
@@ -51,10 +51,10 @@ export function MissionVision() {
             </p>
           </article>
 
-          <article className="group relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-emerald-50/80 via-white to-white p-8 shadow-sm transition hover:border-emerald-300/60 hover:shadow-md">
-            <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-emerald-400/10 blur-2xl transition group-hover:bg-emerald-400/20" />
+          <article className="group relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-accent-cool/15 via-white to-white p-8 shadow-sm transition hover:border-accent-cool/45 hover:shadow-md">
+            <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-accent-warm/10 blur-2xl transition group-hover:bg-accent-warm/18" />
             <div className="relative">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-900 text-white">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-900 text-white">
                 <IconVision className="h-6 w-6" />
               </div>
               <h2 className="mt-6 text-xl font-bold tracking-tight text-zinc-900">

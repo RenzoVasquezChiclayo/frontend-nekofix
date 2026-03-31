@@ -131,7 +131,7 @@ export function ProductFilters() {
         <button
           type="button"
           onClick={applyColorStorage}
-          className="w-full rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+          className="w-full rounded-lg bg-primary-600 py-2 text-sm font-semibold text-white hover:bg-primary-500"
         >
           Aplicar color / almacenamiento
         </button>
@@ -161,7 +161,7 @@ function FilterChip({
       href={href}
       className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
         active
-          ? "bg-zinc-900 text-white"
+          ? "bg-primary-900 text-white"
           : "bg-white text-zinc-700 ring-1 ring-zinc-200 hover:ring-zinc-300"
       }`}
     >

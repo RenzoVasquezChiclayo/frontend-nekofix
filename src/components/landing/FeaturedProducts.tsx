@@ -28,7 +28,7 @@ export function FeaturedProducts({ products }: Props) {
               <li key={p.id}>
                 <Link
                   href={`/producto/${p.slug}`}
-                  className="group block overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:border-emerald-200 hover:shadow-md"
+                  className="group block overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:border-primary-200 hover:shadow-md"
                 >
                   <div className="relative aspect-square bg-zinc-100">
                     <Image
@@ -47,7 +47,7 @@ export function FeaturedProducts({ products }: Props) {
                     <h3 className="mt-1 font-semibold text-zinc-900 line-clamp-2">
                       {p.name}
                     </h3>
-                    <p className="mt-2 text-lg font-bold text-emerald-700">
+                    <p className="mt-2 text-lg font-bold text-primary-700">
                       {formatPrice(p.price, p.currency)}
                     </p>
                   </div>
@@ -59,7 +59,7 @@ export function FeaturedProducts({ products }: Props) {
         <div className="mt-12 text-center">
           <Link
             href="/catalogo"
-            className="inline-flex rounded-full border border-zinc-300 px-8 py-3 text-sm font-semibold text-zinc-800 transition hover:border-emerald-500 hover:text-emerald-800"
+            className="inline-flex rounded-full border border-zinc-300 px-8 py-3 text-sm font-semibold text-zinc-800 transition hover:border-primary-500 hover:text-primary-800"
           >
             Ver todo el catálogo
           </Link>

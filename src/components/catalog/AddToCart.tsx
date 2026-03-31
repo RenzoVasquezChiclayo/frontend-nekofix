@@ -48,7 +48,7 @@ export function AddToCart({ product }: Props) {
                 className={cn(
                   "rounded-full px-3 py-1.5 text-sm ring-1 transition",
                   color === c
-                    ? "bg-zinc-900 text-white ring-zinc-900"
+                    ? "bg-primary-900 text-white ring-primary-900"
                     : "bg-white text-zinc-700 ring-zinc-200 hover:ring-zinc-400"
                 )}
               >
@@ -71,7 +71,7 @@ export function AddToCart({ product }: Props) {
                 className={cn(
                   "rounded-full px-3 py-1.5 text-sm ring-1 transition",
                   storageGb === g
-                    ? "bg-zinc-900 text-white ring-zinc-900"
+                    ? "bg-primary-900 text-white ring-primary-900"
                     : "bg-white text-zinc-700 ring-zinc-200 hover:ring-zinc-400"
                 )}
               >
@@ -102,7 +102,7 @@ export function AddToCart({ product }: Props) {
         type="button"
         disabled={!canBuy}
         onClick={handleAdd}
-        className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white transition hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {canBuy ? (added ? "¡Agregado!" : "Agregar al carrito") : "Sin stock"}
       </button>

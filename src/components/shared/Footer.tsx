@@ -8,7 +8,7 @@ export function Footer() {
   const mailHref = `mailto:${SITE_CONTACT.email}`;
 
   return (
-    <footer className="border-t border-zinc-200 bg-zinc-50">
+    <footer className="border-t border-zinc-200/80 bg-accent-cool/10">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 md:grid-cols-3">
           <div>
@@ -51,7 +51,7 @@ export function Footer() {
               <li>
                 <a
                   href={waHref}
-                  className="text-emerald-700 underline hover:text-emerald-800"
+                  className="text-primary-700 underline hover:text-primary-800"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

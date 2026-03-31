@@ -10,7 +10,7 @@ export function ProductCard({ product: p }: Props) {
   return (
     <Link
       href={`/producto/${p.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:border-emerald-200 hover:shadow-md"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:border-primary-200 hover:shadow-md"
     >
       <div className="relative aspect-square bg-zinc-100">
         <Image
@@ -29,7 +29,7 @@ export function ProductCard({ product: p }: Props) {
         <h2 className="mt-1 flex-1 font-semibold text-zinc-900 line-clamp-2">
           {p.name}
         </h2>
-        <p className="mt-2 text-lg font-bold text-emerald-700">
+        <p className="mt-2 text-lg font-bold text-primary-700">
           {formatPrice(p.price, p.currency)}
         </p>
         {p.stock <= 3 && p.stock > 0 ? (
