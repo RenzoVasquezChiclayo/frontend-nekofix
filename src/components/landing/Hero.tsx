@@ -24,7 +24,7 @@ export function Hero() {
               href="/catalogo"
               className="inline-flex items-center justify-center rounded-full bg-primary-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-primary-500"
             >
-              Ver catálogo
+              Ver tienda
             </Link>
             <Link
               href="/contacto"

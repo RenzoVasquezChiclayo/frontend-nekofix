@@ -25,7 +25,12 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/catalogo" className="hover:text-zinc-900">
-                  Catálogo
+                  Tienda
+                </Link>
+              </li>
+              <li>
+                <Link href="/categorias" className="hover:text-zinc-900">
+                  Categorías
                 </Link>
               </li>
               <li>

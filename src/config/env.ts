@@ -14,7 +14,7 @@ function required(name: string, fallback?: string): string {
 }
 
 export const env = {
-  apiBaseUrl: required("NEXT_PUBLIC_API_URL", "http://localhost:3001/api"),
+  apiBaseUrl: required("NEXT_PUBLIC_API_URL", "http://localhost:3005/api"),
   siteUrl: required("NEXT_PUBLIC_SITE_URL", "http://localhost:3000"),
   whatsappNumber: required("NEXT_PUBLIC_WHATSAPP", "51917688459"),
   whatsappDefaultMessage: required(

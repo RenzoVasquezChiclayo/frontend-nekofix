@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { AppChrome } from "@/components/layouts/AppChrome";
+import { AdminAuthProvider } from "@/store/admin-auth-context";
 import { AuthProvider } from "@/store/auth-context";
 import { CartProvider } from "@/store/cart-context";
 import { SITE_NAME } from "@/lib/constants";
@@ -41,9 +42,11 @@ export default function RootLayout({
     <html lang="es" className={`h-full antialiased ${outfit.variable}`}>
       <body className="flex min-h-full flex-col font-sans">
         <AuthProvider>
-          <CartProvider>
-            <AppChrome>{children}</AppChrome>
-          </CartProvider>
+          <AdminAuthProvider>
+            <CartProvider>
+              <AppChrome>{children}</AppChrome>
+            </CartProvider>
+          </AdminAuthProvider>
         </AuthProvider>
       </body>
     </html>

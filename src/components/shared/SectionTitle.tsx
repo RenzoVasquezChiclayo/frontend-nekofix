@@ -28,7 +28,7 @@ export function SectionTitle({
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+      <h2 className="mt-2 text-3xl font-semibold tracking-tight text-primary-950 sm:text-4xl">
         {title}
       </h2>
       {subtitle ? (

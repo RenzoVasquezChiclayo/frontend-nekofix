@@ -8,7 +8,7 @@ export function Promotions() {
         <SectionTitle
           eyebrow="Promociones"
           title="Ofertas del mes"
-          subtitle="Cupones aplicables en checkout cuando el backend esté conectado."
+          subtitle="Stock real y condiciones publicadas en la tienda."
           className="[&_h2]:text-white [&_p]:text-white/85"
         />
         <div className="mt-10 flex flex-col items-center justify-between gap-6 rounded-2xl border border-white/10 bg-white/10 p-8 backdrop-blur sm:flex-row">
@@ -22,7 +22,7 @@ export function Promotions() {
             </p>
           </div>
           <Link
-            href="/catalogo?kind=seminuevo"
+            href="/catalogo?condition=SEMINUEVO"
             className="shrink-0 rounded-full bg-white px-8 py-3 text-sm font-semibold text-primary-900 transition hover:bg-accent-cool/20"
           >
             Ver seminuevos

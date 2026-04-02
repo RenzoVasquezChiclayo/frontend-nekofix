@@ -11,23 +11,37 @@ import {
 } from "react";
 import type { CartLine } from "@/types/order";
 
-const STORAGE_KEY = "nekofix-cart";
+const STORAGE_KEY = "nekofix-cart-v2";
 
 type CartState = { lines: CartLine[] };
 
 type Action =
   | { type: "ADD"; line: CartLine }
-  | { type: "REMOVE"; productId: string; color?: string; storageGb?: number }
-  | { type: "SET_QTY"; productId: string; quantity: number; color?: string; storageGb?: number }
+  | {
+      type: "REMOVE";
+      productId: string;
+      color?: string | null;
+      storage?: string | null;
+      condition?: CartLine["condition"];
+    }
+  | {
+      type: "SET_QTY";
+      productId: string;
+      quantity: number;
+      color?: string | null;
+      storage?: string | null;
+      condition?: CartLine["condition"];
+    }
   | { type: "CLEAR" }
   | { type: "HYDRATE"; lines: CartLine[] };
 
 function lineKey(p: {
   productId: string;
-  color?: string;
-  storageGb?: number;
+  color?: string | null;
+  storage?: string | null;
+  condition?: CartLine["condition"];
 }): string {
-  return [p.productId, p.color ?? "", p.storageGb ?? ""].join("::");
+  return [p.productId, p.color ?? "", p.storage ?? "", p.condition ?? ""].join("::");
 }
 
 function cartReducer(state: CartState, action: Action): CartState {
@@ -57,7 +71,8 @@ function cartReducer(state: CartState, action: Action): CartState {
             !(
               l.productId === action.productId &&
               (l.color ?? "") === (action.color ?? "") &&
-              (l.storageGb ?? 0) === (action.storageGb ?? 0)
+              (l.storage ?? "") === (action.storage ?? "") &&
+              l.condition === (action.condition ?? l.condition)
             )
         ),
       };
@@ -66,7 +81,8 @@ function cartReducer(state: CartState, action: Action): CartState {
         (l) =>
           l.productId === action.productId &&
           (l.color ?? "") === (action.color ?? "") &&
-          (l.storageGb ?? 0) === (action.storageGb ?? 0)
+          (l.storage ?? "") === (action.storage ?? "") &&
+          l.condition === (action.condition ?? l.condition)
       );
       if (idx === -1) return state;
       if (action.quantity <= 0) {
@@ -86,14 +102,16 @@ type CartContextValue = CartState & {
   addLine: (line: CartLine) => void;
   removeLine: (p: {
     productId: string;
-    color?: string;
-    storageGb?: number;
+    color?: string | null;
+    storage?: string | null;
+    condition?: CartLine["condition"];
   }) => void;
   setQuantity: (p: {
     productId: string;
     quantity: number;
-    color?: string;
-    storageGb?: number;
+    color?: string | null;
+    storage?: string | null;
+    condition?: CartLine["condition"];
   }) => void;
   clear: () => void;
   subtotal: number;
@@ -102,6 +120,22 @@ type CartContextValue = CartState & {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+function parseHydratedLines(raw: unknown): CartLine[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((item): item is CartLine => {
+    if (!item || typeof item !== "object") return false;
+    const o = item as Record<string, unknown>;
+    return (
+      typeof o.productId === "string" &&
+      typeof o.slug === "string" &&
+      typeof o.name === "string" &&
+      typeof o.unitPrice === "number" &&
+      typeof o.quantity === "number" &&
+      typeof o.condition === "string"
+    );
+  });
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { lines: [] });
 
@@ -109,8 +143,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as CartLine[];
-        if (Array.isArray(parsed)) dispatch({ type: "HYDRATE", lines: parsed });
+        const parsed = parseHydratedLines(JSON.parse(raw));
+        if (parsed.length) dispatch({ type: "HYDRATE", lines: parsed });
       }
     } catch {
       /* ignore */
@@ -130,7 +164,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const removeLine = useCallback(
-    (p: { productId: string; color?: string; storageGb?: number }) => {
+    (p: {
+      productId: string;
+      color?: string | null;
+      storage?: string | null;
+      condition?: CartLine["condition"];
+    }) => {
       dispatch({ type: "REMOVE", ...p });
     },
     []
@@ -140,8 +179,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (p: {
       productId: string;
       quantity: number;
-      color?: string;
-      storageGb?: number;
+      color?: string | null;
+      storage?: string | null;
+      condition?: CartLine["condition"];
     }) => {
       dispatch({ type: "SET_QTY", ...p });
     },
@@ -151,8 +191,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clear = useCallback(() => dispatch({ type: "CLEAR" }), []);
 
   const subtotal = useMemo(
-    () =>
-      state.lines.reduce((s, l) => s + l.unitPrice * l.quantity, 0),
+    () => state.lines.reduce((s, l) => s + l.unitPrice * l.quantity, 0),
     [state.lines]
   );
 
@@ -171,15 +210,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       subtotal,
       itemCount,
     }),
-    [
-      state,
-      addLine,
-      removeLine,
-      setQuantity,
-      clear,
-      subtotal,
-      itemCount,
-    ]
+    [state, addLine, removeLine, setQuantity, clear, subtotal, itemCount]
   );
 
   return (

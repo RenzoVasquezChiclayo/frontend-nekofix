@@ -1,4 +1,6 @@
-/** Checkout — alineable con DTOs del backend NestJS */
+import type { ProductCondition } from "@/types/product";
+
+/** Línea del carrito (persistencia local). Alineado a CartCheckoutItemPayload. */
 export interface CartLine {
   productId: string;
   slug: string;
@@ -6,10 +8,13 @@ export interface CartLine {
   unitPrice: number;
   quantity: number;
   image?: string;
-  /** Variantes seleccionadas */
-  color?: string;
-  storageGb?: number;
+  color?: string | null;
+  storage?: string | null;
+  condition: ProductCondition;
 }
+
+/** Alias explícito para documentación / payloads. */
+export type CartItem = CartLine;
 
 export interface CheckoutPayload {
   lines: CartLine[];

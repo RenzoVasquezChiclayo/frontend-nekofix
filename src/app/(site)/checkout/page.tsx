@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 export default function CheckoutPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Checkout</h1>
-      <p className="mt-2 text-zinc-600">
-        Revisa tu pedido y datos. El pedido se enviará al API NestJS.
+      <h1 className="text-3xl font-bold tracking-tight text-primary-950">Checkout</h1>
+      <p className="mt-2 text-sm text-zinc-500">
+        Confirmamos por WhatsApp. Opcionalmente deja tu teléfono para seguimiento.
       </p>
       <div className="mt-10">
         <CheckoutForm />
