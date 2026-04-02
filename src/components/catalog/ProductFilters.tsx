@@ -49,9 +49,12 @@ export function ProductFilters({ brands, categories, models, onNavigate }: Props
   const searchParams = useSearchParams();
   const type = searchParams.get("type") as ProductType | null;
   const condition = searchParams.get("condition") as ProductCondition | null;
-  const brand = searchParams.get("brand") ?? "";
-  const category = searchParams.get("category") ?? "";
-  const model = searchParams.get("model") ?? "";
+  const brandId = searchParams.get("brandId") ?? "";
+  const legacyBrandSlug = searchParams.get("brand") ?? "";
+  const categoryId = searchParams.get("categoryId") ?? "";
+  const legacyCategorySlug = searchParams.get("category") ?? "";
+  const modelId = searchParams.get("modelId") ?? "";
+  const legacyModelSlug = searchParams.get("model") ?? "";
   const featured = searchParams.get("featured") === "true";
   const minRef = useRef<HTMLInputElement>(null);
   const maxRef = useRef<HTMLInputElement>(null);
@@ -85,18 +88,18 @@ export function ProductFilters({ brands, categories, models, onNavigate }: Props
         </summary>
         <div className="mt-3 flex max-h-40 flex-col gap-1 overflow-y-auto">
           <FilterLink
-            href={`/catalogo?${mergeParams(searchParams, { category: undefined })}`}
+            href={`/catalogo?${mergeParams(searchParams, { categoryId: undefined, category: undefined })}`}
             onClick={onNavigate}
-            active={!category}
+            active={!categoryId && !legacyCategorySlug}
           >
             Todas
           </FilterLink>
           {categories.map((c) => (
             <FilterLink
               key={c.id}
-              href={`/catalogo?${mergeParams(searchParams, { category: c.slug })}`}
+              href={`/catalogo?${mergeParams(searchParams, { categoryId: c.id, category: undefined })}`}
               onClick={onNavigate}
-              active={category === c.slug}
+              active={categoryId === c.id}
             >
               {c.name}
             </FilterLink>
@@ -110,15 +113,17 @@ export function ProductFilters({ brands, categories, models, onNavigate }: Props
         </summary>
         <select
           className="mt-3 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-          value={brand}
+          value={brandId}
           onChange={(e) => {
             const v = e.target.value;
-            navigate(mergeParams(searchParams, { brand: v || undefined }));
+            navigate(
+              mergeParams(searchParams, { brandId: v || undefined, brand: undefined })
+            );
           }}
         >
           <option value="">Todas</option>
           {brands.map((b) => (
-            <option key={b.id} value={b.slug}>
+            <option key={b.id} value={b.id}>
               {b.name}
             </option>
           ))}
@@ -131,15 +136,17 @@ export function ProductFilters({ brands, categories, models, onNavigate }: Props
         </summary>
         <select
           className="mt-3 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-          value={model}
+          value={modelId}
           onChange={(e) => {
             const v = e.target.value;
-            navigate(mergeParams(searchParams, { model: v || undefined }));
+            navigate(
+              mergeParams(searchParams, { modelId: v || undefined, model: undefined })
+            );
           }}
         >
           <option value="">Todos</option>
           {models.map((m) => (
-            <option key={m.id} value={m.slug}>
+            <option key={m.id} value={m.id}>
               {m.name}
             </option>
           ))}

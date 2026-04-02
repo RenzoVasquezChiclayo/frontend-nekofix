@@ -87,12 +87,18 @@ export interface ProductListQuery {
   page?: number;
   limit?: number;
   search?: string;
-  /** slug de marca */
+  /** @deprecated Preferir `brandId`. Slug legacy en URLs antiguas. */
   brand?: string;
-  /** slug de categoría */
+  /** UUID de marca (filtro hacia el API). */
+  brandId?: string;
+  /** @deprecated Preferir `categoryId`. Slug legacy en URLs antiguas. */
   category?: string;
-  /** slug de modelo */
+  /** UUID de categoría (filtro real hacia el API). */
+  categoryId?: string;
+  /** @deprecated Preferir `modelId`. Slug legacy en URLs antiguas. */
   model?: string;
+  /** UUID de modelo de teléfono (filtro hacia el API). */
+  modelId?: string;
   type?: ProductType;
   condition?: ProductCondition;
   storage?: string;

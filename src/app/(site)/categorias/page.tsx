@@ -33,7 +33,7 @@ export default async function CategoriasPage() {
             return (
               <li key={c.id}>
                 <Link
-                  href={`/catalogo?category=${encodeURIComponent(c.slug)}`}
+                  href={`/catalogo?categoryId=${encodeURIComponent(c.id)}`}
                   className="flex flex-col rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-sm transition hover:border-primary-200 hover:shadow-md"
                 >
                   {c.icon?.startsWith("http") ? (

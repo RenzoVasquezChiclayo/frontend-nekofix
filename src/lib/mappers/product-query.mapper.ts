@@ -22,6 +22,7 @@ export type ProductQueryBackend = {
   brandId?: string;
   categoryId?: string;
   model?: string;
+  modelId?: string;
   type?: ProductType;
   condition?: ProductCondition;
   storage?: string;
@@ -38,8 +39,6 @@ export type ProductQueryBackend = {
  * Extiende el patrón base (page, limit, search) con ordenación y filtros de producto.
  */
 export type ProductFiltersInput = ProductListQuery & {
-  brandId?: string;
-  categoryId?: string;
   isPublished?: boolean;
   isFeatured?: boolean;
   lowStock?: boolean;
@@ -92,17 +91,32 @@ export function mapProductFiltersToQuery(
   const { sort: sortKey, featured, isFeatured, ...rest } = filters;
   const { sortBy, sortOrder } = mapSortUiToBackend(sortKey);
 
+  const categoryForApi =
+    rest.categoryId != null && rest.categoryId !== ""
+      ? undefined
+      : rest.category;
+
+  const brandForApi =
+    rest.brandId != null && rest.brandId !== "" ? undefined : rest.brand;
+
+  const modelForApi =
+    rest.modelId != null && rest.modelId !== "" ? undefined : rest.model;
+
   return toQueryParams({
     page: rest.page,
     limit: rest.limit,
     search: rest.search,
     sortBy,
     sortOrder,
-    brand: rest.brand,
-    category: rest.category,
-    brandId: rest.brandId,
-    categoryId: rest.categoryId,
-    model: rest.model,
+    brand: brandForApi,
+    category: categoryForApi,
+    brandId:
+      rest.brandId != null && rest.brandId !== "" ? rest.brandId : undefined,
+    categoryId:
+      rest.categoryId != null && rest.categoryId !== "" ? rest.categoryId : undefined,
+    model: modelForApi,
+    modelId:
+      rest.modelId != null && rest.modelId !== "" ? rest.modelId : undefined,
     type: rest.type,
     condition: rest.condition,
     storage: rest.storage,

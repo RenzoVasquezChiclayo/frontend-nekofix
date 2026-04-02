@@ -47,7 +47,7 @@ export async function getRelatedProducts(
 ): Promise<Product[]> {
   try {
     const byBrand = await getProducts({
-      brand: product.brand.slug,
+      brandId: product.brandId,
       limit: limit + 1,
       page: 1,
       sort: "newest",
@@ -55,7 +55,7 @@ export async function getRelatedProducts(
     const merged = byBrand.data.filter((p) => p.id !== product.id);
     if (merged.length >= limit) return merged.slice(0, limit);
     const byCat = await getProducts({
-      category: product.category.slug,
+      categoryId: product.categoryId,
       limit: limit + 1,
       page: 1,
       sort: "newest",

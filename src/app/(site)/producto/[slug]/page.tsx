@@ -57,7 +57,7 @@ export default async function ProductoPage({ params }: Props) {
         </Link>
         <span className="mx-2">/</span>
         <Link
-          href={`/catalogo?category=${encodeURIComponent(product.category.slug)}`}
+          href={`/catalogo?categoryId=${encodeURIComponent(product.category.id)}`}
           className="text-primary-600 transition hover:text-primary-800"
         >
           {product.category.name}

@@ -25,8 +25,11 @@ export function parseProductListQuery(
   sp: Record<string, string | string[] | undefined>
 ): ProductListQuery {
   const search = pick(sp, "search");
+  const brandId = pick(sp, "brandId");
   const brand = pick(sp, "brand");
+  const categoryId = pick(sp, "categoryId");
   const category = pick(sp, "category");
+  const modelId = pick(sp, "modelId");
   const model = pick(sp, "model");
   const typeRaw = pick(sp, "type");
   const conditionRaw = pick(sp, "condition");
@@ -72,9 +75,12 @@ export function parseProductListQuery(
 
   return {
     search,
-    brand,
-    category,
-    model,
+    brandId: brandId || undefined,
+    brand: brandId ? undefined : brand || undefined,
+    categoryId: categoryId || undefined,
+    category: categoryId ? undefined : category || undefined,
+    modelId: modelId || undefined,
+    model: modelId ? undefined : model || undefined,
     type,
     condition,
     storage,
