@@ -37,6 +37,15 @@ export interface PhoneModel {
   updatedAt?: string;
 }
 
+/** Imagen de galería de producto (relación `productImages` en backend). */
+export interface ProductImage {
+  id: string;
+  url: string;
+  alt?: string | null;
+  sortOrder: number;
+  isPrimary: boolean;
+}
+
 /** Producto con relaciones (respuesta típica del API). */
 export interface Product {
   id: string;
@@ -66,6 +75,8 @@ export interface Product {
   brand: Brand;
   category: Category;
   model?: PhoneModel | null;
+  /** Galería; puede faltar en respuestas antiguas del API. */
+  productImages?: ProductImage[];
 }
 
 /** Orden amigable (admin / catálogo). */

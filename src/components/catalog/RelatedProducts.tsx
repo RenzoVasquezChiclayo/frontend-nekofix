@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ProductBadges } from "@/components/store/ProductBadges";
-import { isLowStock, PRODUCT_PLACEHOLDER_IMAGE } from "@/lib/product-ui";
+import { getProductCoverImage } from "@/lib/product-images";
+import { isLowStock } from "@/lib/product-ui";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/types/product";
 
@@ -18,6 +19,7 @@ export function RelatedProducts({ products }: Props) {
       <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((p) => {
           const low = isLowStock(p.stock, p.minStock) && p.stock > 0;
+          const cover = getProductCoverImage(p);
           return (
             <li key={p.id}>
               <Link
@@ -26,10 +28,11 @@ export function RelatedProducts({ products }: Props) {
               >
                 <div className="relative h-24 w-24 shrink-0 bg-zinc-50">
                   <Image
-                    src={PRODUCT_PLACEHOLDER_IMAGE}
-                    alt=""
+                    src={cover.src}
+                    alt={cover.alt}
                     fill
                     className="object-contain p-2"
+                    unoptimized
                   />
                 </div>
                 <div className="min-w-0 flex-1">

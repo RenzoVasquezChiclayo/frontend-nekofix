@@ -4,7 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { ProductBadges } from "@/components/store/ProductBadges";
-import { isLowStock, PRODUCT_PLACEHOLDER_IMAGE } from "@/lib/product-ui";
+import { getProductCoverImage } from "@/lib/product-images";
+import { isLowStock } from "@/lib/product-ui";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
@@ -16,6 +17,7 @@ export function ProductCard({ product: p }: Props) {
   const { addLine } = useCart();
   const [added, setAdded] = useState(false);
   const canAdd = p.stock > 0;
+  const cover = getProductCoverImage(p);
 
   function handleAdd() {
     if (!canAdd) return;
@@ -25,6 +27,7 @@ export function ProductCard({ product: p }: Props) {
       name: p.name,
       unitPrice: p.price,
       quantity: 1,
+      image: cover.src,
       color: p.color,
       storage: p.storage,
       condition: p.condition,
@@ -40,11 +43,12 @@ export function ProductCard({ product: p }: Props) {
       <Link href={`/producto/${p.slug}`} className="block">
         <div className="relative aspect-[4/5] rounded-xl bg-zinc-50">
         <Image
-          src={PRODUCT_PLACEHOLDER_IMAGE}
-          alt={p.name}
+          src={cover.src}
+          alt={cover.alt}
           fill
           className="object-contain p-5 transition duration-300 group-hover:scale-[1.03]"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          unoptimized
         />
         <div className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)]">
           <ProductBadges type={p.type} condition={p.condition} lowStock={low} />

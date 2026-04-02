@@ -43,6 +43,7 @@ export function BrandLogo({ className, size = 36, decorative }: Props) {
       className={cn("h-9 w-9 shrink-0 object-contain", className)}
       priority
       onError={() => setFailed(true)}
+      unoptimized
     />
   );
 }

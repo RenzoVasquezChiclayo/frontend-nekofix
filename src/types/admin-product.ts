@@ -1,5 +1,13 @@
 import type { ProductCondition, ProductType } from "@/types/product";
 
+/** Payload de imágenes al crear/actualizar producto (`images` en el cuerpo). */
+export type ProductImagePayload = {
+  url: string;
+  alt?: string | null;
+  sortOrder: number;
+  isPrimary: boolean;
+};
+
 /** Crear producto — cuerpo POST /products */
 export interface ProductCreateInput {
   name: string;
@@ -23,6 +31,7 @@ export interface ProductCreateInput {
   isPublished: boolean;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  images?: ProductImagePayload[];
 }
 
 /** Actualizar producto — PATCH /products/:id */

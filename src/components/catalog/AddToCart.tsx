@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getProductCoverImage } from "@/lib/product-images";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
 
@@ -21,6 +22,7 @@ export function AddToCart({ product }: Props) {
       name: product.name,
       unitPrice: product.price,
       quantity: qty,
+      image: getProductCoverImage(product).src,
       color: product.color,
       storage: product.storage,
       condition: product.condition,

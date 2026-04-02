@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { ProductBadges } from "@/components/store/ProductBadges";
-import { isLowStock, PRODUCT_PLACEHOLDER_IMAGE } from "@/lib/product-ui";
+import { getProductCoverImage } from "@/lib/product-images";
+import { isLowStock } from "@/lib/product-ui";
 import { formatPrice, whatsappHref } from "@/lib/utils";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
@@ -27,6 +28,7 @@ export function FeaturedProductCard({ product: p }: Props) {
       name: p.name,
       unitPrice: p.price,
       quantity: 1,
+      image: getProductCoverImage(p).src,
       color: p.color,
       storage: p.storage,
       condition: p.condition,
@@ -36,16 +38,18 @@ export function FeaturedProductCard({ product: p }: Props) {
   }
 
   const waMsg = `Hola, consulto por: ${p.name} (SKU ${p.sku}) — ${formatPrice(p.price)}`;
+  const cover = getProductCoverImage(p);
 
   return (
     <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-sm transition hover:border-primary-200 hover:shadow-md">
       <Link href={`/producto/${p.slug}`} className="relative block aspect-square bg-zinc-50">
         <Image
-          src={PRODUCT_PLACEHOLDER_IMAGE}
-          alt={p.name}
+          src={cover.src}
+          alt={cover.alt}
           fill
           className="object-contain p-6 transition duration-300 group-hover:scale-[1.02]"
           sizes="(max-width: 640px) 100vw, 25vw"
+          unoptimized
         />
         <div className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)]">
           <ProductBadges type={p.type} condition={p.condition} lowStock={low} />

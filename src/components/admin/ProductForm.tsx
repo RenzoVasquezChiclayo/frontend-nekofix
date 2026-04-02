@@ -13,6 +13,12 @@ import { adminListBrands } from "@/services/admin/brand.service";
 import { adminListCategories } from "@/services/admin/category.service";
 import { getPhoneModels } from "@/services/phone-model.service";
 import { useAdminAuth } from "@/store/admin-auth-context";
+import {
+  draftsFromProductImages,
+  draftsToPayload,
+  ProductImagesEditor,
+  type ProductImageDraft,
+} from "@/components/admin/ProductImagesEditor";
 import { Loader } from "@/components/shared/Loader";
 import type { ProductCreateInput } from "@/types/admin-product";
 import type { Brand, Category, PhoneModel, ProductCondition, ProductType } from "@/types/product";
@@ -67,6 +73,7 @@ export function ProductForm({ productId }: Props) {
   const [isPublished, setIsPublished] = useState(true);
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
+  const [imageDrafts, setImageDrafts] = useState<ProductImageDraft[]>([]);
 
   const loadRefs = useCallback(async () => {
     if (!accessToken) return;
@@ -118,6 +125,7 @@ export function ProductForm({ productId }: Props) {
         setIsPublished(p.isPublished);
         setSeoTitle(p.seoTitle ?? "");
         setSeoDescription(p.seoDescription ?? "");
+        setImageDrafts(draftsFromProductImages(p.productImages));
       } catch (e) {
         if (!cancelled) setError(getApiErrorMessage(e));
       } finally {
@@ -132,9 +140,16 @@ export function ProductForm({ productId }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!accessToken) return;
+    if (imageDrafts.some((d) => d.uploading)) {
+      setError("Espera a que terminen las subidas de imágenes.");
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
+      const images = draftsToPayload(
+        imageDrafts.filter((d) => d.url.trim() && !d.uploading && !d.error)
+      );
       const payload: ProductCreateInput = {
         name: name.trim(),
         slug: slug.trim() || slugify(name),
@@ -157,6 +172,7 @@ export function ProductForm({ productId }: Props) {
         isPublished,
         seoTitle: seoTitle.trim() || null,
         seoDescription: seoDescription.trim() || null,
+        images,
       };
 
       if (!payload.brandId || !payload.categoryId) {
@@ -427,6 +443,15 @@ export function ProductForm({ productId }: Props) {
         </div>
       </section>
 
+      {accessToken ? (
+        <ProductImagesEditor
+          accessToken={accessToken}
+          defaultAltHint={name.trim() || "Producto"}
+          drafts={imageDrafts}
+          onChange={setImageDrafts}
+        />
+      ) : null}
+
       <section className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">SEO</h2>
         <div className="grid gap-4">
@@ -449,7 +474,7 @@ export function ProductForm({ productId }: Props) {
       <div className="flex flex-wrap gap-3 border-t border-zinc-100 pt-8">
         <button
           type="submit"
-          disabled={saving}
+          disabled={saving || imageDrafts.some((d) => d.uploading)}
           className="rounded-xl bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:opacity-50"
         >
           {saving ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear producto"}

@@ -38,9 +38,10 @@ export default function CarritoPage() {
             <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-zinc-50">
               <Image
                 src={line.image ?? PRODUCT_PLACEHOLDER_IMAGE}
-                alt=""
+                alt={line.name}
                 fill
                 className="object-contain p-2"
+                unoptimized
               />
             </div>
             <div className="min-w-0 flex-1">

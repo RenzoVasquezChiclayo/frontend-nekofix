@@ -32,10 +32,11 @@ export async function adminGetProduct(token: string, slugOrId: string): Promise<
 }
 
 export async function adminCreateProduct(token: string, body: ProductCreateInput): Promise<Product> {
-  return adminApiFetch<Product>("/products", token, {
+  const raw = await adminApiFetch<unknown>("/products", token, {
     method: "POST",
     body: JSON.stringify(body),
   });
+  return normalizeApiSingleResponse<Product>(raw);
 }
 
 export async function adminUpdateProduct(
@@ -43,10 +44,30 @@ export async function adminUpdateProduct(
   id: string,
   body: ProductUpdateInput
 ): Promise<Product> {
-  return adminApiFetch<Product>(`/products/${encodeURIComponent(id)}`, token, {
+  const raw = await adminApiFetch<unknown>(`/products/${encodeURIComponent(id)}`, token, {
     method: "PATCH",
     body: JSON.stringify(body),
   });
+  return normalizeApiSingleResponse<Product>(raw);
+}
+
+/** POST /products/upload-image — multipart `file` (jpg/png/webp). */
+export async function adminUploadProductImage(token: string, file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const raw = await adminApiFetch<unknown>("/products/upload-image", token, {
+    method: "POST",
+    body: formData,
+  });
+  const data = normalizeApiSingleResponse<{ url?: string }>(raw);
+  const url =
+    data && typeof data === "object" && "url" in data && typeof (data as { url: unknown }).url === "string"
+      ? (data as { url: string }).url
+      : null;
+  if (!url?.trim()) {
+    throw new Error("El servidor no devolvió una URL de imagen válida.");
+  }
+  return url.trim();
 }
 
 export async function adminDeleteProduct(token: string, id: string): Promise<void> {

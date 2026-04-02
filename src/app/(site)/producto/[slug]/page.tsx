@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/catalog/AddToCart";
+import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts";
 import { ProductBadges } from "@/components/store/ProductBadges";
-import { isLowStock, PRODUCT_PLACEHOLDER_IMAGE } from "@/lib/product-ui";
+import { env } from "@/config/env";
+import { getProductCoverImage } from "@/lib/product-images";
+import { isLowStock } from "@/lib/product-ui";
 import {
   PRODUCT_CONDITION_LABELS,
   PRODUCT_TYPE_LABELS,
@@ -16,18 +18,28 @@ import { formatPrice, whatsappHref } from "@/lib/utils";
 
 type Props = { params: Promise<{ slug: string }> };
 
+function absoluteOgImageUrl(src: string): string {
+  if (src.startsWith("http://") || src.startsWith("https://")) return src;
+  const base = env.siteUrl.replace(/\/$/, "");
+  const path = src.startsWith("/") ? src : `/${src}`;
+  return `${base}${path}`;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   try {
     const product = await getProductBySlug(slug);
     const title = product.seoTitle ?? product.name;
     const description = product.seoDescription ?? product.description ?? undefined;
+    const cover = getProductCoverImage(product);
+    const ogUrl = absoluteOgImageUrl(cover.src);
     return {
       title,
       description: description ?? undefined,
       openGraph: {
         title: product.name,
         description: description ?? undefined,
+        images: [{ url: ogUrl, alt: cover.alt }],
       },
     };
   } catch {
@@ -66,17 +78,8 @@ export default async function ProductoPage({ params }: Props) {
         <span className="text-primary-900">{product.name}</span>
       </nav>
 
-      <div className="mt-8 grid gap-12 lg:grid-cols-2 lg:gap-16">
-        <div className="relative aspect-square overflow-hidden rounded-3xl bg-primary-50/50 ring-1 ring-primary-100">
-          <Image
-            src={PRODUCT_PLACEHOLDER_IMAGE}
-            alt={product.name}
-            fill
-            className="object-contain p-10"
-            priority
-            sizes="(max-width: 1024px) 100vw, 50vw"
-          />
-        </div>
+      <div className="mt-8 grid gap-12 lg:grid-cols-2 lg:gap-16 lg:items-start">
+        <ProductGallery product={product} />
 
         <div>
           <ProductBadges
