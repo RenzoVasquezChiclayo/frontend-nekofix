@@ -10,30 +10,46 @@ function mediaOriginForImageConfig(): string {
 }
 
 /**
- * Orígenes desde los que `next/image` puede cargar `/uploads/**`.
- * No usa `NEXT_PUBLIC_API_URL` directamente (el API es `/api/*`; los estáticos no).
+ * Orígenes para `next/image`: medios del backend (`/uploads/**`), CDNs extra y servicios de placeholder.
+ * - Origen de medios: `NEXT_PUBLIC_MEDIA_URL` o, si falta, mismo host que el API sin sufijo `/api` (`NEXT_PUBLIC_API_URL`).
  */
 function imageRemotePatterns(): NonNullable<NonNullable<NextConfig["images"]>["remotePatterns"]> {
   const patterns: NonNullable<NonNullable<NextConfig["images"]>["remotePatterns"]> = [];
-  const pushOrigin = (href: string) => {
+  const seen = new Set<string>();
+
+  function pushUrl(href: string, pathname: string) {
     try {
       const u = new URL(href);
+      const port = u.port || "";
+      const key = `${u.protocol}//${u.hostname}:${port}:${pathname}`;
+      if (seen.has(key)) return;
+      seen.add(key);
       patterns.push({
         protocol: u.protocol.replace(":", "") as "http" | "https",
         hostname: u.hostname,
-        ...(u.port ? { port: u.port } : {}),
-        pathname: "/uploads/**",
+        ...(port ? { port } : {}),
+        pathname,
       });
     } catch {
       /* vacío */
     }
-  };
-  pushOrigin(mediaOriginForImageConfig());
+  }
+
+  pushUrl(mediaOriginForImageConfig(), "/uploads/**");
+  pushUrl("https://placehold.co", "/**");
+
   const extra = process.env.NEXT_PUBLIC_IMAGE_HOSTS;
   if (extra) {
     for (const part of extra.split(",")) {
       const t = part.trim();
-      if (t) pushOrigin(t.includes("://") ? t : `https://${t}`);
+      if (!t) continue;
+      const href = t.includes("://") ? t : `https://${t}`;
+      try {
+        if (new URL(href).hostname === "placehold.co") continue;
+      } catch {
+        continue;
+      }
+      pushUrl(href, "/uploads/**");
     }
   }
   return patterns;
