@@ -93,7 +93,11 @@ export type ProductSortLegacy = "relevance" | "price_asc" | "price_desc";
 
 export type ProductSortKey = ProductSortUI | ProductSortLegacy;
 
-/** Query params para GET /products (snake_case opcional según backend; usamos camelCase en TS y mapeamos al enviar). */
+/**
+ * Query params para GET /products (catálogo público).
+ * URLs pueden usar slugs (`brand`, `category`, `model`) o UUIDs; `mapProductFiltersToQuery` serializa ambos.
+ * El panel admin usa `AdminProductFiltersInput` y `mapAdminProductFiltersToQuery` (solo `brandId` / `categoryId` / `modelId`).
+ */
 export interface ProductListQuery {
   page?: number;
   limit?: number;

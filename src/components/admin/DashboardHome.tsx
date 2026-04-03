@@ -53,7 +53,7 @@ export function DashboardHome() {
         title="Dashboard"
         description="Resumen de inventario y publicación del catálogo."
       />
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {error ? (
           <p className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
             {error}

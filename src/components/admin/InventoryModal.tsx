@@ -47,14 +47,14 @@ export function InventoryModal({ accessToken, product, onClose, onSuccess }: Pro
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
       <button
         type="button"
         className="absolute inset-0 bg-zinc-900/40 backdrop-blur-sm"
         aria-label="Cerrar"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl">
+      <div className="relative z-10 max-h-[min(90dvh,800px)] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-zinc-200 bg-white p-5 shadow-xl sm:rounded-2xl sm:p-6">
         <h2 className="text-lg font-semibold text-primary-950">Mover inventario</h2>
         <p className="mt-1 text-sm text-zinc-600">
           <span className="font-medium text-zinc-800">{product.name}</span>
@@ -111,18 +111,18 @@ export function InventoryModal({ accessToken, product, onClose, onSuccess }: Pro
             <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-900">{result}</p>
           ) : null}
 
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end sm:gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+              className="touch-manipulation rounded-xl border border-zinc-200 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 sm:py-2"
             >
               Cerrar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50"
+              className="touch-manipulation rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50 sm:py-2"
             >
               {loading ? "Aplicando…" : "Registrar movimiento"}
             </button>

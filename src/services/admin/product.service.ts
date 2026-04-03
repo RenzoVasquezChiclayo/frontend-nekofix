@@ -1,16 +1,16 @@
 import type { ProductCreateInput, ProductUpdateInput } from "@/types/admin-product";
 import {
-  mapProductFiltersToQuery,
-  type ProductFiltersInput,
-} from "@/lib/mappers/product-query.mapper";
+  mapAdminProductFiltersToQuery,
+  type AdminProductFiltersInput,
+} from "@/lib/mappers/admin-product-query.mapper";
 import { normalizeApiListResponse } from "@/lib/normalize-api-list";
 import { normalizeApiSingleResponse } from "@/lib/normalize-api-single";
 import type { ApiListResponse } from "@/types/api";
 import type { Product, ProductCondition, ProductType } from "@/types/product";
 import { adminApiFetch } from "@/services/admin/client";
 
-/** Query del panel (alias de `ProductFiltersInput`). */
-export type AdminProductListQuery = ProductFiltersInput;
+/** Query del panel admin: solo IDs para marca/categoría/modelo (ver `mapAdminProductFiltersToQuery`). */
+export type AdminProductListQuery = AdminProductFiltersInput;
 
 export async function adminListProducts(
   token: string,
@@ -18,7 +18,7 @@ export async function adminListProducts(
 ): Promise<ApiListResponse<Product>> {
   const raw = await adminApiFetch<unknown>("/products", token, {
     method: "GET",
-    searchParams: mapProductFiltersToQuery(query),
+    searchParams: mapAdminProductFiltersToQuery(query),
   });
   return normalizeApiListResponse<Product>(raw);
 }

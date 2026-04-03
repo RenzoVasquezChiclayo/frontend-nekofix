@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import { adminListBrands } from "@/services/admin/brand.service";
 import {
   adminCreatePhoneModel,
@@ -57,8 +58,16 @@ export function PhoneModelModal({ open, accessToken, phoneModel, onClose, onSave
     async function loadBrands() {
       setLoadingBrands(true);
       try {
-        const res = await adminListBrands(accessToken, { page: 1, limit: 100, sort: "name_asc" });
-        if (!cancelled) setBrands(res.data);
+        const rows = await fetchAllAdminPages((p) =>
+          adminListBrands(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            sort: "newest",
+          })
+        );
+        if (!cancelled) {
+          setBrands(rows.sort((a, b) => a.name.localeCompare(b.name, "es")));
+        }
       } catch (err) {
         if (!cancelled) setError(getApiErrorMessage(err));
       } finally {

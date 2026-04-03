@@ -1,10 +1,12 @@
 export const SITE_NAME = "NekoFix";
 
+/** Máximo de productos relacionados en la ficha de producto (UI). */
+export const RELATED_PRODUCTS_DISPLAY_LIMIT = 8;
+
 export const NAV_LINKS = [
   { href: "/", label: "Inicio" },
-  { href: "/nosotros", label: "Nosotros" },
   { href: "/catalogo", label: "Tienda" },
-  { href: "/categorias", label: "Categorías" },
+  { href: "/nosotros", label: "Nosotros" },
   { href: "/contacto", label: "Contacto" },
 ] as const;
 

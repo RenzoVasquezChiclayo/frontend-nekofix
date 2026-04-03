@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import { adminListBrands } from "@/services/admin/brand.service";
 import {
   adminDeletePhoneModel,
@@ -33,7 +34,7 @@ export function PhoneModelsAdminView() {
   });
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [brand, setBrand] = useState("");
+  const [brandId, setBrandId] = useState("");
   const [sort, setSort] = useState<PhoneModelSortKey>("newest");
   const [brandOptions, setBrandOptions] = useState<Brand[]>([]);
 
@@ -51,7 +52,7 @@ export function PhoneModelsAdminView() {
         page,
         limit: PAGE_SIZE,
         search: search.trim() || undefined,
-        brand: brand || undefined,
+        brandId: brandId || undefined,
         sort,
       });
       setRows(res.data);
@@ -63,7 +64,7 @@ export function PhoneModelsAdminView() {
     } finally {
       setLoading(false);
     }
-  }, [accessToken, page, search, brand, sort]);
+  }, [accessToken, page, search, brandId, sort]);
 
   useEffect(() => {
     void load();
@@ -76,8 +77,16 @@ export function PhoneModelsAdminView() {
     let cancelled = false;
     async function loadBrands() {
       try {
-        const res = await adminListBrands(authToken, { page: 1, limit: 100, sort: "name_asc" });
-        if (!cancelled) setBrandOptions(res.data);
+        const rows = await fetchAllAdminPages((p) =>
+          adminListBrands(authToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            sort: "newest",
+          })
+        );
+        if (!cancelled) {
+          setBrandOptions(rows.sort((a, b) => a.name.localeCompare(b.name, "es")));
+        }
       } catch {
         if (!cancelled) setBrandOptions([]);
       }
@@ -130,7 +139,7 @@ export function PhoneModelsAdminView() {
           </button>
         }
       />
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-4 sm:p-6">
         {error ? (
           <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
             {error}
@@ -153,16 +162,16 @@ export function PhoneModelsAdminView() {
           <label className="min-w-[180px]">
             <span className="text-xs font-medium text-zinc-500">Marca</span>
             <select
-              value={brand}
+              value={brandId}
               onChange={(e) => {
                 setPage(1);
-                setBrand(e.target.value);
+                setBrandId(e.target.value);
               }}
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
             >
               <option value="">Todas</option>
               {brandOptions.map((b) => (
-                <option key={b.id} value={b.slug}>
+                <option key={b.id} value={b.id}>
                   {b.name}
                 </option>
               ))}
@@ -196,7 +205,43 @@ export function PhoneModelsAdminView() {
           </p>
         ) : (
           <>
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+            <ul className="space-y-3 lg:hidden">
+              {rows.map((m) => (
+                <li
+                  key={m.id}
+                  className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm"
+                >
+                  <p className="font-semibold text-zinc-900">{m.name}</p>
+                  <p className="mt-1 font-mono text-xs text-zinc-600">{m.slug}</p>
+                  <p className="mt-2 text-sm text-zinc-700">
+                    {m.brand?.name ?? brandOptions.find((b) => b.id === m.brandId)?.name ?? "—"}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {m.createdAt ? new Date(m.createdAt).toLocaleString("es-PE") : "—"}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2 border-t border-zinc-100 pt-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditing(m);
+                        setModalOpen(true);
+                      }}
+                      className="touch-manipulation rounded-lg bg-primary-50 px-4 py-2 text-xs font-semibold text-primary-800"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteId(m.id)}
+                      className="touch-manipulation rounded-lg px-4 py-2 text-xs font-semibold text-red-600"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="hidden overflow-hidden rounded-2xl border border-zinc-200 bg-white lg:block">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-zinc-100 bg-zinc-50/90 text-xs font-semibold uppercase tracking-wider text-zinc-500">
                   <tr>

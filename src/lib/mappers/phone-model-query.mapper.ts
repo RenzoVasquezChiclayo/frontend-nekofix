@@ -21,6 +21,7 @@ export type PhoneModelListFiltersInput = {
 
 export type PhoneModelSortBackend = Pick<PhoneModelQueryBackend, "sortBy" | "sortOrder">;
 
+/** Exportado para `mapAdminPhoneModelFiltersToQuery`. */
 export function mapPhoneModelSortUiToBackend(sort?: PhoneModelSortKey): PhoneModelSortBackend {
   switch (sort) {
     case "oldest":

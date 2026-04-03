@@ -10,8 +10,8 @@ export function LandingAdminView() {
         title="Landing CMS"
         description="Bloques de la página de inicio: textos, promos y secciones."
       />
-      <div className="space-y-6 p-6">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <div className="space-y-6 p-4 sm:p-6">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-6">
           <AdminPlaceholder
             embedded
             title="Landing CMS"

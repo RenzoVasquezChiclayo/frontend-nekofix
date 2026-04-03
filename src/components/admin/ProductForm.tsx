@@ -7,11 +7,11 @@ import {
   PRODUCT_TYPE_LABELS,
 } from "@/lib/catalog-labels";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { emptyListResponse } from "@/lib/normalize-api-list";
+import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import { adminCreateProduct, adminGetProduct, adminUpdateProduct } from "@/services/admin/product.service";
 import { adminListBrands } from "@/services/admin/brand.service";
 import { adminListCategories } from "@/services/admin/category.service";
-import { getPhoneModels } from "@/services/phone-model.service";
+import { adminListPhoneModels } from "@/services/admin/phone-model.service";
 import { useAdminAuth } from "@/store/admin-auth-context";
 import {
   draftsFromProductImages,
@@ -79,13 +79,31 @@ export function ProductForm({ productId }: Props) {
     if (!accessToken) return;
     try {
       const [b, c, m] = await Promise.all([
-        adminListBrands(accessToken),
-        adminListCategories(accessToken),
-        getPhoneModels().catch(() => emptyListResponse<PhoneModel>()),
+        fetchAllAdminPages((p) =>
+          adminListBrands(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            sort: "newest",
+          })
+        ),
+        fetchAllAdminPages((p) =>
+          adminListCategories(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            sort: "newest",
+          })
+        ),
+        fetchAllAdminPages((p) =>
+          adminListPhoneModels(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            sort: "newest",
+          })
+        ),
       ]);
-      setBrands(b.data);
-      setCategories(c.data);
-      setModels(m.data);
+      setBrands(b.sort((a, z) => a.name.localeCompare(z.name, "es")));
+      setCategories(c.sort((a, z) => a.name.localeCompare(z.name, "es")));
+      setModels(m.sort((a, z) => a.name.localeCompare(z.name, "es")));
     } catch {
       /* empty */
     }

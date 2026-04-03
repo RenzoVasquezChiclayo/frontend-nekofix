@@ -7,16 +7,27 @@ import { SITE_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useAdminAuth } from "@/store/admin-auth-context";
 
-export function AdminSidebar() {
+type SidebarProps = {
+  className?: string;
+  onNavigate?: () => void;
+};
+
+export function AdminSidebar({ className, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAdminAuth();
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-zinc-200 bg-white">
+    <aside
+      className={cn(
+        "flex h-full w-60 shrink-0 flex-col border-r border-zinc-200 bg-white",
+        className
+      )}
+    >
       <div className="border-b border-zinc-100 px-4 py-5">
         <Link
           href="/admin/dashboard"
+          onClick={() => onNavigate?.()}
           className="font-semibold tracking-tight text-primary-900"
         >
           Admin · {SITE_NAME}
@@ -38,8 +49,9 @@ export function AdminSidebar() {
             <Link
               key={href}
               href={href}
+              onClick={() => onNavigate?.()}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition",
+                "touch-manipulation flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition sm:py-2.5",
                 active
                   ? "bg-primary-50 text-primary-900"
                   : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
@@ -54,6 +66,7 @@ export function AdminSidebar() {
       <div className="space-y-1 border-t border-zinc-100 p-3">
         <Link
           href="/"
+          onClick={() => onNavigate?.()}
           className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-zinc-500 transition hover:bg-zinc-50 hover:text-zinc-800"
         >
           ← Ver sitio público

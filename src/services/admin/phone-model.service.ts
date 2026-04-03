@@ -1,7 +1,7 @@
 import {
-  mapPhoneModelFiltersToQuery,
-  type PhoneModelListFiltersInput,
-} from "@/lib/mappers/phone-model-query.mapper";
+  mapAdminPhoneModelFiltersToQuery,
+  type AdminPhoneModelListFiltersInput,
+} from "@/lib/mappers/admin-phone-model-query.mapper";
 import { normalizeApiListResponse } from "@/lib/normalize-api-list";
 import type { ApiListResponse } from "@/types/api";
 import type { PhoneModel } from "@/types/product";
@@ -22,11 +22,11 @@ export type PhoneModelInput = {
 
 export async function adminListPhoneModels(
   token: string,
-  filters: PhoneModelListFiltersInput = {}
+  filters: AdminPhoneModelListFiltersInput = {}
 ): Promise<ApiListResponse<AdminPhoneModel>> {
   const raw = await adminApiFetch<unknown>("/phone-models", token, {
     method: "GET",
-    searchParams: mapPhoneModelFiltersToQuery(filters),
+    searchParams: mapAdminPhoneModelFiltersToQuery(filters),
   });
   return normalizeApiListResponse<AdminPhoneModel>(raw);
 }
@@ -57,3 +57,5 @@ export async function adminDeletePhoneModel(token: string, id: string): Promise<
     method: "DELETE",
   });
 }
+
+export type { AdminPhoneModelListFiltersInput } from "@/lib/mappers/admin-phone-model-query.mapper";

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { CatalogLayout } from "@/components/catalog/CatalogLayout";
 import { parseProductListQuery } from "@/lib/catalog-query";
 import { emptyListResponse } from "@/lib/normalize-api-list";
@@ -34,8 +35,8 @@ export default async function CatalogoPage({
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 sm:py-14">
-      <header className="mb-10">
-        <h1 className="text-3xl font-semibold tracking-tight text-primary-950 sm:text-4xl">
+      <header className="mb-6 sm:mb-10">
+        <h1 className="text-2xl font-semibold tracking-tight text-primary-950 sm:text-3xl md:text-4xl">
           Tienda
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-500">
@@ -43,13 +44,15 @@ export default async function CatalogoPage({
           categoría, condición y más.
         </p>
       </header>
-      <CatalogLayout
-        products={result.data}
-        total={result.meta.total}
-        brands={brands}
-        categories={categories}
-        models={models}
-      />
+      <Suspense fallback={null}>
+        <CatalogLayout
+          products={result.data}
+          meta={result.meta}
+          brands={brands}
+          categories={categories}
+          models={models}
+        />
+      </Suspense>
     </div>
   );
 }

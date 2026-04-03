@@ -90,6 +90,6 @@ export function parseProductListQuery(
     featured,
     sort,
     page: Number.isFinite(page) && page! > 0 ? page : 1,
-    limit: Number.isFinite(limit) && limit! > 0 ? limit : 48,
+    limit: Number.isFinite(limit) && limit! > 0 ? limit : 12,
   };
 }

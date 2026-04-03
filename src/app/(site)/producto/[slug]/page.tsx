@@ -2,16 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/catalog/AddToCart";
+import { ProductDetailSpecs } from "@/components/catalog/ProductDetailSpecs";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts";
 import { ProductBadges } from "@/components/store/ProductBadges";
 import { env } from "@/config/env";
+import { RELATED_PRODUCTS_DISPLAY_LIMIT } from "@/lib/constants";
 import { getProductCoverImage } from "@/lib/product-images";
 import { isLowStock } from "@/lib/product-ui";
-import {
-  PRODUCT_CONDITION_LABELS,
-  PRODUCT_TYPE_LABELS,
-} from "@/lib/catalog-labels";
 import { getProductBySlug, getRelatedProducts } from "@/services/product.service";
 import { ApiError } from "@/services/api";
 import { formatPrice, whatsappHref } from "@/lib/utils";
@@ -57,13 +55,13 @@ export default async function ProductoPage({ params }: Props) {
     throw e;
   }
 
-  const related = await getRelatedProducts(product, 6);
+  const related = await getRelatedProducts(product, RELATED_PRODUCTS_DISPLAY_LIMIT);
   const low = isLowStock(product.stock, product.minStock) && product.stock > 0;
   const waMsg = `Hola, consulto por: ${product.name} (SKU ${product.sku}) — ${formatPrice(product.price)}`;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-      <nav className="text-xs font-medium text-zinc-500">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-14">
+      <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-zinc-500">
         <Link href="/catalogo" className="text-primary-600 transition hover:text-primary-800">
           Tienda
         </Link>
@@ -78,7 +76,7 @@ export default async function ProductoPage({ params }: Props) {
         <span className="text-primary-900">{product.name}</span>
       </nav>
 
-      <div className="mt-8 grid gap-12 lg:grid-cols-2 lg:gap-16 lg:items-start">
+      <div className="mt-6 grid gap-8 sm:mt-8 sm:gap-10 lg:grid-cols-2 lg:gap-16 lg:items-start">
         <ProductGallery product={product} />
 
         <div>
@@ -92,13 +90,13 @@ export default async function ProductoPage({ params }: Props) {
             {product.brand.name}
             {product.model ? ` · ${product.model.name}` : ""}
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl md:text-4xl">
             {product.name}
           </h1>
           <p className="mt-2 text-xs text-zinc-400">SKU {product.sku}</p>
 
-          <div className="mt-8 flex flex-wrap items-baseline gap-3">
-            <span className="text-3xl font-semibold text-primary-800">
+          <div className="mt-6 flex flex-wrap items-baseline gap-3 sm:mt-8">
+            <span className="text-2xl font-semibold text-primary-800 sm:text-3xl">
               {formatPrice(product.price)}
             </span>
             {product.comparePrice != null && product.comparePrice > product.price ? (
@@ -108,56 +106,15 @@ export default async function ProductoPage({ params }: Props) {
             ) : null}
           </div>
 
-          <dl className="mt-8 grid gap-3 text-sm text-zinc-600 sm:grid-cols-2">
-            <div>
-              <dt className="text-zinc-400">Stock</dt>
-              <dd className="font-medium text-zinc-800">{product.stock}</dd>
-            </div>
-            <div>
-              <dt className="text-zinc-400">Tipo</dt>
-              <dd className="font-medium text-zinc-800">
-                {PRODUCT_TYPE_LABELS[product.type]}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-zinc-400">Condición</dt>
-              <dd className="font-medium text-zinc-800">
-                {PRODUCT_CONDITION_LABELS[product.condition]}
-              </dd>
-            </div>
-            {product.storage ? (
-              <div>
-                <dt className="text-zinc-400">Almacenamiento</dt>
-                <dd className="font-medium text-zinc-800">{product.storage}</dd>
-              </div>
-            ) : null}
-            {product.color ? (
-              <div>
-                <dt className="text-zinc-400">Color</dt>
-                <dd className="font-medium text-zinc-800">{product.color}</dd>
-              </div>
-            ) : null}
-            {product.batteryHealth != null ? (
-              <div>
-                <dt className="text-zinc-400">Batería</dt>
-                <dd className="font-medium text-zinc-800">{product.batteryHealth}%</dd>
-              </div>
-            ) : null}
-            {product.grade ? (
-              <div>
-                <dt className="text-zinc-400">Grado</dt>
-                <dd className="font-medium text-zinc-800">{product.grade}</dd>
-              </div>
-            ) : null}
-          </dl>
+          <ProductDetailSpecs product={product} />
 
-          <div className="mt-10 space-y-3">
+          <div className="mt-8 space-y-3 sm:mt-10">
             <AddToCart product={product} />
             <a
               href={whatsappHref(waMsg)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-full items-center justify-center rounded-full border border-primary-200 py-3.5 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
+              className="flex min-h-12 w-full items-center justify-center rounded-full border border-primary-200 py-3.5 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
             >
               Comprar por WhatsApp
             </a>

@@ -10,9 +10,13 @@ import { formatPrice, whatsappHref } from "@/lib/utils";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
 
-type Props = { product: Product };
+type Props = {
+  product: Product;
+  /** Override para `next/image` sizes (p. ej. carrusel) */
+  imageSizes?: string;
+};
 
-export function FeaturedProductCard({ product: p }: Props) {
+export function FeaturedProductCard({ product: p, imageSizes }: Props) {
   const { addLine } = useCart();
   const [added, setAdded] = useState(false);
   const low = isLowStock(p.stock, p.minStock) && p.stock > 0;
@@ -48,7 +52,9 @@ export function FeaturedProductCard({ product: p }: Props) {
           alt={cover.alt}
           fill
           className="object-contain p-6 transition duration-300 group-hover:scale-[1.02]"
-          sizes="(max-width: 640px) 100vw, 25vw"
+          sizes={
+            imageSizes ?? "(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+          }
           unoptimized
         />
         <div className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)]">

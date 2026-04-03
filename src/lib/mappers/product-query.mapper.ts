@@ -71,7 +71,8 @@ export function mapSortUiToBackend(sort?: ProductSortKey): ProductSortBackend {
   }
 }
 
-function normalizeFeatured(
+/** Usado también por `mapAdminProductFiltersToQuery`. */
+export function normalizeFeatured(
   featured: ProductFiltersInput["featured"],
   isFeatured: ProductFiltersInput["isFeatured"]
 ): boolean | undefined {

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   PRODUCT_CONDITION_LABELS,
   PRODUCT_TYPE_LABELS,
@@ -15,6 +15,9 @@ import {
   filterProductsClient,
   type AdminProductListQuery,
 } from "@/services/admin/product.service";
+import { adminListBrands } from "@/services/admin/brand.service";
+import { adminListCategories } from "@/services/admin/category.service";
+import { adminListPhoneModels, type AdminPhoneModel } from "@/services/admin/phone-model.service";
 import { useAdminAuth } from "@/store/admin-auth-context";
 import { AdminHeader } from "@/components/admin/Header";
 import { ConfirmModal } from "@/components/admin/ConfirmModal";
@@ -22,8 +25,9 @@ import { InventoryModal } from "@/components/admin/InventoryModal";
 import { ProductTable } from "@/components/admin/ProductTable";
 import { Pagination } from "@/components/admin/Pagination";
 import { Loader } from "@/components/shared/Loader";
+import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import type { PaginationMeta } from "@/types/api";
-import type { Product, ProductCondition, ProductType } from "@/types/product";
+import type { Brand, Category, Product, ProductCondition, ProductType } from "@/types/product";
 
 const PAGE_SIZE = 15;
 
@@ -41,16 +45,63 @@ export function ProductsAdminView() {
   const [page, setPage] = useState(1);
 
   const [search, setSearch] = useState("");
-  const [brand, setBrand] = useState("");
-  const [category, setCategory] = useState("");
+  const [brandId, setBrandId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [modelId, setModelId] = useState("");
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [phoneModels, setPhoneModels] = useState<AdminPhoneModel[]>([]);
   const [type, setType] = useState<ProductType | "">("");
   const [condition, setCondition] = useState<ProductCondition | "">("");
   const [lowStock, setLowStock] = useState(false);
   const [featuredOnly, setFeaturedOnly] = useState(false);
 
+  const modelsForSelect = useMemo(() => {
+    if (!brandId) return phoneModels;
+    return phoneModels.filter((m) => m.brandId === brandId);
+  }, [phoneModels, brandId]);
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [inventoryProduct, setInventoryProduct] = useState<Product | null>(null);
+
+  const loadRefs = useCallback(async () => {
+    if (!accessToken) return;
+    try {
+      const [b, c, m] = await Promise.all([
+        fetchAllAdminPages((p) =>
+          adminListBrands(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            sort: "newest",
+          })
+        ),
+        fetchAllAdminPages((p) =>
+          adminListCategories(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            sort: "newest",
+          })
+        ),
+        fetchAllAdminPages((p) =>
+          adminListPhoneModels(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            sort: "newest",
+          })
+        ),
+      ]);
+      setBrands([...b].sort((a, z) => a.name.localeCompare(z.name, "es")));
+      setCategories([...c].sort((a, z) => a.name.localeCompare(z.name, "es")));
+      setPhoneModels([...m].sort((a, z) => a.name.localeCompare(z.name, "es")));
+    } catch {
+      /* refs opcionales */
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    void loadRefs();
+  }, [loadRefs]);
 
   const load = useCallback(async () => {
     if (!accessToken) return;
@@ -61,8 +112,9 @@ export function ProductsAdminView() {
         page,
         limit: PAGE_SIZE,
         search: search.trim() || undefined,
-        brand: brand || undefined,
-        category: category || undefined,
+        brandId: brandId || undefined,
+        categoryId: categoryId || undefined,
+        modelId: modelId || undefined,
         type: type || undefined,
         condition: condition || undefined,
         sort: "newest",
@@ -90,8 +142,9 @@ export function ProductsAdminView() {
     accessToken,
     page,
     search,
-    brand,
-    category,
+    brandId,
+    categoryId,
+    modelId,
     type,
     condition,
     lowStock,
@@ -150,7 +203,7 @@ export function ProductsAdminView() {
           </Link>
         }
       />
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-4 sm:p-6">
         {error ? (
           <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
             {error}
@@ -170,29 +223,65 @@ export function ProductsAdminView() {
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             />
           </label>
-          <label className="min-w-[120px]">
-            <span className="text-xs font-medium text-zinc-500">Marca (slug)</span>
-            <input
-              value={brand}
+          <label className="min-w-[160px]">
+            <span className="text-xs font-medium text-zinc-500">Marca</span>
+            <select
+              value={brandId}
               onChange={(e) => {
                 setPage(1);
-                setBrand(e.target.value);
+                const next = e.target.value;
+                setBrandId(next);
+                setModelId((prev) => {
+                  if (!next || !prev) return "";
+                  const ok = phoneModels.some((mod) => mod.id === prev && mod.brandId === next);
+                  return ok ? prev : "";
+                });
               }}
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-              placeholder="apple"
-            />
+            >
+              <option value="">Todas</option>
+              {brands.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
           </label>
-          <label className="min-w-[120px]">
-            <span className="text-xs font-medium text-zinc-500">Categoría (slug)</span>
-            <input
-              value={category}
+          <label className="min-w-[160px]">
+            <span className="text-xs font-medium text-zinc-500">Categoría</span>
+            <select
+              value={categoryId}
               onChange={(e) => {
                 setPage(1);
-                setCategory(e.target.value);
+                setCategoryId(e.target.value);
               }}
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
-              placeholder="smartphones"
-            />
+            >
+              <option value="">Todas</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="min-w-[180px]">
+            <span className="text-xs font-medium text-zinc-500">Modelo</span>
+            <select
+              value={modelId}
+              onChange={(e) => {
+                setPage(1);
+                setModelId(e.target.value);
+              }}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            >
+              <option value="">Todos</option>
+              {modelsForSelect.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="min-w-[130px]">
             <span className="text-xs font-medium text-zinc-500">Tipo</span>
