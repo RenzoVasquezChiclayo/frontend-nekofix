@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { BRAND_LOGO_PATH } from "@/config/theme";
+import { BRAND_LOGO_PATH, BRAND_WORDMARK_PATH } from "@/config/theme";
 import { SITE_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +53,40 @@ export function BrandLogoWithTitle({ className }: { className?: string }) {
       <BrandLogo decorative />
       <span className="font-black tracking-tight text-zinc-900">{SITE_NAME}</span>
     </span>
+  );
+}
+
+type WordmarkProps = {
+  className?: string;
+  priority?: boolean;
+};
+
+/**
+ * Título gráfico (`public/brand/logo2.png`). Si falla la carga, muestra el nombre en texto.
+ */
+export function BrandWordmark({ className, priority = false }: WordmarkProps) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <span className={cn("font-black tracking-tight text-zinc-900", className)}>{SITE_NAME}</span>
+    );
+  }
+
+  return (
+    <Image
+      src={BRAND_WORDMARK_PATH}
+      alt={SITE_NAME}
+      width={240}
+      height={64}
+      className={cn(
+        "h-9 w-auto max-w-[min(240px,100%)] object-contain object-left sm:h-10",
+        className
+      )}
+      priority={priority}
+      onError={() => setFailed(true)}
+      unoptimized
+    />
   );
 }
 

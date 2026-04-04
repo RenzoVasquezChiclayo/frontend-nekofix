@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ADMIN_PHONE_MODEL_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { notifyApiError, notifySuccess } from "@/lib/toast";
+import { notifyApiError, notifyError, notifySuccess } from "@/lib/toast";
+import { ApiError } from "@/services/api";
 import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import { adminListBrands } from "@/services/admin/brand.service";
 import {
@@ -103,8 +105,13 @@ export function PhoneModelModal({ open, accessToken, phoneModel, onClose, onSave
       onSaved();
       onClose();
     } catch (err) {
-      setError(getApiErrorMessage(err));
-      notifyApiError(err);
+      if (err instanceof ApiError && err.status === 404) {
+        setError(ADMIN_PHONE_MODEL_NOT_FOUND_MESSAGE);
+        notifyError(ADMIN_PHONE_MODEL_NOT_FOUND_MESSAGE);
+      } else {
+        setError(getApiErrorMessage(err));
+        notifyApiError(err);
+      }
     } finally {
       setLoading(false);
     }

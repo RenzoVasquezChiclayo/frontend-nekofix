@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { ADMIN_INVENTORY_PRODUCT_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { notifyApiError, notifySuccess } from "@/lib/toast";
+import { notifyApiError, notifyError, notifySuccess } from "@/lib/toast";
+import { ApiError } from "@/services/api";
 import { adminMoveInventory } from "@/services/admin/inventory.service";
 import { INVENTORY_MOVE_LABELS, type InventoryMoveType } from "@/types/inventory";
 import type { Product } from "@/types/product";
@@ -42,8 +44,13 @@ export function InventoryModal({ accessToken, product, onClose, onSuccess }: Pro
       notifySuccess("Inventario actualizado correctamente");
       onSuccess();
     } catch (err) {
-      setError(getApiErrorMessage(err));
-      notifyApiError(err, "No se pudo actualizar el inventario.");
+      if (err instanceof ApiError && err.status === 404) {
+        setError(ADMIN_INVENTORY_PRODUCT_NOT_FOUND_MESSAGE);
+        notifyError(ADMIN_INVENTORY_PRODUCT_NOT_FOUND_MESSAGE);
+      } else {
+        setError(getApiErrorMessage(err));
+        notifyApiError(err, "No se pudo actualizar el inventario.");
+      }
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ADMIN_BRAND_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { notifyApiError, notifySuccess } from "@/lib/toast";
+import { notifyApiError, notifyError, notifySuccess } from "@/lib/toast";
+import { ApiError } from "@/services/api";
 import { adminCreateBrand, adminUpdateBrand } from "@/services/admin/brand.service";
 import type { Brand } from "@/types/product";
 import type { BrandInput } from "@/services/admin/brand.service";
@@ -67,8 +69,13 @@ export function BrandModal({ open, accessToken, brand, onClose, onSaved }: Props
       onSaved();
       onClose();
     } catch (err) {
-      setError(getApiErrorMessage(err));
-      notifyApiError(err);
+      if (err instanceof ApiError && err.status === 404) {
+        setError(ADMIN_BRAND_NOT_FOUND_MESSAGE);
+        notifyError(ADMIN_BRAND_NOT_FOUND_MESSAGE);
+      } else {
+        setError(getApiErrorMessage(err));
+        notifyApiError(err);
+      }
     } finally {
       setLoading(false);
     }

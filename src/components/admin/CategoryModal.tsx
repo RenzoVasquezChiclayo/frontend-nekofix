@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ADMIN_CATEGORY_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { notifyApiError, notifySuccess } from "@/lib/toast";
+import { notifyApiError, notifyError, notifySuccess } from "@/lib/toast";
+import { ApiError } from "@/services/api";
 import { adminCreateCategory, adminUpdateCategory } from "@/services/admin/category.service";
 import type { Category } from "@/types/product";
 import type { CategoryInput } from "@/services/admin/category.service";
@@ -67,8 +69,13 @@ export function CategoryModal({ open, accessToken, category, onClose, onSaved }:
       onSaved();
       onClose();
     } catch (err) {
-      setError(getApiErrorMessage(err));
-      notifyApiError(err);
+      if (err instanceof ApiError && err.status === 404) {
+        setError(ADMIN_CATEGORY_NOT_FOUND_MESSAGE);
+        notifyError(ADMIN_CATEGORY_NOT_FOUND_MESSAGE);
+      } else {
+        setError(getApiErrorMessage(err));
+        notifyApiError(err);
+      }
     } finally {
       setLoading(false);
     }

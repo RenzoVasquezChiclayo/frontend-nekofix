@@ -27,6 +27,10 @@ export const metadata: Metadata = {
   },
   description:
     "Especialistas en iPhone y Android. Reparación, equipos nuevos y seminuevos, accesorios. Cotiza por WhatsApp.",
+  icons: {
+    icon: [{ url: "/brand/logo.png", type: "image/png" }],
+    apple: [{ url: "/brand/logo.png", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     locale: "es_MX",

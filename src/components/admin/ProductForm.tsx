@@ -6,13 +6,20 @@ import {
   PRODUCT_CONDITION_LABELS,
   PRODUCT_TYPE_LABELS,
 } from "@/lib/catalog-labels";
+import { ADMIN_PRODUCT_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
+import { coerceAdminProductForForm } from "@/lib/coerce-admin-product";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { notifyApiError, notifySuccess, notifyWarning } from "@/lib/toast";
+import { notifyApiError, notifyError, notifySuccess, notifyWarning } from "@/lib/toast";
 import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
-import { adminCreateProduct, adminGetProduct, adminUpdateProduct } from "@/services/admin/product.service";
+import {
+  adminCreateProduct,
+  adminGetProductById,
+  adminUpdateProduct,
+} from "@/services/admin/product.service";
 import { adminListBrands } from "@/services/admin/brand.service";
 import { adminListCategories } from "@/services/admin/category.service";
 import { adminListPhoneModels } from "@/services/admin/phone-model.service";
+import { ApiError } from "@/services/api";
 import { useAdminAuth } from "@/store/admin-auth-context";
 import {
   draftsFromProductImages,
@@ -20,9 +27,11 @@ import {
   ProductImagesEditor,
   type ProductImageDraft,
 } from "@/components/admin/ProductImagesEditor";
-import { Loader } from "@/components/shared/Loader";
+import { ProductFormSkeleton } from "@/components/admin/ProductFormSkeleton";
 import type { ProductCreateInput } from "@/types/admin-product";
 import type { Brand, Category, PhoneModel, ProductCondition, ProductType } from "@/types/product";
+
+type EditLoadPhase = "loading" | "ready" | "not_found" | "load_error";
 
 const TYPES = Object.keys(PRODUCT_TYPE_LABELS) as ProductType[];
 const CONDITIONS = Object.keys(PRODUCT_CONDITION_LABELS) as ProductCondition[];
@@ -45,7 +54,8 @@ export function ProductForm({ productId }: Props) {
   const { accessToken } = useAdminAuth();
   const isEdit = Boolean(productId);
 
-  const [loading, setLoading] = useState(isEdit);
+  const [editPhase, setEditPhase] = useState<EditLoadPhase>(() => (isEdit ? "loading" : "ready"));
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -115,14 +125,27 @@ export function ProductForm({ productId }: Props) {
   }, [loadRefs]);
 
   useEffect(() => {
-    if (!isEdit || !accessToken || !productId) return;
+    if (!isEdit) {
+      setEditPhase("ready");
+      return;
+    }
+    if (!productId) {
+      setEditPhase("not_found");
+      return;
+    }
+    if (!accessToken) {
+      setEditPhase("loading");
+      return;
+    }
+
     let cancelled = false;
     (async () => {
-      setLoading(true);
+      setEditPhase("loading");
       setError(null);
       try {
-        const p = await adminGetProduct(accessToken, productId);
+        const raw = await adminGetProductById(accessToken, productId);
         if (cancelled) return;
+        const p = coerceAdminProductForForm(raw);
         setName(p.name);
         setSlug(p.slug);
         setSku(p.sku);
@@ -145,20 +168,31 @@ export function ProductForm({ productId }: Props) {
         setSeoTitle(p.seoTitle ?? "");
         setSeoDescription(p.seoDescription ?? "");
         setImageDrafts(draftsFromProductImages(p.productImages));
+        setEditPhase("ready");
       } catch (e) {
-        if (!cancelled) {
-          const m = getApiErrorMessage(e);
-          setError(m);
-          notifyApiError(e);
+        if (cancelled) return;
+        if (e instanceof ApiError && e.status === 404) {
+          notifyError(ADMIN_PRODUCT_NOT_FOUND_MESSAGE);
+          setEditPhase("not_found");
+          return;
         }
-      } finally {
-        if (!cancelled) setLoading(false);
+        setError(getApiErrorMessage(e));
+        notifyApiError(e);
+        setEditPhase("load_error");
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [isEdit, accessToken, productId]);
+  }, [isEdit, accessToken, productId, loadAttempt]);
+
+  useEffect(() => {
+    if (editPhase !== "not_found") return;
+    const t = window.setTimeout(() => {
+      router.replace("/admin/products");
+    }, 2200);
+    return () => window.clearTimeout(t);
+  }, [editPhase, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -214,6 +248,11 @@ export function ProductForm({ productId }: Props) {
       router.push("/admin/products");
       router.refresh();
     } catch (err) {
+      if (isEdit && err instanceof ApiError && err.status === 404) {
+        notifyError(ADMIN_PRODUCT_NOT_FOUND_MESSAGE);
+        setEditPhase("not_found");
+        return;
+      }
       setError(getApiErrorMessage(err));
       notifyApiError(err);
     } finally {
@@ -221,10 +260,49 @@ export function ProductForm({ productId }: Props) {
     }
   }
 
-  if (loading) {
+  if (isEdit && editPhase === "loading") {
+    return <ProductFormSkeleton />;
+  }
+
+  if (isEdit && editPhase === "not_found") {
     return (
-      <div className="flex min-h-[320px] items-center justify-center">
-        <Loader label="Cargando producto…" />
+      <div className="mx-auto max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm">
+        <p className="text-base font-medium text-zinc-900">{ADMIN_PRODUCT_NOT_FOUND_MESSAGE}</p>
+        <p className="mt-2 text-sm text-zinc-500">
+          Serás redirigido al listado de productos en unos segundos.
+        </p>
+        <button
+          type="button"
+          onClick={() => router.replace("/admin/products")}
+          className="mt-6 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+        >
+          Ir al listado ahora
+        </button>
+      </div>
+    );
+  }
+
+  if (isEdit && editPhase === "load_error") {
+    return (
+      <div className="mx-auto max-w-lg rounded-2xl border border-red-200 bg-red-50/80 p-8 shadow-sm">
+        <p className="text-sm font-medium text-red-900">No se pudo cargar el producto</p>
+        {error ? <p className="mt-2 text-sm text-red-800">{error}</p> : null}
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => setLoadAttempt((n) => n + 1)}
+            className="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+          >
+            Reintentar
+          </button>
+          <button
+            type="button"
+            onClick={() => router.replace("/admin/products")}
+            className="rounded-xl border border-zinc-200 bg-white px-5 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+          >
+            Volver al listado
+          </button>
+        </div>
       </div>
     );
   }
