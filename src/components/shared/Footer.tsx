@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandWordmark } from "@/components/shared/BrandLogo";
 import { SITE_NAME } from "@/lib/constants";
 import { SITE_CONTACT, SITE_TAGLINE } from "@/lib/site-contact";
 
@@ -12,8 +13,8 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 md:grid-cols-3">
           <div>
-            <p className="font-semibold text-zinc-900">{SITE_NAME}</p>
-            <p className="mt-2 text-sm text-zinc-600">{SITE_TAGLINE}</p>
+            <BrandWordmark className="object-left" />
+            <p className="mt-3 text-sm text-zinc-600">{SITE_TAGLINE}</p>
           </div>
           <div>
             <p className="text-sm font-medium text-zinc-900">Enlaces</p>

@@ -96,7 +96,8 @@ export type ProductSortKey = ProductSortUI | ProductSortLegacy;
 /**
  * Query params para GET /products (catálogo público).
  * URLs pueden usar slugs (`brand`, `category`, `model`) o UUIDs; `mapProductFiltersToQuery` serializa ambos.
- * El panel admin usa `AdminProductFiltersInput` y `mapAdminProductFiltersToQuery` (solo `brandId` / `categoryId` / `modelId`).
+ * El panel admin usa `AdminProductFiltersInput` y `mapAdminProductFiltersToQuery`
+ * (`brandId` / `categoryId` / `modelId`; sin `id` en query: el API no lo soporta).
  */
 export interface ProductListQuery {
   page?: number;

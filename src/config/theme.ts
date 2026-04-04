@@ -23,3 +23,6 @@ export const BRAND_COLORS = {
 
 /** Logo PNG en `public/brand/logo.png` (añadir el archivo en esa carpeta). */
 export const BRAND_LOGO_PATH = "/brand/logo.png" as const;
+
+/** Wordmark / título gráfico en `public/brand/logo2.png`. */
+export const BRAND_WORDMARK_PATH = "/brand/logo2.png" as const;

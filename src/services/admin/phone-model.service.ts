@@ -2,9 +2,12 @@ import {
   mapAdminPhoneModelFiltersToQuery,
   type AdminPhoneModelListFiltersInput,
 } from "@/lib/mappers/admin-phone-model-query.mapper";
+import { ADMIN_PHONE_MODEL_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { normalizeApiListResponse } from "@/lib/normalize-api-list";
+import { normalizeApiSingleResponse } from "@/lib/normalize-api-single";
 import type { ApiListResponse } from "@/types/api";
 import type { PhoneModel } from "@/types/product";
+import { ApiError } from "@/services/api";
 import { adminApiFetch } from "@/services/admin/client";
 
 export type AdminPhoneModel = PhoneModel & {
@@ -29,6 +32,29 @@ export async function adminListPhoneModels(
     searchParams: mapAdminPhoneModelFiltersToQuery(filters),
   });
   return normalizeApiListResponse<AdminPhoneModel>(raw);
+}
+
+/** `GET /phone-models/:id` — panel admin por UUID. */
+export async function adminGetPhoneModel(
+  token: string,
+  phoneModelId: string
+): Promise<AdminPhoneModel> {
+  let notFound: ApiError | undefined;
+  try {
+    const raw = await adminApiFetch<unknown>(
+      `/phone-models/${encodeURIComponent(phoneModelId)}`,
+      token,
+      { method: "GET" }
+    );
+    return normalizeApiSingleResponse<AdminPhoneModel>(raw);
+  } catch (e) {
+    if (!(e instanceof ApiError) || e.status !== 404) throw e;
+    notFound = e;
+  }
+  const list = await adminListPhoneModels(token, { search: phoneModelId, limit: 50, page: 1 });
+  const hit = list.data.find((m) => m.id === phoneModelId);
+  if (hit) return hit;
+  throw new ApiError(ADMIN_PHONE_MODEL_NOT_FOUND_MESSAGE, 404, notFound?.body);
 }
 
 export async function adminCreatePhoneModel(
