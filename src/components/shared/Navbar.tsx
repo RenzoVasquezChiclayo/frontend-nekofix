@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { NAV_LINKS } from "@/lib/constants";
+import { notifyInfo } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { CartBadge } from "@/components/shared/CartBadge";
 import { BrandLogoWithTitle } from "@/components/shared/BrandLogo";
@@ -42,7 +43,10 @@ function NavbarAuth({
         </Link>
         <button
           type="button"
-          onClick={() => logout()}
+          onClick={() => {
+            logout();
+            notifyInfo("Sesión cerrada correctamente");
+          }}
           className="touch-manipulation rounded-full border border-zinc-200 px-3 py-2 text-xs font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50"
         >
           Salir

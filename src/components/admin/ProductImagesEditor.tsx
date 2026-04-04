@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useId, useRef, useState } from "react";
 import { resolveProductMediaUrl, sortProductImages } from "@/lib/product-images";
+import { notifyApiError } from "@/lib/toast";
 import { adminUploadProductImage } from "@/services/admin/product.service";
 import type { ProductImagePayload } from "@/types/admin-product";
 import type { ProductImage } from "@/types/product";
@@ -146,6 +147,7 @@ export function ProductImagesEditor({ accessToken, defaultAltHint, drafts, onCha
           return mapped;
         });
       } catch (e) {
+        notifyApiError(e, "No se pudo subir la imagen. Revisa el formato y el tamaño.");
         const msg = e instanceof Error ? e.message : "Error al subir";
         onChange((prev) =>
           prev.map((d) =>

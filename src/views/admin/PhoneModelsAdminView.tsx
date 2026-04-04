@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import { adminListBrands } from "@/services/admin/brand.service";
 import {
@@ -59,6 +60,7 @@ export function PhoneModelsAdminView() {
       setListMeta(res.meta);
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
       setRows([]);
       setListMeta({ page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 });
     } finally {
@@ -103,9 +105,11 @@ export function PhoneModelsAdminView() {
     try {
       await adminDeletePhoneModel(accessToken, deleteId);
       setDeleteId(null);
+      notifySuccess("Modelo eliminado correctamente");
       await load();
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
     } finally {
       setDeleting(false);
     }

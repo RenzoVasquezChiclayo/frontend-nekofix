@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError } from "@/lib/toast";
 import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import { adminListBrands } from "@/services/admin/brand.service";
 import { adminListProducts } from "@/services/admin/product.service";
@@ -75,6 +76,7 @@ export function InventoryAdminView() {
       setListMeta(res.meta);
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
       setProducts([]);
       setListMeta({ page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 });
     } finally {
@@ -103,6 +105,7 @@ export function InventoryAdminView() {
       setHistory(res.data);
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e, "No se pudo cargar el historial de inventario.");
       setHistory([]);
     } finally {
       setLoadingHist(false);

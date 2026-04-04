@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { adminDeleteBrand, adminListBrands } from "@/services/admin/brand.service";
 import { useAdminAuth } from "@/store/admin-auth-context";
 import { AdminHeader } from "@/components/admin/Header";
@@ -48,6 +49,7 @@ export function BrandsAdminView() {
       setListMeta(res.meta);
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
       setBrands([]);
       setListMeta({ page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 });
     } finally {
@@ -65,9 +67,11 @@ export function BrandsAdminView() {
     try {
       await adminDeleteBrand(accessToken, deleteId);
       setDeleteId(null);
+      notifySuccess("Marca eliminada correctamente");
       await load();
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
     } finally {
       setDeleting(false);
     }

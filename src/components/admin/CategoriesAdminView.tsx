@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { adminDeleteCategory, adminListCategories } from "@/services/admin/category.service";
 import { useAdminAuth } from "@/store/admin-auth-context";
 import { AdminHeader } from "@/components/admin/Header";
@@ -48,6 +49,7 @@ export function CategoriesAdminView() {
       setListMeta(res.meta);
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
       setCategories([]);
       setListMeta({ page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 });
     } finally {
@@ -65,9 +67,11 @@ export function CategoriesAdminView() {
     try {
       await adminDeleteCategory(accessToken, deleteId);
       setDeleteId(null);
+      notifySuccess("Categoría eliminada correctamente");
       await load();
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
     } finally {
       setDeleting(false);
     }

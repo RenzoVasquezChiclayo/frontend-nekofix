@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ADMIN_NAV_ITEMS } from "@/lib/admin-nav";
 import { SITE_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { notifyInfo } from "@/lib/toast";
 import { useAdminAuth } from "@/store/admin-auth-context";
 
 type SidebarProps = {
@@ -75,6 +76,7 @@ export function AdminSidebar({ className, onNavigate }: SidebarProps) {
           type="button"
           onClick={() => {
             logout();
+            notifyInfo("Sesión cerrada correctamente");
             router.replace("/admin/login");
           }}
           className="w-full rounded-lg px-3 py-2 text-left text-sm text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-900"

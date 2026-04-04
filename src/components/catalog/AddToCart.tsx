@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { notifySuccess } from "@/lib/toast";
 import { getProductCoverImage } from "@/lib/product-images";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
@@ -27,6 +28,7 @@ export function AddToCart({ product }: Props) {
       storage: product.storage,
       condition: product.condition,
     });
+    notifySuccess("Producto agregado al carrito");
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }

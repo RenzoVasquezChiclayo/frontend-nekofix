@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { adminCreateCategory, adminUpdateCategory } from "@/services/admin/category.service";
 import type { Category } from "@/types/product";
 import type { CategoryInput } from "@/services/admin/category.service";
@@ -58,13 +59,16 @@ export function CategoryModal({ open, accessToken, category, onClose, onSaved }:
       };
       if (category) {
         await adminUpdateCategory(accessToken, category.id, body);
+        notifySuccess("Categoría actualizada correctamente");
       } else {
         await adminCreateCategory(accessToken, body);
+        notifySuccess("Categoría creada correctamente");
       }
       onSaved();
       onClose();
     } catch (err) {
       setError(getApiErrorMessage(err));
+      notifyApiError(err);
     } finally {
       setLoading(false);
     }

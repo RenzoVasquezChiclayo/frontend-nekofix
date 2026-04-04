@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { notifyError, notifyInfo } from "@/lib/toast";
 import { submitWhatsAppCheckout } from "@/app/(site)/checkout/actions";
 import { useCart } from "@/store/cart-context";
 import { buildWhatsAppCartMessage, formatPrice, whatsappHref } from "@/lib/utils";
@@ -15,7 +16,9 @@ export function CheckoutForm() {
     e.preventDefault();
     setError(null);
     if (lines.length === 0) {
-      setError("El carrito está vacío.");
+      const msg = "El carrito está vacío.";
+      setError(msg);
+      notifyError(msg);
       return;
     }
     const items = lines.map((l) => ({
@@ -36,6 +39,7 @@ export function CheckoutForm() {
         phone: phone.trim() || undefined,
       });
       if (result.ok) {
+        notifyInfo("Abriendo WhatsApp para confirmar tu pedido…");
         const url =
           result.whatsappUrl ??
           whatsappHref(buildWhatsAppCartMessage(lines, subtotal));
@@ -43,10 +47,11 @@ export function CheckoutForm() {
         window.location.href = url;
         return;
       }
-      setError(
+      const errMsg =
         result.error ??
-          "No se pudo registrar el pedido. Intenta de nuevo o escríbenos por WhatsApp."
-      );
+        "No se pudo registrar el pedido. Intenta de nuevo o escríbenos por WhatsApp.";
+      setError(errMsg);
+      notifyError(errMsg);
     });
   }
 

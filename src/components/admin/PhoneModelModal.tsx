@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import { adminListBrands } from "@/services/admin/brand.service";
 import {
@@ -94,13 +95,16 @@ export function PhoneModelModal({ open, accessToken, phoneModel, onClose, onSave
       };
       if (phoneModel) {
         await adminUpdatePhoneModel(accessToken, phoneModel.id, body);
+        notifySuccess("Modelo actualizado correctamente");
       } else {
         await adminCreatePhoneModel(accessToken, body);
+        notifySuccess("Modelo creado correctamente");
       }
       onSaved();
       onClose();
     } catch (err) {
       setError(getApiErrorMessage(err));
+      notifyApiError(err);
     } finally {
       setLoading(false);
     }

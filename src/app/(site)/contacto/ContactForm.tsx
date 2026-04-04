@@ -1,12 +1,27 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { submitContact } from "@/app/(site)/contacto/actions";
+import { notifyError, notifySuccess } from "@/lib/toast";
 
 const initial: { ok: boolean; error?: string } = { ok: false };
 
 export function ContactForm() {
   const [state, action, pending] = useActionState(submitContact, initial);
+  const successToastSent = useRef(false);
+
+  useEffect(() => {
+    if (state.error) {
+      notifyError(state.error);
+    }
+  }, [state.error]);
+
+  useEffect(() => {
+    if (state.ok && !successToastSent.current) {
+      successToastSent.current = true;
+      notifySuccess("Mensaje enviado correctamente");
+    }
+  }, [state.ok]);
 
   if (state.ok) {
     return (

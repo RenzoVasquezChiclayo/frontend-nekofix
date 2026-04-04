@@ -7,6 +7,7 @@ import {
   PRODUCT_TYPE_LABELS,
 } from "@/lib/catalog-labels";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError, notifySuccess, notifyWarning } from "@/lib/toast";
 import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import { adminCreateProduct, adminGetProduct, adminUpdateProduct } from "@/services/admin/product.service";
 import { adminListBrands } from "@/services/admin/brand.service";
@@ -145,7 +146,11 @@ export function ProductForm({ productId }: Props) {
         setSeoDescription(p.seoDescription ?? "");
         setImageDrafts(draftsFromProductImages(p.productImages));
       } catch (e) {
-        if (!cancelled) setError(getApiErrorMessage(e));
+        if (!cancelled) {
+          const m = getApiErrorMessage(e);
+          setError(m);
+          notifyApiError(e);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -159,7 +164,9 @@ export function ProductForm({ productId }: Props) {
     e.preventDefault();
     if (!accessToken) return;
     if (imageDrafts.some((d) => d.uploading)) {
-      setError("Espera a que terminen las subidas de imágenes.");
+      const msg = "Espera a que terminen las subidas de imágenes.";
+      setError(msg);
+      notifyWarning(msg);
       return;
     }
     setSaving(true);
@@ -199,13 +206,16 @@ export function ProductForm({ productId }: Props) {
 
       if (isEdit && productId) {
         await adminUpdateProduct(accessToken, productId, payload);
+        notifySuccess("Producto guardado correctamente");
       } else {
         await adminCreateProduct(accessToken, payload);
+        notifySuccess("Producto creado correctamente");
       }
       router.push("/admin/products");
       router.refresh();
     } catch (err) {
       setError(getApiErrorMessage(err));
+      notifyApiError(err);
     } finally {
       setSaving(false);
     }

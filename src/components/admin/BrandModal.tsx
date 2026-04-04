@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { adminCreateBrand, adminUpdateBrand } from "@/services/admin/brand.service";
 import type { Brand } from "@/types/product";
 import type { BrandInput } from "@/services/admin/brand.service";
@@ -58,13 +59,16 @@ export function BrandModal({ open, accessToken, brand, onClose, onSaved }: Props
       };
       if (brand) {
         await adminUpdateBrand(accessToken, brand.id, body);
+        notifySuccess("Marca actualizada correctamente");
       } else {
         await adminCreateBrand(accessToken, body);
+        notifySuccess("Marca creada correctamente");
       }
       onSaved();
       onClose();
     } catch (err) {
       setError(getApiErrorMessage(err));
+      notifyApiError(err);
     } finally {
       setLoading(false);
     }

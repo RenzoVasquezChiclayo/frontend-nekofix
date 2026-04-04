@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { useAuth } from "@/store/auth-context";
 import { AuthCard } from "@/components/auth/AuthCard";
 
@@ -20,10 +21,13 @@ export function LoginForm() {
     setPending(true);
     try {
       await login({ email: email.trim(), password });
+      notifySuccess("Sesión iniciada correctamente");
       router.push("/");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+      const msg = err instanceof Error ? err.message : "Error al iniciar sesión";
+      setError(msg);
+      notifyApiError(err);
     } finally {
       setPending(false);
     }

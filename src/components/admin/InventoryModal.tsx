@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { adminMoveInventory } from "@/services/admin/inventory.service";
 import { INVENTORY_MOVE_LABELS, type InventoryMoveType } from "@/types/inventory";
 import type { Product } from "@/types/product";
@@ -38,9 +39,11 @@ export function InventoryModal({ accessToken, product, onClose, onSuccess }: Pro
       const prev = res.previousStock ?? "—";
       const next = res.newStock ?? res.stock ?? "—";
       setResult(`Stock anterior: ${prev} → nuevo: ${next}`);
+      notifySuccess("Inventario actualizado correctamente");
       onSuccess();
     } catch (err) {
       setError(getApiErrorMessage(err));
+      notifyApiError(err, "No se pudo actualizar el inventario.");
     } finally {
       setLoading(false);
     }

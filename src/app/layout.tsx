@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { AppChrome } from "@/components/layouts/AppChrome";
+import { ToastProvider } from "@/components/providers/ToastProvider";
 import { AdminAuthProvider } from "@/store/admin-auth-context";
 import { AuthProvider } from "@/store/auth-context";
 import { CartProvider } from "@/store/cart-context";
@@ -45,6 +46,7 @@ export default function RootLayout({
           <AdminAuthProvider>
             <CartProvider>
               <AppChrome>{children}</AppChrome>
+              <ToastProvider />
             </CartProvider>
           </AdminAuthProvider>
         </AuthProvider>

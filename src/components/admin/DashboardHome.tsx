@@ -7,6 +7,7 @@ import { AdminHeader } from "@/components/admin/Header";
 import { StatsCards, type StatItem } from "@/components/admin/StatsCards";
 import { Loader } from "@/components/shared/Loader";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError } from "@/lib/toast";
 
 export function DashboardHome() {
   const { accessToken } = useAdminAuth();
@@ -37,6 +38,7 @@ export function DashboardHome() {
       ]);
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e, "No se pudieron cargar las métricas del panel.");
       setStats([]);
     } finally {
       setLoading(false);

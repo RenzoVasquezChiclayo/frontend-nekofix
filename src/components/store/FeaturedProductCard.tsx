@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { ProductBadges } from "@/components/store/ProductBadges";
+import { notifySuccess } from "@/lib/toast";
 import { getProductCoverImage } from "@/lib/product-images";
 import { isLowStock } from "@/lib/product-ui";
 import { formatPrice, whatsappHref } from "@/lib/utils";
@@ -37,6 +38,7 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
       storage: p.storage,
       condition: p.condition,
     });
+    notifySuccess("Agregado al carrito");
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { useAuth } from "@/store/auth-context";
 import { AuthCard } from "@/components/auth/AuthCard";
 
@@ -38,10 +39,13 @@ export function RegisterForm() {
         password,
         phone: phone.trim() || undefined,
       });
+      notifySuccess("Cuenta creada correctamente");
       router.push("/");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al registrarse");
+      const msg = err instanceof Error ? err.message : "Error al registrarse";
+      setError(msg);
+      notifyApiError(err);
     } finally {
       setPending(false);
     }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { SITE_NAME } from "@/lib/constants";
 import { useAdminAuth } from "@/store/admin-auth-context";
 
@@ -28,9 +29,12 @@ export function AdminLoginForm() {
     setLoading(true);
     try {
       await login({ email, password });
+      notifySuccess("Sesión iniciada correctamente");
       router.replace("/admin/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo iniciar sesión.");
+      const msg = err instanceof Error ? err.message : "No se pudo iniciar sesión.";
+      setError(msg);
+      notifyApiError(err);
     } finally {
       setLoading(false);
     }

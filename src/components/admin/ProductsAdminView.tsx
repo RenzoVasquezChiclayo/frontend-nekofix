@@ -7,6 +7,7 @@ import {
   PRODUCT_TYPE_LABELS,
 } from "@/lib/catalog-labels";
 import { getApiErrorMessage } from "@/lib/api-errors";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import {
   adminDeleteProduct,
   adminListProducts,
@@ -133,6 +134,7 @@ export function ProductsAdminView() {
       setListMeta(res.meta);
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
       setProducts([]);
       setListMeta({ page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 });
     } finally {
@@ -161,9 +163,11 @@ export function ProductsAdminView() {
     try {
       await adminDeleteProduct(accessToken, deleteId);
       setDeleteId(null);
+      notifySuccess("Producto eliminado correctamente");
       await load();
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
     } finally {
       setDeleting(false);
     }
@@ -173,9 +177,13 @@ export function ProductsAdminView() {
     if (!accessToken) return;
     try {
       await adminSetProductPublished(accessToken, p.id, !p.isPublished);
+      notifySuccess(
+        p.isPublished ? "Producto despublicado" : "Producto publicado correctamente"
+      );
       await load();
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
     }
   }
 
@@ -183,9 +191,13 @@ export function ProductsAdminView() {
     if (!accessToken) return;
     try {
       await adminSetProductFeatured(accessToken, p.id, !p.isFeatured);
+      notifySuccess(
+        p.isFeatured ? "Quitado de destacados" : "Marcado como destacado"
+      );
       await load();
     } catch (e) {
       setError(getApiErrorMessage(e));
+      notifyApiError(e);
     }
   }
 
