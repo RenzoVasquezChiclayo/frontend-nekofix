@@ -1,86 +1,74 @@
-import { MOCK_PRODUCTS } from "@/lib/mock-products";
-import { apiFetch, ApiError } from "@/services/api";
-import type { Paginated, Product, ProductListQuery } from "@/types/product";
+import { mapProductFiltersToQuery } from "@/lib/mappers/product-query.mapper";
+import { normalizeApiListResponse } from "@/lib/normalize-api-list";
+import { normalizeApiSingleResponse } from "@/lib/normalize-api-single";
+import { apiFetch } from "@/services/api";
+import type { ApiListResponse } from "@/types/api";
+import type { Product, ProductListQuery } from "@/types/product";
 
-/** Lista productos con filtros (GET /products o equivalente en Nest) */
+function unwrapFeatured(raw: Product[] | { data: Product[] }): Product[] {
+  if (Array.isArray(raw)) return raw;
+  if (raw && typeof raw === "object" && "data" in raw && Array.isArray(raw.data)) {
+    return raw.data;
+  }
+  return [];
+}
+
+/** GET /products/featured */
+export async function getFeaturedProducts(): Promise<Product[]> {
+  const raw = await apiFetch<Product[] | { data: Product[] }>("/products/featured", {
+    next: { revalidate: 60 },
+  });
+  return unwrapFeatured(raw);
+}
+
+/** GET /products — respuesta estándar `data` + `meta`. */
 export async function getProducts(
   query: ProductListQuery = {}
-): Promise<Paginated<Product>> {
-  return apiFetch<Paginated<Product>>("/products", {
-    searchParams: {
-      page: query.page,
-      limit: query.limit,
-      search: query.search,
-      brand: query.brand,
-      series: query.series,
-      model: query.model,
-      kind: Array.isArray(query.kind) ? query.kind.join(",") : query.kind,
-      wearGrade: query.wearGrade,
-      color: query.color,
-      storageGb: query.storageGb,
-      minPrice: query.minPrice,
-      maxPrice: query.maxPrice,
-      sort: query.sort,
-    },
+): Promise<ApiListResponse<Product>> {
+  const raw = await apiFetch<unknown>("/products", {
+    searchParams: mapProductFiltersToQuery(query),
+    next: { revalidate: 60 },
   });
+  return normalizeApiListResponse<Product>(raw);
 }
 
+/** GET /products/:slug */
 export async function getProductBySlug(slug: string): Promise<Product> {
-  return apiFetch<Product>(`/products/slug/${encodeURIComponent(slug)}`);
+  const raw = await apiFetch<unknown>(`/products/${encodeURIComponent(slug)}`, {
+    next: { revalidate: 120 },
+  });
+  return normalizeApiSingleResponse<Product>(raw);
 }
 
-export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
-  const res = await getProducts({ limit, page: 1, sort: "newest" });
-  return res.data;
-}
-
-/** Si el backend no responde, usa datos mock para desarrollo / demo */
-export async function getProductsWithFallback(
-  query: ProductListQuery = {}
-): Promise<Paginated<Product>> {
+/** Productos relacionados (misma marca o categoría). */
+export async function getRelatedProducts(
+  product: Product,
+  limit = 6
+): Promise<Product[]> {
   try {
-    return await getProducts(query);
-  } catch (e) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("[products] API no disponible, usando mock:", e);
+    const byBrand = await getProducts({
+      brandId: product.brandId,
+      limit: limit + 1,
+      page: 1,
+      sort: "newest",
+    });
+    const merged = byBrand.data.filter((p) => p.id !== product.id);
+    if (merged.length >= limit) return merged.slice(0, limit);
+    const byCat = await getProducts({
+      categoryId: product.categoryId,
+      limit: limit + 1,
+      page: 1,
+      sort: "newest",
+    });
+    const ids = new Set(merged.map((p) => p.id));
+    for (const p of byCat.data) {
+      if (p.id === product.id || ids.has(p.id)) continue;
+      merged.push(p);
+      ids.add(p.id);
+      if (merged.length >= limit) break;
     }
-    let data = [...MOCK_PRODUCTS];
-    if (query.search) {
-      const q = query.search.toLowerCase();
-      data = data.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
-      );
-    }
-    if (query.kind) {
-      const kinds = Array.isArray(query.kind) ? query.kind : [query.kind];
-      data = data.filter((p) => kinds.includes(p.kind));
-    }
-    if (query.brand) {
-      data = data.filter((p) =>
-        p.brand.toLowerCase().includes(query.brand!.toLowerCase())
-      );
-    }
-    return {
-      data,
-      total: data.length,
-      page: query.page ?? 1,
-      pageSize: data.length,
-      hasMore: false,
-    };
-  }
-}
-
-export async function getProductBySlugWithFallback(
-  slug: string
-): Promise<Product | null> {
-  try {
-    return await getProductBySlug(slug);
-  } catch (e) {
-    if (e instanceof ApiError && e.status === 404) return null;
-    if (process.env.NODE_ENV === "development") {
-      console.warn("[product] API no disponible, usando mock:", e);
-    }
-    return MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
+    return merged.slice(0, limit);
+  } catch {
+    return [];
   }
 }

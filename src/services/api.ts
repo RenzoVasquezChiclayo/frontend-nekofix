@@ -44,14 +44,21 @@ export async function apiFetch<T>(
   const isGet = (rest.method ?? "GET").toUpperCase() === "GET";
   const isServer = typeof window === "undefined";
 
+  const body = rest.body;
+  const isFormData =
+    typeof FormData !== "undefined" &&
+    body != null &&
+    typeof body === "object" &&
+    body instanceof FormData;
+
   const res = await fetch(url, {
     ...rest,
     ...(isServer
       ? { next: next ?? (isGet ? { revalidate: 60 } : undefined) }
       : {}),
     headers: {
-      "Content-Type": "application/json",
-      ...headers,
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
+      ...(headers as Record<string, string>),
     },
   });
 

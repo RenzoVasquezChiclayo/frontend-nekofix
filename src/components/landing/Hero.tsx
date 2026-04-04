@@ -4,11 +4,11 @@ import { SITE_NAME } from "@/lib/constants";
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-zinc-950 text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(16,185,129,0.35),transparent)]" />
-      <div className="pointer-events-none absolute -right-32 top-20 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(49,89,135,0.45),transparent)]" />
+      <div className="pointer-events-none absolute -right-32 top-20 h-96 w-96 rounded-full bg-accent-cool/15 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32 lg:py-40">
         <div className="max-w-2xl">
-          <p className="text-sm font-medium uppercase tracking-widest text-emerald-400">
+          <p className="text-sm font-medium uppercase tracking-widest text-accent-cool/95">
             Reparación & venta
           </p>
           <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
@@ -22,13 +22,13 @@ export function Hero() {
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/catalogo"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-8 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+              className="inline-flex items-center justify-center rounded-full bg-primary-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-primary-500"
             >
-              Ver catálogo
+              Ver tienda
             </Link>
             <Link
               href="/contacto"
-              className="inline-flex items-center justify-center rounded-full border border-zinc-600 px-8 py-3 text-sm font-semibold text-white transition hover:border-zinc-400 hover:bg-white/5"
+              className="inline-flex items-center justify-center rounded-full border border-zinc-600 px-8 py-3 text-sm font-semibold text-white transition hover:border-accent-warm/50 hover:bg-accent-warm/10"
             >
               Cotizar reparación
             </Link>

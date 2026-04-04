@@ -1,18 +1,33 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { submitContact } from "@/app/(site)/contacto/actions";
+import { notifyError, notifySuccess } from "@/lib/toast";
 
 const initial: { ok: boolean; error?: string } = { ok: false };
 
 export function ContactForm() {
   const [state, action, pending] = useActionState(submitContact, initial);
+  const successToastSent = useRef(false);
+
+  useEffect(() => {
+    if (state.error) {
+      notifyError(state.error);
+    }
+  }, [state.error]);
+
+  useEffect(() => {
+    if (state.ok && !successToastSent.current) {
+      successToastSent.current = true;
+      notifySuccess("Mensaje enviado correctamente");
+    }
+  }, [state.ok]);
 
   if (state.ok) {
     return (
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-8 text-center">
-        <p className="font-semibold text-emerald-900">Mensaje enviado</p>
-        <p className="mt-2 text-sm text-emerald-800">
+      <div className="rounded-2xl border border-accent-cool/40 bg-accent-cool/10 px-6 py-8 text-center">
+        <p className="font-semibold text-primary-900">Mensaje enviado</p>
+        <p className="mt-2 text-sm text-primary-800">
           Te contactaremos pronto. También puedes escribirnos por WhatsApp.
         </p>
       </div>
@@ -61,7 +76,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-zinc-900 py-3 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60"
+        className="w-full rounded-xl bg-primary-800 py-3 text-sm font-semibold text-white hover:bg-primary-900 disabled:opacity-60"
       >
         {pending ? "Enviando…" : "Enviar"}
       </button>

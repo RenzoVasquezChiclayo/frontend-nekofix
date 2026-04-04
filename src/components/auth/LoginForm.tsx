@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { useAuth } from "@/store/auth-context";
 import { AuthCard } from "@/components/auth/AuthCard";
 
@@ -20,10 +21,13 @@ export function LoginForm() {
     setPending(true);
     try {
       await login({ email: email.trim(), password });
+      notifySuccess("Sesión iniciada correctamente");
       router.push("/");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+      const msg = err instanceof Error ? err.message : "Error al iniciar sesión";
+      setError(msg);
+      notifyApiError(err);
     } finally {
       setPending(false);
     }
@@ -36,7 +40,7 @@ export function LoginForm() {
       footer={
         <p className="text-center text-sm text-zinc-600">
           ¿No tienes cuenta?{" "}
-          <Link href="/registro" className="font-semibold text-emerald-700 hover:underline">
+          <Link href="/registro" className="font-semibold text-primary-700 hover:underline">
             Regístrate
           </Link>
         </p>
@@ -51,7 +55,7 @@ export function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           />
         </label>
         <label className="block">
@@ -62,7 +66,7 @@ export function LoginForm() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           />
         </label>
         {error ? (
@@ -73,7 +77,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={pending || !isReady}
-          className="w-full rounded-xl bg-zinc-900 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:opacity-60"
+          className="w-full rounded-xl bg-primary-800 py-3 text-sm font-semibold text-white transition hover:bg-primary-900 disabled:opacity-60"
         >
           {pending ? "Entrando…" : "Entrar"}
         </button>

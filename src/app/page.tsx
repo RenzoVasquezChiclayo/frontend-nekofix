@@ -7,14 +7,10 @@ import { Brands } from "@/components/landing/Brands";
 import { Location } from "@/components/landing/Location";
 import { MapEmbed } from "@/components/landing/MapEmbed";
 import { CTAWhatsApp } from "@/components/landing/CTAWhatsApp";
-import { getProductsWithFallback } from "@/services/product.service";
+import { getFeaturedProducts } from "@/services/product.service";
 
 export default async function HomePage() {
-  const { data: featured } = await getProductsWithFallback({
-    limit: 8,
-    page: 1,
-    sort: "newest",
-  });
+  const featured = await getFeaturedProducts().catch(() => []);
 
   return (
     <>

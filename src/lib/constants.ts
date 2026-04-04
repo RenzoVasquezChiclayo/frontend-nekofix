@@ -1,28 +1,16 @@
-import type { ProductKind } from "@/types/product";
-
 export const SITE_NAME = "NekoFix";
+
+/** Máximo de productos relacionados en la ficha de producto (UI). */
+export const RELATED_PRODUCTS_DISPLAY_LIMIT = 8;
 
 export const NAV_LINKS = [
   { href: "/", label: "Inicio" },
+  { href: "/catalogo", label: "Tienda" },
   { href: "/nosotros", label: "Nosotros" },
-  { href: "/catalogo", label: "Catálogo" },
   { href: "/contacto", label: "Contacto" },
 ] as const;
 
-export const PRODUCT_KIND_LABELS: Record<ProductKind, string> = {
-  nuevo: "Nuevo",
-  seminuevo: "Seminuevo",
-  accesorio: "Accesorio",
-};
-
-export const WEAR_GRADE_LABELS = {
-  excelente: "Excelente",
-  muy_bueno: "Muy bueno",
-  bueno: "Bueno",
-  aceptable: "Aceptable",
-} as const;
-
-/** Marcas mostradas en landing (pueden venir del API después) */
+/** Marcas mostradas en landing (estático hasta conectar con API). */
 export const FEATURED_BRANDS = [
   "Apple",
   "Samsung",

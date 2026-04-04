@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { notifyInfo } from "@/lib/toast";
 import { useAuth } from "@/store/auth-context";
 import { Loader } from "@/components/shared/Loader";
 
@@ -21,7 +22,7 @@ export default function CuentaPage() {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href="/iniciar-sesion"
-            className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
+            className="rounded-full bg-primary-800 px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-900"
           >
             Iniciar sesión
           </Link>
@@ -67,7 +68,10 @@ export default function CuentaPage() {
       </dl>
       <button
         type="button"
-        onClick={() => logout()}
+        onClick={() => {
+          logout();
+          notifyInfo("Sesión cerrada correctamente");
+        }}
         className="mt-8 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-800 hover:bg-red-100"
       >
         Cerrar sesión

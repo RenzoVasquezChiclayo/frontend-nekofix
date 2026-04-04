@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { useAuth } from "@/store/auth-context";
 import { AuthCard } from "@/components/auth/AuthCard";
 
@@ -38,10 +39,13 @@ export function RegisterForm() {
         password,
         phone: phone.trim() || undefined,
       });
+      notifySuccess("Cuenta creada correctamente");
       router.push("/");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al registrarse");
+      const msg = err instanceof Error ? err.message : "Error al registrarse";
+      setError(msg);
+      notifyApiError(err);
     } finally {
       setPending(false);
     }
@@ -56,7 +60,7 @@ export function RegisterForm() {
           ¿Ya tienes cuenta?{" "}
           <Link
             href="/iniciar-sesion"
-            className="font-semibold text-emerald-700 hover:underline"
+            className="font-semibold text-primary-700 hover:underline"
           >
             Inicia sesión
           </Link>
@@ -72,7 +76,7 @@ export function RegisterForm() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           />
         </label>
         <label className="block">
@@ -83,7 +87,7 @@ export function RegisterForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           />
         </label>
         <label className="block">
@@ -96,7 +100,7 @@ export function RegisterForm() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="ej. 917 688 459"
-            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           />
         </label>
         <label className="block">
@@ -107,7 +111,7 @@ export function RegisterForm() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           />
           <span className="mt-1 block text-xs text-zinc-500">
             Mínimo {MIN_PASSWORD} caracteres
@@ -121,7 +125,7 @@ export function RegisterForm() {
             required
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           />
         </label>
         {error ? (
@@ -132,7 +136,7 @@ export function RegisterForm() {
         <button
           type="submit"
           disabled={pending || !isReady}
-          className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-60"
+          className="w-full rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:opacity-60"
         >
           {pending ? "Creando cuenta…" : "Registrarme"}
         </button>

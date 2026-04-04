@@ -79,16 +79,16 @@ export function AboutContactCards() {
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <a
             href={telHref}
-            className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-emerald-300 hover:shadow-md"
+            className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-primary-300 hover:shadow-md"
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 transition group-hover:bg-emerald-600 group-hover:text-white">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-100 text-primary-700 transition group-hover:bg-primary-600 group-hover:text-white">
               <IconPhone className="h-5 w-5" />
             </div>
             <h3 className="mt-4 font-semibold text-zinc-900">Celular / teléfono</h3>
             <p className="mt-2 text-2xl font-bold tracking-tight text-zinc-800">
               {SITE_CONTACT.phoneDisplay}
             </p>
-            <span className="mt-3 text-sm font-medium text-emerald-700 group-hover:underline">
+            <span className="mt-3 text-sm font-medium text-primary-700 group-hover:underline">
               Llamar ahora
             </span>
           </a>
@@ -115,7 +115,7 @@ export function AboutContactCards() {
 
           <a
             href={mailHref}
-            className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-emerald-300 hover:shadow-md sm:col-span-2 lg:col-span-1"
+            className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:border-primary-300 hover:shadow-md sm:col-span-2 lg:col-span-1"
           >
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 transition group-hover:bg-zinc-900 group-hover:text-white">
               <IconMail className="h-5 w-5" />
@@ -124,7 +124,7 @@ export function AboutContactCards() {
             <p className="mt-2 break-all text-base font-medium text-zinc-800">
               {SITE_CONTACT.email}
             </p>
-            <span className="mt-3 text-sm font-medium text-emerald-700 group-hover:underline">
+            <span className="mt-3 text-sm font-medium text-primary-700 group-hover:underline">
               Enviar correo
             </span>
           </a>
@@ -141,7 +141,7 @@ export function AboutContactCards() {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-w-[140px] items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-3 text-sm font-medium text-zinc-800 transition hover:border-emerald-300 hover:bg-white hover:shadow-sm"
+                  className="flex min-w-[140px] items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-3 text-sm font-medium text-zinc-800 transition hover:border-primary-300 hover:bg-white hover:shadow-sm"
                 >
                   <span className="text-zinc-700">
                     <SocialIcon label={s.label} />

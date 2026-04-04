@@ -5,7 +5,7 @@ export function AboutStory() {
     <section className="bg-zinc-50 py-16 sm:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <div className="text-center">
-          <span className="inline-block rounded-full bg-white px-4 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-700 ring-1 ring-emerald-200">
+          <span className="inline-block rounded-full bg-white px-4 py-1 text-xs font-semibold uppercase tracking-wider text-primary-800 ring-1 ring-accent-warm/35">
             Conócenos
           </span>
           <h2 className="mt-5 text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">

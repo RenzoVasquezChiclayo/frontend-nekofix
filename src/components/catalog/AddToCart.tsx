@@ -1,22 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { notifySuccess } from "@/lib/toast";
+import { getProductCoverImage } from "@/lib/product-images";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
-import { cn } from "@/lib/utils";
 
 type Props = { product: Product };
 
 export function AddToCart({ product }: Props) {
   const { addLine } = useCart();
-  const [color, setColor] = useState(product.colors[0] ?? "");
-  const [storageGb, setStorageGb] = useState(product.storageOptionsGb[0]);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
   const canBuy = product.stock > 0;
-  const needsColor = product.colors.length > 0;
-  const needsStorage = product.storageOptionsGb.length > 0;
 
   function handleAdd() {
     if (!canBuy) return;
@@ -26,61 +23,34 @@ export function AddToCart({ product }: Props) {
       name: product.name,
       unitPrice: product.price,
       quantity: qty,
-      image: product.images[0],
-      color: needsColor ? color : undefined,
-      storageGb: needsStorage ? storageGb : undefined,
+      image: getProductCoverImage(product).src,
+      color: product.color,
+      storage: product.storage,
+      condition: product.condition,
     });
+    notifySuccess("Producto agregado al carrito");
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
 
   return (
     <div className="space-y-4">
-      {needsColor ? (
-        <div>
-          <p className="text-sm font-medium text-zinc-700">Color</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {product.colors.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setColor(c)}
-                className={cn(
-                  "rounded-full px-3 py-1.5 text-sm ring-1 transition",
-                  color === c
-                    ? "bg-zinc-900 text-white ring-zinc-900"
-                    : "bg-white text-zinc-700 ring-zinc-200 hover:ring-zinc-400"
-                )}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
+      {(product.color || product.storage) && (
+        <div className="rounded-xl border border-primary-100 bg-primary-50/50 px-4 py-3 text-sm text-zinc-600">
+          {product.storage ? (
+            <p>
+              <span className="font-medium text-zinc-800">Almacenamiento: </span>
+              {product.storage}
+            </p>
+          ) : null}
+          {product.color ? (
+            <p className={product.storage ? "mt-1" : ""}>
+              <span className="font-medium text-zinc-800">Color: </span>
+              {product.color}
+            </p>
+          ) : null}
         </div>
-      ) : null}
-
-      {needsStorage ? (
-        <div>
-          <p className="text-sm font-medium text-zinc-700">Almacenamiento</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {product.storageOptionsGb.map((g) => (
-              <button
-                key={g}
-                type="button"
-                onClick={() => setStorageGb(g)}
-                className={cn(
-                  "rounded-full px-3 py-1.5 text-sm ring-1 transition",
-                  storageGb === g
-                    ? "bg-zinc-900 text-white ring-zinc-900"
-                    : "bg-white text-zinc-700 ring-zinc-200 hover:ring-zinc-400"
-                )}
-              >
-                {g} GB
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      )}
 
       <div className="flex items-center gap-4">
         <label className="text-sm font-medium text-zinc-700">
@@ -91,9 +61,11 @@ export function AddToCart({ product }: Props) {
             max={product.stock}
             value={qty}
             onChange={(e) =>
-              setQty(Math.max(1, Math.min(product.stock, Number(e.target.value) || 1)))
+              setQty(
+                Math.max(1, Math.min(product.stock, Number(e.target.value) || 1))
+              )
             }
-            className="ml-2 w-20 rounded-lg border border-zinc-200 px-2 py-1 text-center"
+            className="ml-2 w-20 rounded-lg border border-zinc-200 px-2 py-1.5 text-center text-sm"
           />
         </label>
       </div>
@@ -102,9 +74,9 @@ export function AddToCart({ product }: Props) {
         type="button"
         disabled={!canBuy}
         onClick={handleAdd}
-        className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-full bg-primary-600 py-3.5 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {canBuy ? (added ? "¡Agregado!" : "Agregar al carrito") : "Sin stock"}
+        {canBuy ? (added ? "Agregado al carrito" : "Agregar al carrito") : "Sin stock"}
       </button>
     </div>
   );
