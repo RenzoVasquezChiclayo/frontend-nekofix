@@ -12,12 +12,12 @@ export function Hero() {
             Reparación & venta
           </p>
           <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Tu iPhone y Android en las mejores manos
+            Tu ecosistema Apple en las mejores manos
           </h1>
           <p className="mt-6 text-lg text-zinc-300">
-            Especialistas en iPhone, equipos nuevos y seminuevos, accesorios y
-            servicio técnico con garantía. {SITE_NAME} combina experiencia y
-            stock actualizado.
+            Especialistas en Apple: iPhone, iPad, Mac y accesorios. Reparación, equipos
+            nuevos y seminuevos, y servicio técnico con garantía. {SITE_NAME} combina
+            experiencia y stock actualizado.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link

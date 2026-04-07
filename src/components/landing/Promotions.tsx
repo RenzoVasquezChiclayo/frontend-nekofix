@@ -14,7 +14,7 @@ export function Promotions() {
         <div className="mt-10 flex flex-col items-center justify-between gap-6 rounded-2xl border border-white/10 bg-white/10 p-8 backdrop-blur sm:flex-row">
           <div>
             <p className="text-sm uppercase tracking-wider text-accent-cool/90">
-              Seminuevos certificados
+              Apple seminuevo certificado
             </p>
             <p className="mt-2 text-2xl font-bold">Hasta 12 MSI en seleccionados</p>
             <p className="mt-1 text-sm text-white/80">

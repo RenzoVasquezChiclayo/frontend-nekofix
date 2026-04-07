@@ -9,13 +9,3 @@ export const NAV_LINKS = [
   { href: "/nosotros", label: "Nosotros" },
   { href: "/contacto", label: "Contacto" },
 ] as const;
-
-/** Marcas mostradas en landing (estático hasta conectar con API). */
-export const FEATURED_BRANDS = [
-  "Apple",
-  "Samsung",
-  "Google",
-  "Xiaomi",
-  "Motorola",
-  "OnePlus",
-] as const;

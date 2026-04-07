@@ -3,19 +3,19 @@ import { SectionTitle } from "@/components/shared/SectionTitle";
 const ITEMS = [
   {
     title: "Pantalla y batería",
-    desc: "Cambio de display original o compatible, baterías certificadas.",
+    desc: "Display y batería en iPhone, iPad y MacBook, con piezas acordes a cada modelo.",
   },
   {
     title: "Placa y carga",
-    desc: "Diagnóstico de fallos de encendido, Face ID, conector y audio.",
+    desc: "Diagnóstico de encendido, Face ID/Touch ID, puertos, audio y carga en toda la gama Apple.",
   },
   {
     title: "Software",
-    desc: "Respaldo, migración y recuperación sin perder tus datos.",
+    desc: "Respaldo, migración y recuperación en iOS, iPadOS y macOS sin perder tus datos.",
   },
   {
     title: "Compra y venta",
-    desc: "Seminuevos certificados y accesorios para el día a día.",
+    desc: "Equipos Apple seminuevos certificados y accesorios originales o compatibles.",
   },
 ] as const;
 
@@ -25,8 +25,8 @@ export function Services() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionTitle
           eyebrow="Servicios"
-          title="Reparación profesional de móviles"
-          subtitle="Técnicos especializados en Apple y Android. Cotiza por WhatsApp o en tienda."
+          title="Reparación profesional Apple"
+          subtitle="Técnicos especializados en iPhone, iPad y Mac. Cotiza por WhatsApp o en tienda."
         />
         <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {ITEMS.map((item) => (

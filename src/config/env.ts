@@ -38,4 +38,9 @@ export const env = {
   ),
   /** Opcional: URL de embed de mapa (Google Maps iframe src) */
   mapEmbedUrl: process.env.NEXT_PUBLIC_MAP_EMBED_URL ?? "",
+  /**
+   * Opcional: enlace a la ficha del negocio o lista de reseñas en Google (botón “Ver más en Google” en landing).
+   * Ej. URL de “Escribir una reseña” o la ficha pública.
+   */
+  googleReviewsListingUrl: (process.env.NEXT_PUBLIC_GOOGLE_REVIEWS_URL ?? "").trim(),
 } as const;

@@ -22,11 +22,11 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${SITE_NAME} · Reparación y venta de smartphones`,
+    default: `${SITE_NAME} · Reparación y venta Apple`,
     template: `%s · ${SITE_NAME}`,
   },
   description:
-    "Especialistas en iPhone y Android. Reparación, equipos nuevos y seminuevos, accesorios. Cotiza por WhatsApp.",
+    "Especialistas en Apple: iPhone, iPad, Mac y accesorios. Reparación, equipos nuevos y seminuevos, servicio técnico con garantía. Cotiza por WhatsApp.",
   icons: {
     icon: [{ url: "/brand/logo.png", type: "image/png" }],
     apple: [{ url: "/brand/logo.png", type: "image/png" }],
