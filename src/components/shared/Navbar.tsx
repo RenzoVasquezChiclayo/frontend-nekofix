@@ -33,7 +33,7 @@ function NavbarAuth({
         <Link
           href="/cuenta"
           className={cn(
-            "truncate text-sm font-medium text-zinc-700 hover:text-zinc-900",
+            "truncate text-sm font-medium text-ink-muted hover:text-ink",
             variant === "desktop" && "hidden max-w-[140px] sm:inline",
             variant === "drawer" && "block max-w-[200px]"
           )}
@@ -47,7 +47,7 @@ function NavbarAuth({
             logout();
             notifyInfo("Sesión cerrada correctamente");
           }}
-          className="touch-manipulation rounded-full border border-zinc-200 px-3 py-2 text-xs font-medium text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50"
+          className="touch-manipulation rounded-full border border-primary-200/80 px-3 py-2 text-xs font-medium text-ink-soft transition hover:border-primary-300 hover:bg-primary-50/80"
         >
           Salir
         </button>
@@ -59,7 +59,7 @@ function NavbarAuth({
     <div className={cn("flex items-center", className)}>
       <Link
         href="/iniciar-sesion"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary-200/80 bg-white text-ink-soft transition hover:border-primary-300 hover:bg-primary-50/80 hover:text-ink"
         aria-label="Iniciar sesión"
         title="Iniciar sesión"
         data-nav-auth="login-icon"
@@ -135,7 +135,7 @@ export function Navbar({ className }: Props) {
         <Link
           href="/"
           onClick={() => setMobileOpen(false)}
-          className="min-w-0 flex items-center gap-2 font-black tracking-tight text-zinc-900"
+          className="min-w-0 flex items-center gap-2 font-display font-black tracking-tight text-ink"
         >
           <BrandLogoWithTitle />
         </Link>
@@ -145,14 +145,14 @@ export function Navbar({ className }: Props) {
             <Link
               key={l.href}
               href={l.href}
-              className="text-sm font-medium text-zinc-600 transition hover:text-zinc-900"
+              className="text-sm font-medium text-ink-muted transition hover:text-ink"
             >
               {l.label}
             </Link>
           ))}
           <Link
             href="/admin"
-            className="text-sm font-medium text-zinc-500 transition hover:text-zinc-800"
+            className="text-sm font-medium text-ink-caption transition hover:text-ink-soft"
           >
             Admin
           </Link>
@@ -172,7 +172,7 @@ export function Navbar({ className }: Props) {
 
           <button
             type="button"
-            className="touch-manipulation rounded-xl border border-zinc-200 p-2 text-zinc-800 transition hover:bg-zinc-50 lg:hidden"
+            className="touch-manipulation rounded-xl border border-primary-200/80 p-2 text-ink-body transition hover:bg-primary-50/80 lg:hidden"
             aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((o) => !o)}
@@ -198,10 +198,10 @@ export function Navbar({ className }: Props) {
               />
               <div className="absolute right-0 top-0 z-10 flex h-full w-[min(100%,20rem)] flex-col border-l border-zinc-200 bg-white shadow-2xl transition-transform duration-300 ease-out">
                 <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-5">
-              <p className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Menú</p>
+              <p className="text-sm font-semibold uppercase tracking-wider text-ink-soft">Menú</p>
               <button
                 type="button"
-                className="touch-manipulation rounded-lg p-2 text-zinc-600 hover:bg-zinc-100"
+                className="touch-manipulation rounded-lg p-2 text-ink-muted hover:bg-primary-50/80"
                 aria-label="Cerrar"
                 onClick={() => setMobileOpen(false)}
               >
@@ -214,7 +214,7 @@ export function Navbar({ className }: Props) {
                   key={l.href}
                   href={l.href}
                   onClick={() => setMobileOpen(false)}
-                  className="touch-manipulation rounded-xl px-4 py-3.5 text-base font-medium text-zinc-800 transition hover:bg-primary-50"
+                  className="touch-manipulation rounded-xl px-4 py-3.5 text-base font-medium text-ink-body transition hover:bg-primary-50"
                 >
                   {l.label}
                 </Link>
@@ -222,7 +222,7 @@ export function Navbar({ className }: Props) {
               <Link
                 href="/admin"
                 onClick={() => setMobileOpen(false)}
-                className="touch-manipulation rounded-xl px-4 py-3.5 text-base font-medium text-zinc-500 transition hover:bg-zinc-50"
+                className="touch-manipulation rounded-xl px-4 py-3.5 text-base font-medium text-ink-caption transition hover:bg-primary-50/50"
               >
                 Admin
               </Link>

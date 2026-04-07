@@ -33,8 +33,10 @@ export function AppleFocusSection() {
               key={item.title}
               className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
             >
-              <h3 className="font-semibold text-zinc-900">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{item.desc}</p>
+              <h3 className="font-display text-lg font-bold tracking-tight text-ink">
+                {item.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.desc}</p>
             </li>
           ))}
         </ul>

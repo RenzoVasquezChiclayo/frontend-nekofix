@@ -13,10 +13,10 @@ export default function ContactoPage() {
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <div className="grid gap-12 lg:grid-cols-2">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900">
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             Contacto
           </h1>
-          <p className="mt-3 text-zinc-600">
+          <p className="mt-3 text-base leading-relaxed text-ink-muted">
             Cotizaciones de reparación, dudas sobre stock o pedidos web. Responderemos
             por el canal que prefieras.
           </p>

@@ -68,23 +68,23 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
         </div>
       </Link>
       <div className="flex flex-1 flex-col p-4">
-        <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-caption">
           {p.brand.name}
           {p.model ? ` · ${p.model.name}` : ""}
         </p>
         <Link href={`/producto/${p.slug}`}>
-          <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-zinc-900">
+          <h3 className="font-display mt-1 line-clamp-2 text-sm font-bold leading-snug text-ink">
             {p.name}
           </h3>
         </Link>
-        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-500">
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-soft">
           {p.storage ? <span>{p.storage}</span> : null}
           {p.color ? <span>{p.color}</span> : null}
         </div>
         <div className="mt-3 flex flex-wrap items-baseline gap-2">
           <span className="text-lg font-semibold text-primary-800">{formatPrice(p.price)}</span>
           {p.comparePrice != null && p.comparePrice > p.price ? (
-            <span className="text-sm text-zinc-400 line-through">
+            <span className="text-sm text-ink-caption/80 line-through">
               {formatPrice(p.comparePrice)}
             </span>
           ) : null}

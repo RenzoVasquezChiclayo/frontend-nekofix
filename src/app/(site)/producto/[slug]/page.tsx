@@ -75,7 +75,7 @@ export default async function ProductoPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-14">
-      <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-zinc-500">
+      <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-ink-soft">
         <Link href="/catalogo" className="text-primary-600 transition hover:text-primary-800">
           Tienda
         </Link>
@@ -102,21 +102,21 @@ export default async function ProductoPage({ params }: Props) {
             />
             <UsedGradeBadge type={product.type} grade={product.grade} size="md" />
           </div>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-ink-soft">
             {product.brand.name}
             {product.model ? ` · ${product.model.name}` : ""}
           </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl md:text-4xl">
+          <h1 className="font-display mt-2 text-2xl font-extrabold tracking-tight text-ink sm:text-3xl md:text-4xl">
             {product.name}
           </h1>
-          <p className="mt-2 text-xs text-zinc-400">SKU {product.sku}</p>
+          <p className="mt-2 text-xs text-ink-caption">SKU {product.sku}</p>
 
           <div className="mt-6 flex flex-wrap items-baseline gap-3 sm:mt-8">
             <span className="text-2xl font-semibold text-primary-800 sm:text-3xl">
               {formatPrice(product.price)}
             </span>
             {product.comparePrice != null && product.comparePrice > product.price ? (
-              <span className="text-lg text-zinc-400 line-through">
+              <span className="text-lg text-ink-caption/80 line-through">
                 {formatPrice(product.comparePrice)}
               </span>
             ) : null}
@@ -138,8 +138,8 @@ export default async function ProductoPage({ params }: Props) {
 
       {product.description ? (
         <section className="mt-16 border-t border-primary-100 pt-14">
-          <h2 className="text-lg font-semibold text-primary-950">Descripción</h2>
-          <div className="prose prose-zinc mt-4 max-w-none text-sm leading-relaxed text-zinc-600">
+          <h2 className="font-display text-lg font-bold text-ink">Descripción</h2>
+          <div className="prose prose-sm mt-4 max-w-none text-sm leading-relaxed text-ink-muted prose-headings:font-display prose-strong:text-ink">
             <p className="whitespace-pre-wrap">{product.description}</p>
           </div>
         </section>

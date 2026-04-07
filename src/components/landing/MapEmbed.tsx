@@ -5,8 +5,8 @@ export function MapEmbed() {
     return (
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-300 bg-zinc-50 py-20 text-center">
-          <p className="text-sm font-medium text-zinc-700">Mapa</p>
-          <p className="mt-2 max-w-md text-sm text-zinc-500">
+          <p className="text-sm font-semibold text-ink-body">Mapa</p>
+          <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">
             Configura <code className="rounded bg-zinc-200 px-1">NEXT_PUBLIC_MAP_EMBED_URL</code>{" "}
             con el iframe de Google Maps para mostrar la ubicación.
           </p>

@@ -5,10 +5,10 @@ export function CTAWhatsApp() {
     <section className="relative overflow-hidden bg-primary-950 py-16 text-white sm:py-20">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(125,207,181,0.18),transparent)]" />
       <div className="relative mx-auto max-w-6xl px-4 text-center sm:px-6">
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <h2 className="font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
           ¿Dudas o cotización?
         </h2>
-        <p className="mx-auto mt-3 max-w-lg text-zinc-400">
+        <p className="mx-auto mt-3 max-w-lg text-base leading-relaxed text-primary-100/85">
           Escríbenos por WhatsApp y te respondemos con el detalle de tu equipo o
           compra.
         </p>

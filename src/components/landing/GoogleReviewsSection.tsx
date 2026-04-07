@@ -11,7 +11,7 @@ function StarDisplay({ value }: { value: number }) {
       aria-label={`Valoración media ${value.toFixed(1)} de 5 estrellas`}
     >
       <span aria-hidden>{"★".repeat(v)}</span>
-      <span className="text-zinc-200" aria-hidden>
+      <span className="text-primary-200/50" aria-hidden>
         {"★".repeat(5 - v)}
       </span>
     </p>
@@ -33,10 +33,10 @@ export async function GoogleReviewsSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <header className="flex flex-col items-center text-center lg:flex-row lg:items-end lg:justify-between lg:text-left">
           <div className="max-w-xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-600">
               Google
             </p>
-            <h2 className="mt-2 font-[family-name:var(--font-outfit)] text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl">
+            <h2 className="font-display mt-2 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
               Lo que opinan nuestros clientes
             </h2>
           </div>
@@ -47,7 +47,7 @@ export async function GoogleReviewsSection() {
                 {data.averageRating.toFixed(1)}
               </span>
               <StarDisplay value={data.averageRating} />
-              <p className="text-sm font-medium text-zinc-600">
+              <p className="text-sm font-medium text-ink-muted">
                 {data.totalReviews.toLocaleString("es-PE")} reseñas en Google
               </p>
             </div>

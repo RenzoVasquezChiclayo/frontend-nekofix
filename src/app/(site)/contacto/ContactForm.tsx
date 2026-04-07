@@ -37,7 +37,7 @@ export function ContactForm() {
   return (
     <form action={action} className="space-y-4">
       <label className="block">
-        <span className="text-sm font-medium text-zinc-700">Nombre</span>
+        <span className="text-sm font-medium text-ink-body">Nombre</span>
         <input
           name="name"
           required
@@ -45,7 +45,7 @@ export function ContactForm() {
         />
       </label>
       <label className="block">
-        <span className="text-sm font-medium text-zinc-700">Email</span>
+        <span className="text-sm font-medium text-ink-body">Email</span>
         <input
           name="email"
           type="email"
@@ -53,7 +53,7 @@ export function ContactForm() {
         />
       </label>
       <label className="block">
-        <span className="text-sm font-medium text-zinc-700">Teléfono</span>
+        <span className="text-sm font-medium text-ink-body">Teléfono</span>
         <input
           name="phone"
           type="tel"
@@ -61,7 +61,7 @@ export function ContactForm() {
         />
       </label>
       <label className="block">
-        <span className="text-sm font-medium text-zinc-700">Mensaje</span>
+        <span className="text-sm font-medium text-ink-body">Mensaje</span>
         <textarea
           name="message"
           required
@@ -80,7 +80,7 @@ export function ContactForm() {
       >
         {pending ? "Enviando…" : "Enviar"}
       </button>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-ink-soft">
         El envío usa el endpoint de leads en NestJS. Si falla, verifica{" "}
         <code className="rounded bg-zinc-100 px-1">NEXT_PUBLIC_API_URL</code> y CORS.
       </p>

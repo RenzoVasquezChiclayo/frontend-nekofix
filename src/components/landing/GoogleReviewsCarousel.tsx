@@ -17,14 +17,14 @@ function CardStars({ rating }: { rating: number }) {
   return (
     <p className="text-sm text-amber-500" aria-label={`${rating} de 5`}>
       <span className="tracking-tighter">{"★".repeat(r)}</span>
-      <span className="text-zinc-200">{"★".repeat(5 - r)}</span>
+      <span className="text-primary-200/60">{"★".repeat(5 - r)}</span>
     </p>
   );
 }
 
 function GoogleMiniBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-zinc-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-600 ring-1 ring-zinc-200/80">
+    <span className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-soft ring-1 ring-primary-100">
       <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" aria-hidden>
         <path
           fill="#4285F4"
@@ -73,17 +73,17 @@ function ReviewCard({ review }: { review: GoogleReviewPublic }) {
             </div>
           )}
           <div className="min-w-0">
-            <p className="truncate font-semibold text-zinc-900">{review.authorName}</p>
+            <p className="truncate font-display font-semibold text-ink">{review.authorName}</p>
             <CardStars rating={review.rating} />
           </div>
         </div>
         <GoogleMiniBadge />
       </div>
-      <p className="mt-4 flex-1 text-[15px] leading-relaxed text-zinc-700">
+      <p className="mt-4 flex-1 text-[15px] leading-relaxed text-ink-body">
         &ldquo;{review.text}&rdquo;
       </p>
       {review.relativeTime ? (
-        <p className="mt-4 text-xs font-medium text-zinc-400">{review.relativeTime}</p>
+        <p className="mt-4 text-xs font-medium text-ink-caption">{review.relativeTime}</p>
       ) : null}
     </article>
   );
@@ -131,7 +131,7 @@ export function GoogleReviewsCarousel({ reviews }: { reviews: GoogleReviewPublic
         disabled={!canPrev}
         onClick={() => scrollByPage(-1)}
         className={cn(
-          "absolute left-0 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white/95 text-zinc-800 shadow-lg backdrop-blur-sm transition hover:border-primary-200 hover:bg-primary-50 hover:text-primary-900 md:flex",
+          "absolute left-0 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-primary-200/80 bg-white/95 text-primary-800 shadow-lg backdrop-blur-sm transition hover:border-primary-300 hover:bg-primary-50 hover:text-primary-950 md:flex",
           !canPrev && "pointer-events-none opacity-0"
         )}
       >
@@ -145,7 +145,7 @@ export function GoogleReviewsCarousel({ reviews }: { reviews: GoogleReviewPublic
         disabled={!canNext}
         onClick={() => scrollByPage(1)}
         className={cn(
-          "absolute right-0 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white/95 text-zinc-800 shadow-lg backdrop-blur-sm transition hover:border-primary-200 hover:bg-primary-50 hover:text-primary-900 md:flex",
+          "absolute right-0 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-primary-200/80 bg-white/95 text-primary-800 shadow-lg backdrop-blur-sm transition hover:border-primary-300 hover:bg-primary-50 hover:text-primary-950 md:flex",
           !canNext && "pointer-events-none opacity-0"
         )}
       >

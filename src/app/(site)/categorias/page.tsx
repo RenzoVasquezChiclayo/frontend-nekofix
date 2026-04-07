@@ -18,12 +18,12 @@ export default async function CategoriasPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-semibold tracking-tight text-primary-950">Categorías</h1>
-      <p className="mt-2 text-sm text-zinc-500">
+      <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink">Categorías</h1>
+      <p className="mt-2 text-sm leading-relaxed text-ink-soft">
         Elige una categoría para ver productos filtrados en el catálogo.
       </p>
       {categories.length === 0 ? (
-        <p className="mt-12 text-center text-sm text-zinc-500">
+        <p className="mt-12 text-center text-sm text-ink-soft">
           No hay categorías disponibles.
         </p>
       ) : (
@@ -50,13 +50,13 @@ export default async function CategoriasPage() {
                       {c.icon || "📁"}
                     </span>
                   )}
-                  <span className="mt-3 font-semibold text-primary-950">{c.name}</span>
+                  <span className="font-display mt-3 text-lg font-bold text-ink">{c.name}</span>
                   {count != null ? (
-                    <span className="mt-1 text-sm text-zinc-500">
+                    <span className="mt-1 text-sm text-ink-soft">
                       {count} producto{count === 1 ? "" : "s"}
                     </span>
                   ) : (
-                    <span className="mt-1 text-sm text-zinc-400">Ver catálogo</span>
+                    <span className="mt-1 text-sm text-ink-caption">Ver catálogo</span>
                   )}
                 </Link>
               </li>

@@ -34,8 +34,10 @@ export function Services() {
               key={item.title}
               className="rounded-2xl border border-zinc-200 bg-zinc-50/80 p-6 transition hover:border-primary-200 hover:shadow-md"
             >
-              <h3 className="font-semibold text-zinc-900">{item.title}</h3>
-              <p className="mt-2 text-sm text-zinc-600">{item.desc}</p>
+              <h3 className="font-display text-lg font-bold tracking-tight text-ink">
+                {item.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.desc}</p>
             </li>
           ))}
         </ul>

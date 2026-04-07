@@ -25,11 +25,11 @@ const COPY: Record<
 export function UsedGradeExplainer() {
   return (
     <section className="mt-16 border-t border-zinc-200 pt-14">
-      <h2 className="text-center font-[family-name:var(--font-outfit)] text-xl font-bold tracking-tight text-zinc-900 sm:text-2xl">
+      <h2 className="text-center font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
         ¿Qué significa cada estado?
       </h2>
-      <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-zinc-600">
-        Cada grado describe el <span className="font-medium text-zinc-800">estado estético</span> del
+      <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-ink-muted">
+        Cada grado describe el <span className="font-semibold text-ink-body">estado estético</span> del
         equipo. Todos pasan por control técnico antes de publicarse.
       </p>
       <ul className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -43,9 +43,9 @@ export function UsedGradeExplainer() {
                 c.accent
               )}
             >
-              <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">Grado {g}</p>
-              <p className="mt-2 font-semibold text-zinc-900">{c.title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{c.body}</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-ink-soft">Grado {g}</p>
+              <p className="font-display mt-2 text-lg font-bold text-ink">{c.title}</p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{c.body}</p>
             </li>
           );
         })}

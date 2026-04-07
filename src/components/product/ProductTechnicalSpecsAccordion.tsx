@@ -102,8 +102,8 @@ export function ProductTechnicalSpecsAccordion({ product }: Props) {
                   key={c.label}
                   className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 transition-colors hover:bg-zinc-100/80"
                 >
-                  <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{c.label}</p>
-                  <p className="mt-1 font-medium text-zinc-900">{c.value}</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">{c.label}</p>
+                  <p className="mt-1 font-medium text-ink">{c.value}</p>
                 </div>
               ))}
             </div>

@@ -51,7 +51,7 @@ export function BrandLogoWithTitle({ className }: { className?: string }) {
   return (
     <span className={cn("flex items-center gap-2", className)}>
       <BrandLogo decorative />
-      <span className="font-black tracking-tight text-zinc-900">{SITE_NAME}</span>
+      <span className="font-display font-black tracking-tight text-ink">{SITE_NAME}</span>
     </span>
   );
 }
@@ -69,7 +69,9 @@ export function BrandWordmark({ className, priority = false }: WordmarkProps) {
 
   if (failed) {
     return (
-      <span className={cn("font-black tracking-tight text-zinc-900", className)}>{SITE_NAME}</span>
+      <span className={cn("font-display font-black tracking-tight text-ink", className)}>
+        {SITE_NAME}
+      </span>
     );
   }
 

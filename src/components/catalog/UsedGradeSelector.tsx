@@ -16,8 +16,8 @@ export function UsedGradeSelector({ selectable, active, onSelect }: Props) {
 
   return (
     <div className="mt-6">
-      <p className="text-sm font-semibold text-zinc-900">Selecciona el estado de uso</p>
-      <p className="mt-1 text-xs text-zinc-500">
+      <p className="font-display text-sm font-bold text-ink">Selecciona el estado de uso</p>
+      <p className="mt-1 text-xs text-ink-soft">
         Precio y disponibilidad según el grado elegido.
       </p>
       <div
@@ -43,10 +43,10 @@ export function UsedGradeSelector({ selectable, active, onSelect }: Props) {
                   : "border-zinc-200 bg-white hover:border-primary-200 hover:bg-zinc-50/80"
               )}
             >
-              <span className="block font-[family-name:var(--font-outfit)] text-lg font-black tracking-tight text-primary-950">
+              <span className="block font-display text-lg font-black tracking-tight text-ink">
                 {g}
               </span>
-              <span className="mt-1 block text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+              <span className="mt-1 block text-[10px] font-medium uppercase tracking-wide text-ink-soft">
                 {p.stock > 0 ? `${p.stock} disp.` : "—"}
               </span>
             </button>

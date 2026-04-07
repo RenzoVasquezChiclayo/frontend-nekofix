@@ -13,13 +13,13 @@ export default function CarritoPage() {
   if (itemCount === 0) {
     return (
       <div className="mx-auto max-w-lg px-4 py-24 text-center">
-        <h1 className="text-2xl font-semibold text-primary-950">Tu carrito está vacío</h1>
-        <p className="mt-3 text-sm text-zinc-500">
+        <h1 className="font-display text-2xl font-extrabold text-ink">Tu carrito está vacío</h1>
+        <p className="mt-3 text-sm text-ink-soft">
           Explora la tienda y agrega productos para continuar.
         </p>
         <Link
           href="/catalogo"
-          className="mt-8 inline-block rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white hover:bg-zinc-800"
+          className="mt-8 inline-block rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-800"
         >
           Ver tienda
         </Link>
@@ -29,7 +29,7 @@ export default function CarritoPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-semibold tracking-tight text-primary-950">Carrito</h1>
+      <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink">Carrito</h1>
       <ul className="mt-8 divide-y divide-zinc-100 border-y border-zinc-100">
         {lines.map((line) => (
           <li
@@ -49,13 +49,13 @@ export default function CarritoPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={`/producto/${line.slug}`}
-                  className="font-semibold text-primary-950 hover:text-primary-700"
+                  className="font-display font-bold text-ink hover:text-primary-700"
                 >
                   {line.name}
                 </Link>
                 {line.grade ? <UsedGradeBadge type="USED" grade={line.grade} /> : null}
               </div>
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-xs text-ink-soft">
                 {[line.color, line.storage].filter(Boolean).join(" · ") || "—"}
               </p>
               <p className="mt-2 text-sm font-medium text-primary-800">
@@ -63,7 +63,7 @@ export default function CarritoPage() {
               </p>
             </div>
             <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-end">
-              <label className="flex items-center gap-2 text-sm text-zinc-600">
+              <label className="flex items-center gap-2 text-sm text-ink-muted">
                 <span>Cant.</span>
                 <input
                   type="number"
@@ -101,7 +101,7 @@ export default function CarritoPage() {
       </ul>
       <div className="mt-8 flex flex-col items-end gap-4 border-t border-zinc-100 pt-8">
         <p className="text-lg">
-          <span className="text-zinc-500">Subtotal </span>
+          <span className="text-ink-soft">Subtotal </span>
           <span className="font-semibold text-primary-900">{formatPrice(subtotal)}</span>
         </p>
         <Link
