@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/store/cart-context";
+import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { PRODUCT_PLACEHOLDER_IMAGE } from "@/lib/product-ui";
 import { formatPrice } from "@/lib/utils";
 
@@ -45,12 +46,15 @@ export default function CarritoPage() {
               />
             </div>
             <div className="min-w-0 flex-1">
-              <Link
-                href={`/producto/${line.slug}`}
-                className="font-semibold text-primary-950 hover:text-primary-700"
-              >
-                {line.name}
-              </Link>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href={`/producto/${line.slug}`}
+                  className="font-semibold text-primary-950 hover:text-primary-700"
+                >
+                  {line.name}
+                </Link>
+                {line.grade ? <UsedGradeBadge type="USED" grade={line.grade} /> : null}
+              </div>
               <p className="mt-1 text-xs text-zinc-500">
                 {[line.color, line.storage].filter(Boolean).join(" · ") || "—"}
               </p>

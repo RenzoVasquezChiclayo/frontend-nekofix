@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { ProductBadges } from "@/components/store/ProductBadges";
+import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { getProductCoverImage } from "@/lib/product-images";
 import { isLowStock } from "@/lib/product-ui";
 import { formatPrice } from "@/lib/utils";
@@ -31,6 +32,8 @@ export function ProductCard({ product: p }: Props) {
       color: p.color,
       storage: p.storage,
       condition: p.condition,
+      grade: p.type === "USED" ? p.grade : undefined,
+      productType: p.type,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
@@ -50,8 +53,9 @@ export function ProductCard({ product: p }: Props) {
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           unoptimized
         />
-        <div className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)]">
+        <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1">
           <ProductBadges type={p.type} condition={p.condition} lowStock={low} />
+          <UsedGradeBadge type={p.type} grade={p.grade} />
         </div>
         </div>
       </Link>

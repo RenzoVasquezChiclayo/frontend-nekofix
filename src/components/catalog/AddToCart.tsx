@@ -27,6 +27,8 @@ export function AddToCart({ product }: Props) {
       color: product.color,
       storage: product.storage,
       condition: product.condition,
+      grade: product.type === "USED" ? product.grade : undefined,
+      productType: product.type,
     });
     notifySuccess("Producto agregado al carrito");
     setAdded(true);
@@ -35,7 +37,7 @@ export function AddToCart({ product }: Props) {
 
   return (
     <div className="space-y-4">
-      {(product.color || product.storage) && (
+      {(product.color || product.storage || (product.type === "USED" && product.grade)) && (
         <div className="rounded-xl border border-primary-100 bg-primary-50/50 px-4 py-3 text-sm text-zinc-600">
           {product.storage ? (
             <p>
@@ -47,6 +49,12 @@ export function AddToCart({ product }: Props) {
             <p className={product.storage ? "mt-1" : ""}>
               <span className="font-medium text-zinc-800">Color: </span>
               {product.color}
+            </p>
+          ) : null}
+          {product.type === "USED" && product.grade ? (
+            <p className={product.storage || product.color ? "mt-1" : ""}>
+              <span className="font-medium text-zinc-800">Grado: </span>
+              {product.grade}
             </p>
           ) : null}
         </div>

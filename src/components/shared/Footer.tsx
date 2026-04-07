@@ -40,6 +40,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/terminos" className="hover:text-zinc-900">
+                  Términos y condiciones
+                </Link>
+              </li>
+              <li>
                 <Link href="/admin" className="hover:text-zinc-900">
                   Panel admin
                 </Link>
