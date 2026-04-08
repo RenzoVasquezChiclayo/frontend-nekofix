@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/store/cart-context";
+import { ProductColorMiniSwatch } from "@/components/product/ProductColorSwatch";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { PRODUCT_PLACEHOLDER_IMAGE } from "@/lib/product-ui";
 import { formatPrice } from "@/lib/utils";
@@ -55,9 +56,15 @@ export default function CarritoPage() {
                 </Link>
                 {line.grade ? <UsedGradeBadge type="USED" grade={line.grade} /> : null}
               </div>
-              <p className="mt-1 text-xs text-ink-soft">
-                {[line.color, line.storage].filter(Boolean).join(" · ") || "—"}
-              </p>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-soft">
+                {line.color ? (
+                  <ProductColorMiniSwatch color={line.color} className="mt-0" />
+                ) : null}
+                {line.storage ? (
+                  <span className={line.color ? "text-ink-soft" : ""}>{line.storage}</span>
+                ) : null}
+                {!line.color && !line.storage ? <span>—</span> : null}
+              </div>
               <p className="mt-2 text-sm font-medium text-primary-800">
                 {formatPrice(line.unitPrice)} c/u
               </p>

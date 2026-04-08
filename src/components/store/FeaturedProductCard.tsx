@@ -8,6 +8,7 @@ import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { notifySuccess } from "@/lib/toast";
 import { getProductCoverImage } from "@/lib/product-images";
 import { isLowStock } from "@/lib/product-ui";
+import { ProductColorMiniSwatch } from "@/components/product/ProductColorSwatch";
 import { formatPrice, whatsappHref } from "@/lib/utils";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
@@ -77,9 +78,9 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
             {p.name}
           </h3>
         </Link>
+        {p.color ? <ProductColorMiniSwatch color={p.color} /> : null}
         <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-soft">
           {p.storage ? <span>{p.storage}</span> : null}
-          {p.color ? <span>{p.color}</span> : null}
         </div>
         <div className="mt-3 flex flex-wrap items-baseline gap-2">
           <span className="text-lg font-semibold text-primary-800">{formatPrice(p.price)}</span>

@@ -7,6 +7,7 @@ import { ProductBadges } from "@/components/store/ProductBadges";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { getProductCoverImage } from "@/lib/product-images";
 import { isLowStock } from "@/lib/product-ui";
+import { ProductColorMiniSwatch } from "@/components/product/ProductColorSwatch";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
@@ -69,9 +70,9 @@ export function ProductCard({ product: p }: Props) {
             {p.name}
           </h2>
         </Link>
+        {p.color ? <ProductColorMiniSwatch color={p.color} /> : null}
         <div className="mt-2 flex flex-wrap gap-2 text-xs text-ink-soft">
           {p.storage ? <span>{p.storage}</span> : null}
-          {p.color ? <span>{p.color}</span> : null}
           {p.batteryHealth != null ? <span>Batería {p.batteryHealth}%</span> : null}
         </div>
         <div className="mt-3 flex flex-wrap items-baseline gap-2">

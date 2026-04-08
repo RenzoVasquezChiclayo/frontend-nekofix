@@ -8,7 +8,13 @@ import {
 } from "@/lib/catalog-labels";
 import { getProductCoverImage } from "@/lib/product-images";
 import { cn, formatPrice } from "@/lib/utils";
+import { normalizeUsedGrade } from "@/lib/used-grade";
 import type { Product } from "@/types/product";
+
+function formatGradeCell(grade: string | null | undefined): string | null {
+  const g = normalizeUsedGrade(grade);
+  return g && g.length > 0 ? g : null;
+}
 
 type Props = {
   products: Product[];
@@ -39,6 +45,7 @@ export function ProductTable({
         {products.map((p) => {
           const low = p.stock <= p.minStock;
           const cover = getProductCoverImage(p);
+          const gradeLabel = formatGradeCell(p.grade);
           return (
             <li
               key={p.id}
@@ -71,6 +78,9 @@ export function ProductTable({
                   </div>
                   <p className="mt-1 text-xs text-zinc-500">
                     {p.brand?.name ?? "—"} · {PRODUCT_CONDITION_LABELS[p.condition]}
+                    {gradeLabel ? (
+                      <span className="text-zinc-600"> · Grado {gradeLabel}</span>
+                    ) : null}
                   </p>
                 </div>
               </div>
@@ -117,7 +127,7 @@ export function ProductTable({
 
       <div className="hidden overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm lg:block">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1100px] text-left text-sm">
+          <table className="w-full min-w-[1180px] text-left text-sm">
             <thead className="border-b border-zinc-100 bg-zinc-50/90 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
               <tr>
                 <th className="px-3 py-3">Producto</th>
@@ -128,6 +138,7 @@ export function ProductTable({
                 <th className="px-3 py-3">Precio</th>
                 <th className="px-3 py-3">Stock</th>
                 <th className="px-3 py-3">Cond.</th>
+                <th className="px-3 py-3">Grado</th>
                 <th className="px-3 py-3">Tipo</th>
                 <th className="px-3 py-3">Dest.</th>
                 <th className="px-3 py-3">Pub.</th>
@@ -138,6 +149,7 @@ export function ProductTable({
             <tbody className="divide-y divide-zinc-100">
               {products.map((p) => {
                 const low = p.stock <= p.minStock;
+                const gradeLabel = formatGradeCell(p.grade);
                 return (
                   <tr key={p.id} className="hover:bg-zinc-50/60">
                     <td className="max-w-[200px] px-3 py-3">
@@ -166,6 +178,9 @@ export function ProductTable({
                     </td>
                     <td className="px-3 py-3 text-xs text-zinc-600">
                       {PRODUCT_CONDITION_LABELS[p.condition]}
+                    </td>
+                    <td className="px-3 py-3 text-xs text-zinc-600">
+                      {gradeLabel ?? "—"}
                     </td>
                     <td className="px-3 py-3 text-xs text-zinc-600">
                       {PRODUCT_TYPE_LABELS[p.type]}

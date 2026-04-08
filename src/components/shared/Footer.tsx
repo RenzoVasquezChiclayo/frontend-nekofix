@@ -30,6 +30,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/reparaciones" className="transition hover:text-ink">
+                  Reparaciones
+                </Link>
+              </li>
+              <li>
                 <Link href="/categorias" className="transition hover:text-ink">
                   Categorías
                 </Link>
