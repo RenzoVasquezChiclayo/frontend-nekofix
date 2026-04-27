@@ -1,3 +1,6 @@
+import { getEnv, isDev } from "./env-utils";
+const API_FALLBACK = isDev() ? "http://localhost:3005/api" : "";
+const SITE_FALLBACK = isDev() ? "http://localhost:3000" : "";
 /**
  * Variables de entorno públicas (NEXT_PUBLIC_*).
  * El backend NestJS vive en otro origen; la URL base se configura aquí.
@@ -32,29 +35,59 @@ function required(name: string, fallback?: string): string {
  * Origen de archivos estáticos (p. ej. `/uploads/...`), distinto del prefijo `/api` del REST.
  * Preferir `NEXT_PUBLIC_MEDIA_URL`. Si falta, se deduce quitando `/api` al final de la URL del API (compat).
  */
+// function resolveMediaBaseUrl(): string {
+//   const explicit = process.env.NEXT_PUBLIC_MEDIA_URL?.trim();
+//   if (explicit) return explicit.replace(/\/$/, "");
+//   const api = required("NEXT_PUBLIC_API_URL");
+//   const trimmed = api.replace(/\/$/, "");
+//   if (trimmed.endsWith("/api")) return trimmed.slice(0, -4);
+//   return trimmed;
+// }
 function resolveMediaBaseUrl(): string {
-  const explicit = process.env.NEXT_PUBLIC_MEDIA_URL?.trim();
+  const explicit = getEnv("NEXT_PUBLIC_MEDIA_URL");
+
   if (explicit) return explicit.replace(/\/$/, "");
-  const api = required("NEXT_PUBLIC_API_URL");
+
+  const api = getEnv("NEXT_PUBLIC_API_URL", API_FALLBACK);
   const trimmed = api.replace(/\/$/, "");
-  if (trimmed.endsWith("/api")) return trimmed.slice(0, -4);
-  return trimmed;
+
+  return trimmed.endsWith("/api") ? trimmed.slice(0, -4) : trimmed;
 }
 
+// export const env = {
+//   apiBaseUrl: required("NEXT_PUBLIC_API_URL"),
+//   /** Base para rutas relativas de medios (`/uploads/...`). No incluye `/api`. */
+//   mediaBaseUrl: resolveMediaBaseUrl(),
+//   siteUrl: required("NEXT_PUBLIC_SITE_URL"),
+//   whatsappNumber: required("NEXT_PUBLIC_WHATSAPP"),
+//   whatsappDefaultMessage: required(
+//     "NEXT_PUBLIC_WHATSAPP_MESSAGE"
+//   ),
+//   /** Opcional: URL de embed de mapa (Google Maps iframe src) */
+//   mapEmbedUrl: process.env.NEXT_PUBLIC_MAP_EMBED_URL ?? "",
+//   /**
+//    * Opcional: enlace a la ficha del negocio o lista de reseñas en Google (botón “Ver más en Google” en landing).
+//    * Ej. URL de “Escribir una reseña” o la ficha pública.
+//    */
+//   googleReviewsListingUrl: (process.env.NEXT_PUBLIC_GOOGLE_REVIEWS_URL ?? "").trim(),
+// } as const;
 export const env = {
-  apiBaseUrl: required("NEXT_PUBLIC_API_URL"),
-  /** Base para rutas relativas de medios (`/uploads/...`). No incluye `/api`. */
+  // API
+  apiBaseUrl: getEnv("NEXT_PUBLIC_API_URL", API_FALLBACK),
+
+  // Media (uploads)
   mediaBaseUrl: resolveMediaBaseUrl(),
-  siteUrl: required("NEXT_PUBLIC_SITE_URL"),
-  whatsappNumber: required("NEXT_PUBLIC_WHATSAPP"),
-  whatsappDefaultMessage: required(
-    "NEXT_PUBLIC_WHATSAPP_MESSAGE"
+
+  // Site
+  siteUrl: getEnv("NEXT_PUBLIC_SITE_URL", SITE_FALLBACK),
+
+  // Otros
+  whatsappNumber: getEnv("NEXT_PUBLIC_WHATSAPP", "51917688459"),
+  whatsappDefaultMessage: getEnv(
+    "NEXT_PUBLIC_WHATSAPP_MESSAGE",
+    "Hola, quiero información sobre NekoFix."
   ),
-  /** Opcional: URL de embed de mapa (Google Maps iframe src) */
-  mapEmbedUrl: process.env.NEXT_PUBLIC_MAP_EMBED_URL ?? "",
-  /**
-   * Opcional: enlace a la ficha del negocio o lista de reseñas en Google (botón “Ver más en Google” en landing).
-   * Ej. URL de “Escribir una reseña” o la ficha pública.
-   */
-  googleReviewsListingUrl: (process.env.NEXT_PUBLIC_GOOGLE_REVIEWS_URL ?? "").trim(),
+
+  mapEmbedUrl: getEnv("NEXT_PUBLIC_MAP_EMBED_URL"),
+  googleReviewsListingUrl: getEnv("NEXT_PUBLIC_GOOGLE_REVIEWS_URL"),
 } as const;

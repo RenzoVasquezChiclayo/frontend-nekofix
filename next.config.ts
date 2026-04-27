@@ -1,14 +1,29 @@
 import type { NextConfig } from "next";
 
 /** Misma regla que `env.mediaBaseUrl`: solo para `images.remotePatterns`, sin tocar el cliente en runtime. */
+// function mediaOriginForImageConfig(): string {
+//   const explicit = process.env.NEXT_PUBLIC_MEDIA_URL?.trim();
+//   if (explicit) return explicit.replace(/\/$/, "");
+//   const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3005/api";
+//   const trimmed = api.replace(/\/$/, "");
+//   return trimmed.endsWith("/api") ? trimmed.slice(0, -4) : trimmed;
+// }
 function mediaOriginForImageConfig(): string {
   const explicit = process.env.NEXT_PUBLIC_MEDIA_URL?.trim();
   if (explicit) return explicit.replace(/\/$/, "");
-  const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3005/api";
+
+  const api = process.env.NEXT_PUBLIC_API_URL;
+
+  if (!api) {
+    if (process.env.NODE_ENV === "development") {
+      return "http://localhost:3005";
+    }
+    return "";
+  }
+
   const trimmed = api.replace(/\/$/, "");
   return trimmed.endsWith("/api") ? trimmed.slice(0, -4) : trimmed;
 }
-
 /**
  * Orígenes para `next/image`: medios del backend (`/uploads/**`), CDNs extra y servicios de placeholder.
  * - Origen de medios: `NEXT_PUBLIC_MEDIA_URL` o, si falta, mismo host que el API sin sufijo `/api` (`NEXT_PUBLIC_API_URL`).
