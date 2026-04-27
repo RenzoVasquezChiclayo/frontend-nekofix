@@ -34,6 +34,7 @@ function buildUrl(
   path: string,
   searchParams?: FetchOptions["searchParams"]
 ): string {
+  console.log("ENV BUILD:", process.env.NEXT_PUBLIC_API_URL);
   if (!env.apiBaseUrl) {
     throw new Error("❌ NEXT_PUBLIC_API_URL no está definido");
   }
