@@ -12,11 +12,18 @@
 //   }
 //   return v ?? "";
 // }
-function required(name: string): string {
+function required(name: string, fallback?: string): string {
   const value = process.env[name];
 
+  // durante build (SSR)
   if (!value) {
-    throw new Error(`❌ Missing environment variable: ${name}`);
+    if (typeof window === "undefined") {
+      // estamos en build/SSR → no romper
+      return fallback ?? "";
+    }
+
+    // en cliente → sí romper
+    throw new Error(`Missing environment variable: ${name}`);
   }
 
   return value;
