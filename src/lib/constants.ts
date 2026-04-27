@@ -6,16 +6,7 @@ export const RELATED_PRODUCTS_DISPLAY_LIMIT = 8;
 export const NAV_LINKS = [
   { href: "/", label: "Inicio" },
   { href: "/catalogo", label: "Tienda" },
+  { href: "/reparaciones", label: "Reparaciones" },
   { href: "/nosotros", label: "Nosotros" },
   { href: "/contacto", label: "Contacto" },
-] as const;
-
-/** Marcas mostradas en landing (estático hasta conectar con API). */
-export const FEATURED_BRANDS = [
-  "Apple",
-  "Samsung",
-  "Google",
-  "Xiaomi",
-  "Motorola",
-  "OnePlus",
 ] as const;

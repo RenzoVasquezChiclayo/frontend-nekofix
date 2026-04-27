@@ -14,43 +14,53 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-3">
           <div>
             <BrandWordmark className="object-left" />
-            <p className="mt-3 text-sm text-zinc-600">{SITE_TAGLINE}</p>
+            <p className="mt-3 text-sm leading-relaxed text-ink-muted">{SITE_TAGLINE}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-900">Enlaces</p>
-            <ul className="mt-3 space-y-2 text-sm text-zinc-600">
+            <p className="text-sm font-semibold text-ink">Enlaces</p>
+            <ul className="mt-3 space-y-2 text-sm text-ink-muted">
               <li>
-                <Link href="/nosotros" className="hover:text-zinc-900">
+                <Link href="/nosotros" className="transition hover:text-ink">
                   Nosotros
                 </Link>
               </li>
               <li>
-                <Link href="/catalogo" className="hover:text-zinc-900">
+                <Link href="/catalogo" className="transition hover:text-ink">
                   Tienda
                 </Link>
               </li>
               <li>
-                <Link href="/categorias" className="hover:text-zinc-900">
+                <Link href="/reparaciones" className="transition hover:text-ink">
+                  Reparaciones
+                </Link>
+              </li>
+              <li>
+                <Link href="/categorias" className="transition hover:text-ink">
                   Categorías
                 </Link>
               </li>
               <li>
-                <Link href="/contacto" className="hover:text-zinc-900">
+                <Link href="/contacto" className="transition hover:text-ink">
                   Contacto
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="hover:text-zinc-900">
+                <Link href="/terminos" className="transition hover:text-ink">
+                  Términos y condiciones
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin" className="transition hover:text-ink">
                   Panel admin
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-900">Contacto</p>
-            <ul className="mt-3 space-y-2 text-sm text-zinc-600">
+            <p className="text-sm font-semibold text-ink">Contacto</p>
+            <ul className="mt-3 space-y-2 text-sm text-ink-muted">
               <li>
-                <a href={telHref} className="hover:text-zinc-900">
+                <a href={telHref} className="transition hover:text-ink">
                   {SITE_CONTACT.phoneDisplay}
                 </a>
               </li>
@@ -65,19 +75,19 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href={mailHref} className="break-all hover:text-zinc-900">
+                <a href={mailHref} className="break-all transition hover:text-ink">
                   {SITE_CONTACT.email}
                 </a>
               </li>
             </ul>
-            <ul className="mt-4 flex flex-wrap gap-3 text-xs font-medium text-zinc-500">
+            <ul className="mt-4 flex flex-wrap gap-3 text-xs font-medium text-ink-caption">
               {SITE_CONTACT.social.map((s) => (
                 <li key={s.href}>
                   <a
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-zinc-800"
+                    className="transition hover:text-ink-soft"
                   >
                     {s.label}
                   </a>
@@ -86,7 +96,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <p className="mt-10 text-center text-xs text-zinc-500">
+        <p className="mt-10 text-center text-xs text-ink-caption">
           © {new Date().getFullYear()} {SITE_NAME}. Todos los derechos reservados.
         </p>
       </div>

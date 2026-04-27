@@ -8,16 +8,16 @@ export function Hero() {
       <div className="pointer-events-none absolute -right-32 top-20 h-96 w-96 rounded-full bg-accent-cool/15 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32 lg:py-40">
         <div className="max-w-2xl">
-          <p className="text-sm font-medium uppercase tracking-widest text-accent-cool/95">
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary-100/95">
             Reparación & venta
           </p>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Tu iPhone y Android en las mejores manos
+          <h1 className="font-display mt-4 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Tu ecosistema Apple en las mejores manos
           </h1>
-          <p className="mt-6 text-lg text-zinc-300">
-            Especialistas en iPhone, equipos nuevos y seminuevos, accesorios y
-            servicio técnico con garantía. {SITE_NAME} combina experiencia y
-            stock actualizado.
+          <p className="mt-6 text-lg leading-relaxed text-primary-100/90">
+            Especialistas en Apple: iPhone, iPad, Mac y accesorios. Reparación, equipos
+            nuevos y seminuevos, y servicio técnico con garantía. {SITE_NAME} combina
+            experiencia y stock actualizado.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link

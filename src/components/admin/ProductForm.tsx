@@ -8,6 +8,7 @@ import {
 } from "@/lib/catalog-labels";
 import { ADMIN_PRODUCT_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { coerceAdminProductForForm } from "@/lib/coerce-admin-product";
+import { normalizeUsedGrade, USED_GRADE_ORDER } from "@/lib/used-grade";
 import { getApiErrorMessage } from "@/lib/api-errors";
 import { notifyApiError, notifyError, notifySuccess, notifyWarning } from "@/lib/toast";
 import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
@@ -27,6 +28,7 @@ import {
   ProductImagesEditor,
   type ProductImageDraft,
 } from "@/components/admin/ProductImagesEditor";
+import { AdminProductColorPicker } from "@/components/admin/AdminProductColorPicker";
 import { ProductFormSkeleton } from "@/components/admin/ProductFormSkeleton";
 import type { ProductCreateInput } from "@/types/admin-product";
 import type { Brand, Category, PhoneModel, ProductCondition, ProductType } from "@/types/product";
@@ -162,7 +164,7 @@ export function ProductForm({ productId }: Props) {
         setStorage(p.storage ?? "");
         setColor(p.color ?? "");
         setBatteryHealth(p.batteryHealth != null ? String(p.batteryHealth) : "");
-        setGrade(p.grade ?? "");
+        setGrade(normalizeUsedGrade(p.grade) ?? "");
         setIsFeatured(p.isFeatured);
         setIsPublished(p.isPublished);
         setSeoTitle(p.seoTitle ?? "");
@@ -193,6 +195,13 @@ export function ProductForm({ productId }: Props) {
     }, 2200);
     return () => window.clearTimeout(t);
   }, [editPhase, router]);
+
+  /** `grade` solo aplica a `USED`; si el tipo deja de ser usado, limpiar. */
+  useEffect(() => {
+    if (type !== "USED") {
+      setGrade("");
+    }
+  }, [type]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -226,7 +235,7 @@ export function ProductForm({ productId }: Props) {
         storage: storage.trim() || null,
         color: color.trim() || null,
         batteryHealth: batteryHealth === "" ? null : Number(batteryHealth),
-        grade: grade.trim() || null,
+        grade: type === "USED" ? (grade.trim() || null) : null,
         isFeatured,
         isPublished,
         seoTitle: seoTitle.trim() || null,
@@ -448,6 +457,29 @@ export function ProductForm({ productId }: Props) {
               ))}
             </select>
           </label>
+          {type === "USED" ? (
+            <label className="sm:col-span-2">
+              <span className="text-sm font-medium text-zinc-700">Grado del equipo</span>
+              <select
+                value={grade}
+                onChange={(e) => setGrade(e.target.value)}
+                className={input}
+              >
+                <option value="">Seleccionar grado</option>
+                {USED_GRADE_ORDER.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+                {grade && !(USED_GRADE_ORDER as readonly string[]).includes(grade) ? (
+                  <option value={grade}>{grade}</option>
+                ) : null}
+              </select>
+              <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
+                Estado cosmético del equipo usado. Solo aplica cuando el tipo es &quot;Usado&quot;.
+              </p>
+            </label>
+          ) : null}
           <label>
             <span className="text-sm font-medium text-zinc-700">Marca</span>
             <select
@@ -503,10 +535,15 @@ export function ProductForm({ productId }: Props) {
             <span className="text-sm font-medium text-zinc-700">Almacenamiento</span>
             <input value={storage} onChange={(e) => setStorage(e.target.value)} className={input} />
           </label>
-          <label>
+          <div className="sm:col-span-2">
             <span className="text-sm font-medium text-zinc-700">Color</span>
-            <input value={color} onChange={(e) => setColor(e.target.value)} className={input} />
-          </label>
+            <p className="mt-1 text-xs text-zinc-500">
+              Selecciona el acabado comercial; se guarda el nombre en el producto.
+            </p>
+            <div className="mt-3">
+              <AdminProductColorPicker value={color} onChange={setColor} />
+            </div>
+          </div>
           <label>
             <span className="text-sm font-medium text-zinc-700">Salud batería (%)</span>
             <input
@@ -517,10 +554,6 @@ export function ProductForm({ productId }: Props) {
               onChange={(e) => setBatteryHealth(e.target.value)}
               className={input}
             />
-          </label>
-          <label>
-            <span className="text-sm font-medium text-zinc-700">Grado</span>
-            <input value={grade} onChange={(e) => setGrade(e.target.value)} className={input} />
           </label>
         </div>
       </section>

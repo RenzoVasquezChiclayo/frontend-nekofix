@@ -1,6 +1,7 @@
 import { mapProductFiltersToQuery } from "@/lib/mappers/product-query.mapper";
 import { normalizeApiListResponse } from "@/lib/normalize-api-list";
 import { normalizeApiSingleResponse } from "@/lib/normalize-api-single";
+import { sortProductsByGrade } from "@/lib/used-grade";
 import { apiFetch } from "@/services/api";
 import type { ApiListResponse } from "@/types/api";
 import type { Product, ProductListQuery } from "@/types/product";
@@ -70,5 +71,46 @@ export async function getRelatedProducts(
     return merged.slice(0, limit);
   } catch {
     return [];
+  }
+}
+
+/**
+ * Variantes del mismo equipo (modelo + almacenamiento + color) en `USED`, distinto `grade`.
+ * Solo incluye filas con stock &gt; 0 para el selector; el producto actual se añade si falta (p. ej. sin stock).
+ */
+export async function getUsedGradeVariants(product: Product): Promise<Product[]> {
+  if (product.type !== "USED" || !product.modelId) {
+    return [product];
+  }
+  const storage = (product.storage ?? "").trim();
+  const color = (product.color ?? "").trim();
+
+  try {
+    const res = await getProducts({
+      modelId: product.modelId,
+      type: "USED",
+      limit: 48,
+      page: 1,
+      sort: "newest",
+    });
+
+    const sameSkuFamily = res.data.filter((p) => {
+      const ps = (p.storage ?? "").trim();
+      const pc = (p.color ?? "").trim();
+      return ps === storage && pc === color && p.type === "USED";
+    });
+
+    const inStock = sameSkuFamily.filter((p) => p.stock > 0);
+    const merged = inStock.some((p) => p.id === product.id)
+      ? inStock
+      : [...inStock, product];
+
+    const byId = new Map<string, Product>();
+    for (const p of merged) {
+      if (!byId.has(p.id)) byId.set(p.id, p);
+    }
+    return sortProductsByGrade([...byId.values()]);
+  } catch {
+    return [product];
   }
 }

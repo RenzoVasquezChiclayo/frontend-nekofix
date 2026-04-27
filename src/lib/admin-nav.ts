@@ -24,8 +24,8 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/categories", label: "Categorías", Icon: IconFolderTree },
   { href: "/admin/brands", label: "Marcas", Icon: IconTag },
   { href: "/admin/inventory", label: "Inventario", Icon: IconWarehouse },
-  { href: "/admin/leads", label: "Leads WhatsApp", Icon: IconMessage },
-  { href: "/admin/clients", label: "Clientes", Icon: IconUsers },
-  { href: "/admin/landing", label: "Landing CMS", Icon: IconPanel },
-  { href: "/admin/settings", label: "Configuración", Icon: IconSettings },
+  // { href: "/admin/leads", label: "Leads WhatsApp", Icon: IconMessage },
+  // { href: "/admin/clients", label: "Clientes", Icon: IconUsers },
+  // { href: "/admin/landing", label: "Landing CMS", Icon: IconPanel },
+  // { href: "/admin/settings", label: "Configuración", Icon: IconSettings },
 ];

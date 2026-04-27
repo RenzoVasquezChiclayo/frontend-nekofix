@@ -1,4 +1,4 @@
-import type { ProductCondition } from "@/types/product";
+import type { ProductCondition, ProductType } from "@/types/product";
 
 /** Línea del carrito (persistencia local). Alineado a CartCheckoutItemPayload. */
 export interface CartLine {
@@ -11,6 +11,10 @@ export interface CartLine {
   color?: string | null;
   storage?: string | null;
   condition: ProductCondition;
+  /** Opcional: grado cosmético (USED) para badge en carrito. */
+  grade?: string | null;
+  /** Opcional: para badges tipo / usado. */
+  productType?: ProductType;
 }
 
 /** Alias explícito para documentación / payloads. */

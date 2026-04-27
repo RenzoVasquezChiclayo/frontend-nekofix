@@ -43,10 +43,10 @@ export function MissionVision() {
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600 text-white shadow-lg shadow-primary-900/20">
               <IconMission className="h-6 w-6" />
             </div>
-            <h2 className="mt-6 text-xl font-bold tracking-tight text-zinc-900">
+            <h2 className="font-display mt-6 text-xl font-extrabold tracking-tight text-ink">
               {ABOUT_COPY.mission.title}
             </h2>
-            <p className="mt-4 text-[15px] leading-relaxed text-zinc-600">
+            <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">
               {ABOUT_COPY.mission.body}
             </p>
           </article>
@@ -57,10 +57,10 @@ export function MissionVision() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-900 text-white">
                 <IconVision className="h-6 w-6" />
               </div>
-              <h2 className="mt-6 text-xl font-bold tracking-tight text-zinc-900">
+              <h2 className="font-display mt-6 text-xl font-extrabold tracking-tight text-ink">
                 {ABOUT_COPY.vision.title}
               </h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-zinc-600">
+              <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">
                 {ABOUT_COPY.vision.body}
               </p>
             </div>

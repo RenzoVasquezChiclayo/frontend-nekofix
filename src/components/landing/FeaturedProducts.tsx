@@ -38,7 +38,7 @@ export function FeaturedProducts({ products }: Props) {
         </div>
 
         {products.length === 0 ? (
-          <p className="mt-10 text-center text-sm text-zinc-500">
+          <p className="mt-10 text-center text-sm text-ink-soft">
             Pronto habrá productos destacados.
           </p>
         ) : (

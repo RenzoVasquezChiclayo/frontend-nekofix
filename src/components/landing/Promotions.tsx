@@ -13,11 +13,13 @@ export function Promotions() {
         />
         <div className="mt-10 flex flex-col items-center justify-between gap-6 rounded-2xl border border-white/10 bg-white/10 p-8 backdrop-blur sm:flex-row">
           <div>
-            <p className="text-sm uppercase tracking-wider text-accent-cool/90">
-              Seminuevos certificados
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary-100/95">
+              Apple seminuevo certificado
             </p>
-            <p className="mt-2 text-2xl font-bold">Hasta 12 MSI en seleccionados</p>
-            <p className="mt-1 text-sm text-white/80">
+            <p className="font-display mt-2 text-2xl font-extrabold tracking-tight text-white">
+              Hasta 12 MSI en seleccionados
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-primary-100/85">
               Sujeto a existencias. Consulta términos en tienda.
             </p>
           </div>

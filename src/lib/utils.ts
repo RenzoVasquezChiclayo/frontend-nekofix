@@ -20,6 +20,7 @@ export function buildWhatsAppCartMessage(lines: CartLine[], total: number): stri
     const bits = [l.name];
     if (l.color) bits.push(l.color);
     if (l.storage) bits.push(l.storage);
+    if (l.grade) bits.push(`Grado ${l.grade}`);
     bits.push(`×${l.quantity}`);
     bits.push(formatPrice(l.unitPrice * l.quantity));
     return `• ${bits.join(" · ")}`;

@@ -4,8 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { ProductBadges } from "@/components/store/ProductBadges";
+import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { getProductCoverImage } from "@/lib/product-images";
 import { isLowStock } from "@/lib/product-ui";
+import { ProductColorMiniSwatch } from "@/components/product/ProductColorSwatch";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
@@ -31,6 +33,8 @@ export function ProductCard({ product: p }: Props) {
       color: p.color,
       storage: p.storage,
       condition: p.condition,
+      grade: p.type === "USED" ? p.grade : undefined,
+      productType: p.type,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
@@ -50,30 +54,31 @@ export function ProductCard({ product: p }: Props) {
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           unoptimized
         />
-        <div className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)]">
+        <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1">
           <ProductBadges type={p.type} condition={p.condition} lowStock={low} />
+          <UsedGradeBadge type={p.type} grade={p.grade} />
         </div>
         </div>
       </Link>
       <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-caption">
           {p.brand.name}
           {p.model ? ` · ${p.model.name}` : ""}
         </p>
         <Link href={`/producto/${p.slug}`} className="mt-1">
-          <h2 className="line-clamp-2 min-h-[2.8rem] text-sm font-semibold leading-snug text-zinc-900">
+          <h2 className="font-display line-clamp-2 min-h-[2.8rem] text-sm font-bold leading-snug text-ink">
             {p.name}
           </h2>
         </Link>
-        <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-500">
+        {p.color ? <ProductColorMiniSwatch color={p.color} /> : null}
+        <div className="mt-2 flex flex-wrap gap-2 text-xs text-ink-soft">
           {p.storage ? <span>{p.storage}</span> : null}
-          {p.color ? <span>{p.color}</span> : null}
           {p.batteryHealth != null ? <span>Batería {p.batteryHealth}%</span> : null}
         </div>
         <div className="mt-3 flex flex-wrap items-baseline gap-2">
           <span className="text-lg font-semibold text-primary-800">{formatPrice(p.price)}</span>
           {p.comparePrice != null && p.comparePrice > p.price ? (
-            <span className="text-sm text-zinc-400 line-through">
+            <span className="text-sm text-ink-caption/80 line-through">
               {formatPrice(p.comparePrice)}
             </span>
           ) : null}
@@ -82,7 +87,7 @@ export function ProductCard({ product: p }: Props) {
         <div className="mt-4 grid grid-cols-1 gap-2">
           <Link
             href={`/producto/${p.slug}`}
-            className="rounded-xl border border-zinc-200 px-3 py-2 text-center text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
+            className="rounded-xl border border-primary-200/80 px-3 py-2 text-center text-sm font-medium text-ink-body transition hover:bg-primary-50/80"
           >
             Ver detalle
           </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ProductColorPickerRow } from "@/components/product/ProductColorSwatch";
 import { notifySuccess } from "@/lib/toast";
 import { getProductCoverImage } from "@/lib/product-images";
 import { useCart } from "@/store/cart-context";
@@ -27,30 +28,63 @@ export function AddToCart({ product }: Props) {
       color: product.color,
       storage: product.storage,
       condition: product.condition,
+      grade: product.type === "USED" ? product.grade : undefined,
+      productType: product.type,
     });
     notifySuccess("Producto agregado al carrito");
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
 
+  const showSpecs =
+    product.storage ||
+    product.color ||
+    product.batteryHealth != null ||
+    (product.type === "USED" && product.grade);
+
   return (
     <div className="space-y-4">
-      {(product.color || product.storage) && (
-        <div className="rounded-xl border border-primary-100 bg-primary-50/50 px-4 py-3 text-sm text-zinc-600">
+      {showSpecs ? (
+        <div className="space-y-3 rounded-xl border border-primary-100 bg-primary-50/50 px-4 py-4 text-sm text-zinc-600">
+          {product.type === "USED" && product.grade ? (
+            <p>
+              <span className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
+                Grado
+              </span>
+              <span className="mt-1 block font-medium text-ink">{product.grade}</span>
+            </p>
+          ) : null}
           {product.storage ? (
             <p>
-              <span className="font-medium text-zinc-800">Almacenamiento: </span>
-              {product.storage}
+              <span className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
+                Almacenamiento
+              </span>
+              <span className="mt-1 block font-medium text-ink">{product.storage}</span>
+            </p>
+          ) : null}
+          {product.batteryHealth != null ? (
+            <p>
+              <span className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
+                Batería
+              </span>
+              <span className="mt-1 block font-medium text-ink">{product.batteryHealth}%</span>
             </p>
           ) : null}
           {product.color ? (
-            <p className={product.storage ? "mt-1" : ""}>
-              <span className="font-medium text-zinc-800">Color: </span>
-              {product.color}
-            </p>
+            <div
+              className={
+                product.storage ||
+                product.batteryHealth != null ||
+                (product.type === "USED" && product.grade)
+                  ? "border-t border-primary-100/80 pt-4"
+                  : ""
+              }
+            >
+              <ProductColorPickerRow color={product.color} />
+            </div>
           ) : null}
         </div>
-      )}
+      ) : null}
 
       <div className="flex items-center gap-4">
         <label className="text-sm font-medium text-zinc-700">

@@ -27,6 +27,13 @@
   /* Display: Outfit (next/font en layout) + Calibri como respaldo */
   --font-family-display: var(--font-outfit), Calibri, "Segoe UI", sans-serif;
   --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Texto semántico (alineado a primarios — UI pública / landing) */
+  --text-ink: var(--primary-950);
+  --text-ink-body: var(--primary-800);
+  --text-ink-muted: var(--primary-700);
+  --text-ink-soft: var(--primary-600);
+  --text-ink-caption: var(--primary-500);
 }
 
 @theme inline {
@@ -53,6 +60,12 @@
   --font-sans: var(--font-family-body);
   --font-display: var(--font-family-display);
   --font-mono: var(--font-family-mono);
+
+  --color-ink: var(--text-ink);
+  --color-ink-body: var(--text-ink-body);
+  --color-ink-muted: var(--text-ink-muted);
+  --color-ink-soft: var(--text-ink-soft);
+  --color-ink-caption: var(--text-ink-caption);
 }
 
 @layer base {
@@ -73,6 +86,13 @@
   h4 {
     font-family: var(--font-family-display);
     font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h5,
+  h6 {
+    font-family: var(--font-family-display);
+    font-weight: 600;
     letter-spacing: -0.01em;
   }
 }

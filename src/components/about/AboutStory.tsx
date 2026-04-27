@@ -8,7 +8,7 @@ export function AboutStory() {
           <span className="inline-block rounded-full bg-white px-4 py-1 text-xs font-semibold uppercase tracking-wider text-primary-800 ring-1 ring-accent-warm/35">
             Conócenos
           </span>
-          <h2 className="mt-5 text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+          <h2 className="font-display mt-5 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             {ABOUT_COPY.whoWeAre.title}
           </h2>
         </div>
@@ -16,7 +16,7 @@ export function AboutStory() {
           {ABOUT_COPY.whoWeAre.paragraphs.map((p, i) => (
             <p
               key={i}
-              className="text-[17px] leading-[1.75] text-zinc-600 first:text-lg first:font-medium first:text-zinc-800"
+              className="text-[17px] leading-[1.75] text-ink-muted first:text-lg first:font-semibold first:text-ink-body"
             >
               {p}
             </p>

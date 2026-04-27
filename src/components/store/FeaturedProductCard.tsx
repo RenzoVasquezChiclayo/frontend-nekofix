@@ -4,9 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { ProductBadges } from "@/components/store/ProductBadges";
+import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { notifySuccess } from "@/lib/toast";
 import { getProductCoverImage } from "@/lib/product-images";
 import { isLowStock } from "@/lib/product-ui";
+import { ProductColorMiniSwatch } from "@/components/product/ProductColorSwatch";
 import { formatPrice, whatsappHref } from "@/lib/utils";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
@@ -37,6 +39,8 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
       color: p.color,
       storage: p.storage,
       condition: p.condition,
+      grade: p.type === "USED" ? p.grade : undefined,
+      productType: p.type,
     });
     notifySuccess("Agregado al carrito");
     setAdded(true);
@@ -59,28 +63,29 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
           }
           unoptimized
         />
-        <div className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)]">
+        <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1">
           <ProductBadges type={p.type} condition={p.condition} lowStock={low} />
+          <UsedGradeBadge type={p.type} grade={p.grade} />
         </div>
       </Link>
       <div className="flex flex-1 flex-col p-4">
-        <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-caption">
           {p.brand.name}
           {p.model ? ` · ${p.model.name}` : ""}
         </p>
         <Link href={`/producto/${p.slug}`}>
-          <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-zinc-900">
+          <h3 className="font-display mt-1 line-clamp-2 text-sm font-bold leading-snug text-ink">
             {p.name}
           </h3>
         </Link>
-        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-500">
+        {p.color ? <ProductColorMiniSwatch color={p.color} /> : null}
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-soft">
           {p.storage ? <span>{p.storage}</span> : null}
-          {p.color ? <span>{p.color}</span> : null}
         </div>
         <div className="mt-3 flex flex-wrap items-baseline gap-2">
           <span className="text-lg font-semibold text-primary-800">{formatPrice(p.price)}</span>
           {p.comparePrice != null && p.comparePrice > p.price ? (
-            <span className="text-sm text-zinc-400 line-through">
+            <span className="text-sm text-ink-caption/80 line-through">
               {formatPrice(p.comparePrice)}
             </span>
           ) : null}

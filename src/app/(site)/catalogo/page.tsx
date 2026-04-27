@@ -36,10 +36,10 @@ export default async function CatalogoPage({
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-6 sm:mb-10">
-        <h1 className="text-2xl font-semibold tracking-tight text-primary-950 sm:text-3xl md:text-4xl">
+        <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl md:text-4xl">
           Tienda
         </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-500">
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
           Equipos y accesorios alineados a nuestro inventario. Filtra por marca,
           categoría, condición y más.
         </p>

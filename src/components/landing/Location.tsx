@@ -6,7 +6,7 @@ type Props = {
 };
 
 export function Location({
-  address = "Av. Ejemplo 123, Col. Centro, Ciudad",
+  address = "Jr. Estete 480, Trujillo",
   hours = "Lun–Sáb 10:00–20:00 · Dom cerrado",
 }: Props) {
   return (
@@ -17,7 +17,9 @@ export function Location({
           title="Visítanos"
           subtitle={hours}
         />
-        <p className="mx-auto mt-6 max-w-xl text-center text-zinc-600">{address}</p>
+        <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-ink-muted">
+          {address}
+        </p>
       </div>
     </section>
   );
