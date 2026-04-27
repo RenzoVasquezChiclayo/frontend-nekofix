@@ -34,29 +34,22 @@ function buildUrl(
   path: string,
   searchParams?: FetchOptions["searchParams"]
 ): string {
-  console.log("ENV BUILD:", process.env.NEXT_PUBLIC_API_URL);
-  if (!env.apiBaseUrl) {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  console.log("CLIENT ENV:", process.env.NEXT_PUBLIC_API_URL);
+  if (!base) {
     throw new Error("❌ NEXT_PUBLIC_API_URL no está definido");
   }
 
-  const base = env.apiBaseUrl.replace(/\/$/, "");
+  const cleanBase = base.replace(/\/$/, "");
   const safePath = path.startsWith("/") ? path : `/${path}`;
 
-  const urlString = `${base}${safePath}`;
-
-  // 👉 VALIDACIÓN SEGURA
-  let url: URL;
-  try {
-    url = new URL(urlString);
-  } catch (err) {
-    console.error("❌ URL inválida:", urlString);
-    throw err;
-  }
+  const url = new URL(`${cleanBase}${safePath}`);
 
   if (searchParams) {
     for (const [k, v] of Object.entries(searchParams)) {
-      if (v === undefined) continue;
-      url.searchParams.set(k, String(v));
+      if (v !== undefined) {
+        url.searchParams.set(k, String(v));
+      }
     }
   }
 
