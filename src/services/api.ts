@@ -18,19 +18,49 @@ type FetchOptions = RequestInit & {
   next?: { revalidate?: number | false; tags?: string[] };
 };
 
-function buildUrl(path: string, searchParams?: FetchOptions["searchParams"]): string {
+// function buildUrl(path: string, searchParams?: FetchOptions["searchParams"]): string {
+//   const base = env.apiBaseUrl.replace(/\/$/, "");
+//   const p = path.startsWith("/") ? path : `/${path}`;
+//   const url = new URL(`${base}${p}`);
+//   if (searchParams) {
+//     for (const [k, v] of Object.entries(searchParams)) {
+//       if (v === undefined) continue;
+//       url.searchParams.set(k, String(v));
+//     }
+//   }
+//   return url.toString();
+// }
+function buildUrl(
+  path: string,
+  searchParams?: FetchOptions["searchParams"]
+): string {
+  if (!env.apiBaseUrl) {
+    throw new Error("❌ NEXT_PUBLIC_API_URL no está definido");
+  }
+
   const base = env.apiBaseUrl.replace(/\/$/, "");
-  const p = path.startsWith("/") ? path : `/${path}`;
-  const url = new URL(`${base}${p}`);
+  const safePath = path.startsWith("/") ? path : `/${path}`;
+
+  const urlString = `${base}${safePath}`;
+
+  // 👉 VALIDACIÓN SEGURA
+  let url: URL;
+  try {
+    url = new URL(urlString);
+  } catch (err) {
+    console.error("❌ URL inválida:", urlString);
+    throw err;
+  }
+
   if (searchParams) {
     for (const [k, v] of Object.entries(searchParams)) {
       if (v === undefined) continue;
       url.searchParams.set(k, String(v));
     }
   }
+
   return url.toString();
 }
-
 /**
  * Cliente HTTP hacia el backend NestJS.
  * En Server Components puede usarse directamente; en cliente, preferir route handlers o CORS configurado en Nest.
