@@ -159,9 +159,9 @@ export function Navbar({ className }: Props) {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <div className="hidden md:block">
+          {/* <div className="hidden md:block">
             <NavbarAuth variant="desktop" />
-          </div>
+          </div> */}
           <CartBadge />
           <Link
             href="/catalogo"
@@ -234,9 +234,9 @@ export function Navbar({ className }: Props) {
                 Ir a la tienda
               </Link>
                 </nav>
-                <div className="border-t border-zinc-100 p-4">
+                {/* <div className="border-t border-zinc-100 p-4">
                   <NavbarAuth variant="drawer" className="justify-between" />
-                </div>
+                </div> */}
               </div>
             </div>,
             document.body
