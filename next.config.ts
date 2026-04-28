@@ -25,7 +25,7 @@ function mediaOriginForImageConfig(): string {
   return trimmed.endsWith("/api") ? trimmed.slice(0, -4) : trimmed;
 }
 /**
- * Orígenes para `next/image`: medios del backend (`/uploads/**`), CDNs extra y servicios de placeholder.
+ * Orígenes para `next/image`: backend, Cloudinary, CDNs extra y placeholders.
  * - Origen de medios: `NEXT_PUBLIC_MEDIA_URL` o, si falta, mismo host que el API sin sufijo `/api` (`NEXT_PUBLIC_API_URL`).
  */
 function imageRemotePatterns(): NonNullable<NonNullable<NextConfig["images"]>["remotePatterns"]> {
@@ -50,7 +50,9 @@ function imageRemotePatterns(): NonNullable<NonNullable<NextConfig["images"]>["r
     }
   }
 
-  pushUrl(mediaOriginForImageConfig(), "/uploads/**");
+  // Backends locales suelen exponer `/uploads/**`, pero Cloudinary/otros CDNs usan rutas distintas.
+  pushUrl(mediaOriginForImageConfig(), "/**");
+  pushUrl("https://res.cloudinary.com", "/**");
   pushUrl("https://placehold.co", "/**");
 
   const extra = process.env.NEXT_PUBLIC_IMAGE_HOSTS;
@@ -64,7 +66,7 @@ function imageRemotePatterns(): NonNullable<NonNullable<NextConfig["images"]>["r
       } catch {
         continue;
       }
-      pushUrl(href, "/uploads/**");
+      pushUrl(href, "/**");
     }
   }
   return patterns;
