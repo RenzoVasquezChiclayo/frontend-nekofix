@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ADMIN_NAV_ITEMS } from "@/lib/admin-nav";
+import { isSuperAdmin } from "@/lib/roles";
 import { SITE_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { notifyInfo } from "@/lib/toast";
@@ -41,7 +42,9 @@ export function AdminSidebar({ className, onNavigate }: SidebarProps) {
         ) : null}
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto p-3" aria-label="Secciones del panel">
-        {ADMIN_NAV_ITEMS.map(({ href, label, Icon }) => {
+        {ADMIN_NAV_ITEMS.map((item) => {
+          if (item.superAdminOnly && !isSuperAdmin(user?.role)) return null;
+          const { href, label, Icon } = item;
           const active =
             href === "/admin/dashboard"
               ? pathname === href || pathname === "/admin"

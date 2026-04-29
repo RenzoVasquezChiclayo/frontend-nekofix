@@ -93,6 +93,13 @@ const nextConfig: NextConfig = {
       { source: "/admin/inventario", destination: "/admin/inventory", permanent: true },
       { source: "/admin/clientes", destination: "/admin/clients", permanent: true },
       { source: "/admin/configuracion", destination: "/admin/settings", permanent: true },
+      { source: "/admin/usuarios", destination: "/admin/users", permanent: true },
+      { source: "/admin/usuarios/nuevo", destination: "/admin/users/new", permanent: true },
+      {
+        source: "/admin/usuarios/:id/editar",
+        destination: "/admin/users/:id/edit",
+        permanent: true,
+      },
     ];
   },
 };

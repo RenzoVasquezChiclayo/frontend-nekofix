@@ -3,7 +3,8 @@
  *
  * ## Contrato esperado para panel admin (`POST /auth/login` y `GET /auth/me`)
  *
- * El campo `user.role` debe ser exactamente `"ADMINISTRADOR"` para acceder al panel.
+ * El campo `user.role` identifica permisos. Para acceder al panel admin debe ser uno de:
+ * `ADMINISTRADOR`, `SUPER_ADMIN` o `CLIENT` (valores exactos según el backend).
  *
  * ```json
  * {
@@ -17,10 +18,12 @@
  *     "phone": "+51999888777",
  *     "role": "ADMINISTRADOR"
  *   }
+ *
+ * (`CLIENT` es tienda/cliente; no accede al panel admin salvo que el backend lo permita explícitamente.)
  * }
  * ```
  *
- * Si `role` no es `ADMINISTRADOR`, el front rechaza el acceso aunque el token sea válido.
+ * Si `role` no es uno de los roles de panel, el front rechaza el acceso aunque el token sea válido.
  * Errores: `401` credenciales inválidas; `403` usuario sin rol admin (mensaje en `message`).
  *
  * ## Rutas esperadas (convención actual)
@@ -32,7 +35,7 @@ export interface AuthUser {
   email: string;
   name: string;
   phone?: string;
-  /** Ej. `ADMINISTRADOR` | `CLIENTE`. Obligatorio para validar acceso al panel. */
+  /** Ej. `ADMINISTRADOR` | `SUPER_ADMIN` | `CLIENT`. Para el panel solo cuentan admin/superadmin. */
   role?: string;
 }
 
