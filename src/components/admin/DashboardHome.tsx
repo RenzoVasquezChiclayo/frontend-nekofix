@@ -1,76 +1,74 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { getDashboardStats } from "@/services/admin/dashboard.service";
+import { useEffect, useMemo, useState } from "react";
+import { useReports } from "@/hooks/useReports";
 import { useAdminAuth } from "@/store/admin-auth-context";
 import { AdminHeader } from "@/components/admin/Header";
-import { StatsCards, type StatItem } from "@/components/admin/StatsCards";
-import { Loader } from "@/components/shared/Loader";
-import { getApiErrorMessage } from "@/lib/api-errors";
+import { ReportsDateFilter } from "@/components/admin/reports/ReportsDateFilter";
+import { ReportsPanels } from "@/components/admin/reports/ReportsPanels";
 import { notifyApiError } from "@/lib/toast";
+import type { ReportDatePreset } from "@/types/report";
 
 export function DashboardHome() {
   const { accessToken } = useAdminAuth();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<StatItem[]>([]);
+  const [preset, setPreset] = useState<ReportDatePreset>("30d");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
-  const load = useCallback(async () => {
-    if (!accessToken) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const d = await getDashboardStats(accessToken);
-      setStats([
-        { label: "Total productos", value: d.totalProducts },
-        {
-          label: "Publicados",
-          value: d.publishedProducts,
-          tone: "success",
-        },
-        {
-          label: "Stock bajo",
-          value: d.lowStockProducts,
-          tone: d.lowStockProducts > 0 ? "warning" : "default",
-          hint: "stock ≤ mínimo",
-        },
-        { label: "Destacados", value: d.featuredProducts },
-      ]);
-    } catch (e) {
-      setError(getApiErrorMessage(e));
-      notifyApiError(e, "No se pudieron cargar las métricas del panel.");
-      setStats([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [accessToken]);
+  const range = useMemo(
+    () => ({
+      preset,
+      startDate: preset === "custom" ? startDate || undefined : undefined,
+      endDate: preset === "custom" ? endDate || undefined : undefined,
+    }),
+    [endDate, preset, startDate]
+  );
+
+  const {
+    dashboard,
+    monthlySales,
+    leadStatuses,
+    topProducts,
+    lowStock,
+    loading,
+    error,
+  } = useReports(accessToken, range);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (error) notifyApiError(new Error(error), "No se pudieron cargar los reportes.");
+  }, [error]);
 
   return (
     <>
       <AdminHeader
         title="Dashboard"
-        description="Resumen de inventario y publicación del catálogo."
+        description="Métricas comerciales y operativas en tiempo real."
       />
-      <div className="p-4 sm:p-6">
+      <div className="space-y-6 p-4 sm:p-6">
+        <ReportsDateFilter
+          preset={preset}
+          startDate={startDate}
+          endDate={endDate}
+          onPresetChange={setPreset}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+        />
+
         {error ? (
           <p className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
             {error}
           </p>
         ) : null}
 
-        {loading ? (
-          <div className="flex min-h-[200px] items-center justify-center">
-            <Loader label="Cargando métricas…" />
-          </div>
-        ) : (
-          <>
-            <StatsCards items={stats} />
-          </>
-        )}
+        <ReportsPanels
+          dashboard={dashboard}
+          monthlySales={monthlySales}
+          leadStatuses={leadStatuses}
+          topProducts={topProducts}
+          lowStock={lowStock}
+        />
+
+        {loading ? <p className="text-sm text-zinc-500">Actualizando métricas…</p> : null}
       </div>
     </>
   );
