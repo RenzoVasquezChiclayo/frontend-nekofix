@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { resolveProductMediaUrl } from "@/lib/product-images";
+import { getProductCoverImage, resolveProductMediaUrl } from "@/lib/product-images";
 import { PRODUCT_PLACEHOLDER_IMAGE } from "@/lib/product-ui";
 import { notifyApiError } from "@/lib/toast";
 import { adminGetLead } from "@/services/admin/lead.service";
+import { adminGetProduct } from "@/services/admin/product.service";
 import { useAdminAuth } from "@/store/admin-auth-context";
 import type { Lead, LeadStatus } from "@/types/lead";
 
@@ -40,6 +41,7 @@ export function LeadDetailView({ leadId }: { leadId: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lead, setLead] = useState<Lead | null>(null);
+  const [productImageById, setProductImageById] = useState<Record<string, string>>({});
 
   const loadLead = useCallback(async () => {
     if (!accessToken) return;
@@ -48,10 +50,36 @@ export function LeadDetailView({ leadId }: { leadId: string }) {
     try {
       const row = await adminGetLead(accessToken, leadId);
       setLead(row);
+      const uniqueIds = Array.from(
+        new Set(
+          row.products
+            .map((item) => item.productId?.trim())
+            .filter((id): id is string => Boolean(id))
+        )
+      );
+      if (uniqueIds.length > 0) {
+        const entries = await Promise.allSettled(
+          uniqueIds.map(async (productId) => {
+            const product = await adminGetProduct(accessToken, productId);
+            return [productId, getProductCoverImage(product).src] as const;
+          })
+        );
+        const imageMap: Record<string, string> = {};
+        for (const result of entries) {
+          if (result.status === "fulfilled") {
+            const [id, src] = result.value;
+            imageMap[id] = src;
+          }
+        }
+        setProductImageById(imageMap);
+      } else {
+        setProductImageById({});
+      }
     } catch (e) {
       setError(getApiErrorMessage(e));
       notifyApiError(e, "No se pudo cargar el detalle del lead.");
       setLead(null);
+      setProductImageById({});
     } finally {
       setLoading(false);
     }
@@ -137,7 +165,11 @@ export function LeadDetailView({ leadId }: { leadId: string }) {
                     <div className="flex items-center gap-3">
                       <div className="relative h-12 w-12 overflow-hidden rounded-xl bg-zinc-50">
                         <Image
-                          src={resolveProductMediaUrl(item.imageUrl) || PRODUCT_PLACEHOLDER_IMAGE}
+                          src={
+                            productImageById[item.productId] ??
+                            resolveProductMediaUrl(item.imageUrl) ??
+                            PRODUCT_PLACEHOLDER_IMAGE
+                          }
                           alt={item.name}
                           fill
                           className="object-contain p-1"
