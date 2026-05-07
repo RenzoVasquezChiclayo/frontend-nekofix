@@ -9,12 +9,28 @@ import type { Product } from "@/types/product";
 
 type Props = { product: Product };
 
-export function AddToCart({ product }: Props) {
+type ControlledQuantityProps = {
+  quantity?: number;
+  onQuantityChange?: (qty: number) => void;
+};
+
+type AddToCartProps = Props & ControlledQuantityProps;
+
+export function AddToCart({ product, quantity, onQuantityChange }: AddToCartProps) {
   const { addLine } = useCart();
-  const [qty, setQty] = useState(1);
+  const [internalQty, setInternalQty] = useState(1);
   const [added, setAdded] = useState(false);
 
   const canBuy = product.stock > 0;
+  const qty = quantity ?? internalQty;
+
+  function updateQty(next: number) {
+    if (quantity !== undefined) {
+      onQuantityChange?.(next);
+      return;
+    }
+    setInternalQty(next);
+  }
 
   function handleAdd() {
     if (!canBuy) return;
@@ -95,9 +111,7 @@ export function AddToCart({ product }: Props) {
             max={product.stock}
             value={qty}
             onChange={(e) =>
-              setQty(
-                Math.max(1, Math.min(product.stock, Number(e.target.value) || 1))
-              )
+              updateQty(Math.max(1, Math.min(product.stock, Number(e.target.value) || 1)))
             }
             className="ml-2 w-20 rounded-lg border border-zinc-200 px-2 py-1.5 text-center text-sm"
           />

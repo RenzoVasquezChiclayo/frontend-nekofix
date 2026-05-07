@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { AddToCart } from "@/components/catalog/AddToCart";
+import { ProductDetailActions } from "@/components/catalog/ProductDetailActions";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts";
 import { UsedGradeExplainer } from "@/components/catalog/UsedGradeExplainer";
@@ -11,7 +11,7 @@ import { ProductTechnicalSpecsAccordion } from "@/components/product/ProductTech
 import { ProductBadges } from "@/components/store/ProductBadges";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { isLowStock } from "@/lib/product-ui";
-import { formatPrice, whatsappHref } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/types/product";
 
 type Props = {
@@ -41,7 +41,6 @@ export function UsedProductDetailClient({ product, variants, related }: Props) {
   }, [active.slug]);
 
   const low = isLowStock(active.stock, active.minStock) && active.stock > 0;
-  const waMsg = `Hola, consulto por: ${active.name} (SKU ${active.sku}) — ${formatPrice(active.price)}`;
   const showGradePicker = selectable.length > 1;
 
   return (
@@ -104,17 +103,7 @@ export function UsedProductDetailClient({ product, variants, related }: Props) {
               ) : null}
             </div>
 
-            <div className="mt-6 space-y-3 sm:mt-8">
-              <AddToCart key={active.id} product={active} />
-              <a
-                href={whatsappHref(waMsg)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex min-h-12 w-full items-center justify-center rounded-full border border-primary-200 py-3.5 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
-              >
-                Comprar por WhatsApp
-              </a>
-            </div>
+            <ProductDetailActions key={active.id} product={active} />
           </div>
         </div>
 
