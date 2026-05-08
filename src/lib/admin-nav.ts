@@ -2,6 +2,7 @@ import type { ComponentType, SVGProps } from "react";
 import {
   IconDashboard,
   IconFolderTree,
+  IconMessage,
   IconPackage,
   IconTag,
   IconUsers,
@@ -23,6 +24,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/phone-models", label: "Modelos", Icon: IconTag },
   { href: "/admin/categories", label: "Categorías", Icon: IconFolderTree },
   { href: "/admin/brands", label: "Marcas", Icon: IconTag },
+  { href: "/admin/leads", label: "Leads", Icon: IconMessage },
   { href: "/admin/inventory", label: "Inventario", Icon: IconWarehouse },
   // Leads, clientes, landing CMS, ajustes: ver `components/admin/icons` y añadir aquí.
 ];

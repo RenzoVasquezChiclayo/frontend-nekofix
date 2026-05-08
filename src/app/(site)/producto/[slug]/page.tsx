@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProductDetailActions } from "@/components/catalog/ProductDetailActions";
 import { UsedProductDetailClient } from "@/components/catalog/UsedProductDetailClient";
-import { AddToCart } from "@/components/catalog/AddToCart";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts";
 import { ProductTechnicalSpecsAccordion } from "@/components/product/ProductTechnicalSpecsAccordion";
@@ -18,7 +18,7 @@ import {
   getUsedGradeVariants,
 } from "@/services/product.service";
 import { ApiError } from "@/services/api";
-import { formatPrice, whatsappHref } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -71,7 +71,6 @@ export default async function ProductoPage({ params }: Props) {
   }
 
   const low = isLowStock(product.stock, product.minStock) && product.stock > 0;
-  const waMsg = `Hola, consulto por: ${product.name} (SKU ${product.sku}) — ${formatPrice(product.price)}`;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-14">
@@ -123,15 +122,7 @@ export default async function ProductoPage({ params }: Props) {
           </div>
 
           <div className="mt-6 space-y-3 sm:mt-8">
-            <AddToCart product={product} />
-            <a
-              href={whatsappHref(waMsg)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex min-h-12 w-full items-center justify-center rounded-full border border-primary-200 py-3.5 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
-            >
-              Comprar por WhatsApp
-            </a>
+            <ProductDetailActions product={product} />
           </div>
         </div>
       </div>

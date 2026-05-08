@@ -40,9 +40,8 @@ export function CheckoutForm() {
       });
       if (result.ok) {
         notifyInfo("Abriendo WhatsApp para confirmar tu pedido…");
-        const url =
-          result.whatsappUrl ??
-          whatsappHref(buildWhatsAppCartMessage(lines, subtotal));
+        const fallbackUrl = whatsappHref(buildWhatsAppCartMessage(lines, subtotal));
+        const url = resolveSafeWhatsAppUrl(result.whatsappUrl, fallbackUrl);
         clear();
         window.location.href = url;
         return;
@@ -126,4 +125,19 @@ export function CheckoutForm() {
       </div>
     </form>
   );
+}
+
+function resolveSafeWhatsAppUrl(
+  rawUrl: string | undefined,
+  fallbackUrl: string
+): string {
+  if (!rawUrl) return fallbackUrl;
+  try {
+    const parsed = new URL(rawUrl);
+    const host = parsed.hostname.toLowerCase();
+    const isWhatsAppHost = host === "wa.me" || host.endsWith(".whatsapp.com");
+    return isWhatsAppHost ? parsed.toString() : fallbackUrl;
+  } catch {
+    return fallbackUrl;
+  }
 }
