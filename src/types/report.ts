@@ -1,4 +1,4 @@
-export type ReportDatePreset = "7d" | "30d" | "month" | "custom";
+export type ReportDatePreset = "7d" | "30d" | "this-month" | "custom" | "month";
 
 export interface ReportDateRange {
   preset: ReportDatePreset;
