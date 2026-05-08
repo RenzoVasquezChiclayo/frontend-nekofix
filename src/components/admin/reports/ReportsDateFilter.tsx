@@ -30,7 +30,7 @@ export function ReportsDateFilter({
         >
           <option value="7d">Ultimos 7 dias</option>
           <option value="30d">Ultimos 30 dias</option>
-          <option value="month">Este mes</option>
+          <option value="this-month">Este mes</option>
           <option value="custom">Personalizado</option>
         </select>
       </label>
