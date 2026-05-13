@@ -2,13 +2,21 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { submitWhatsAppCheckout } from "@/app/(site)/checkout/actions";
 import { ProductBadges } from "@/components/store/ProductBadges";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { getProductCoverImage } from "@/lib/product-images";
 import { isLowStock } from "@/lib/product-ui";
 import { ProductColorMiniSwatch } from "@/components/product/ProductColorSwatch";
-import { formatPrice } from "@/lib/utils";
+import {
+  productToCartCheckoutPayload,
+  productToCartLine,
+  WHATSAPP_CATALOG_CONSULT_INTRO,
+} from "@/lib/product-checkout";
+import { notifyError, notifyInfo } from "@/lib/toast";
+import { buildWhatsAppCartMessage, formatPrice, whatsappHref } from "@/lib/utils";
+import { resolveSafeWhatsAppUrl } from "@/lib/whatsapp-url";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
 
@@ -17,6 +25,7 @@ type Props = { product: Product };
 export function ProductCard({ product: p }: Props) {
   const low = isLowStock(p.stock, p.minStock) && p.stock > 0;
   const { addLine } = useCart();
+  const [waPending, startWaTransition] = useTransition();
   const [added, setAdded] = useState(false);
   const canAdd = p.stock > 0;
   const cover = getProductCoverImage(p);
@@ -40,7 +49,26 @@ export function ProductCard({ product: p }: Props) {
     setTimeout(() => setAdded(false), 1500);
   }
 
-  const waText = encodeURIComponent(`Hola, quiero comprar ${p.name} (${p.slug})`);
+  function handleWhatsAppConsult() {
+    const qty = 1;
+    const line = productToCartLine(p, qty);
+    const total = p.price * qty;
+    startWaTransition(async () => {
+      const result = await submitWhatsAppCheckout(productToCartCheckoutPayload(p, qty));
+      if (result.ok) {
+        notifyInfo("Abriendo WhatsApp…");
+        const fallbackUrl = whatsappHref(
+          buildWhatsAppCartMessage([line], total, { intro: WHATSAPP_CATALOG_CONSULT_INTRO })
+        );
+        window.location.href = resolveSafeWhatsAppUrl(result.whatsappUrl, fallbackUrl);
+        return;
+      }
+      notifyError(
+        result.error ??
+          "No se pudo registrar la consulta. Intenta de nuevo o escríbenos por WhatsApp."
+      );
+    });
+  }
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-lg">
@@ -99,14 +127,14 @@ export function ProductCard({ product: p }: Props) {
           >
             {canAdd ? (added ? "Agregado" : "Agregar carrito") : "Sin stock"}
           </button>
-          <a
-            href={`https://api.whatsapp.com/send?text=${waText}`}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
+          <button
+            type="button"
+            disabled={waPending}
+            onClick={handleWhatsAppConsult}
+            className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-sm font-medium text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50"
           >
-            Comprar por WhatsApp
-          </a>
+            {waPending ? "Enviando…" : "Consultar por WhatsApp"}
+          </button>
         </div>
       </div>
     </article>

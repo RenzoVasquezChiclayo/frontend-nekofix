@@ -15,7 +15,12 @@ export function formatPrice(amount: number, currency = "PEN"): string {
 }
 
 /** Mensaje de texto para WhatsApp si el backend no devuelve `whatsappUrl`. */
-export function buildWhatsAppCartMessage(lines: CartLine[], total: number): string {
+export function buildWhatsAppCartMessage(
+  lines: CartLine[],
+  total: number,
+  options?: { intro?: string }
+): string {
+  const intro = options?.intro ?? "Hola, quiero confirmar este pedido:";
   const rows = lines.map((l) => {
     const bits = [l.name];
     if (l.color) bits.push(l.color);
@@ -25,7 +30,7 @@ export function buildWhatsAppCartMessage(lines: CartLine[], total: number): stri
     bits.push(formatPrice(l.unitPrice * l.quantity));
     return `• ${bits.join(" · ")}`;
   });
-  return `Hola, quiero confirmar este pedido:\n${rows.join("\n")}\n\nTotal: ${formatPrice(total)}`;
+  return `${intro}\n${rows.join("\n")}\n\nTotal: ${formatPrice(total)}`;
 }
 
 /** Construye URL de WhatsApp con mensaje por defecto */
