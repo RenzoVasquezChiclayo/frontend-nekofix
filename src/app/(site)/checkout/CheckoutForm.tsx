@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { notifyError, notifyInfo } from "@/lib/toast";
 import { submitWhatsAppCheckout } from "@/app/(site)/checkout/actions";
 import { useCart } from "@/store/cart-context";
+import { resolveSafeWhatsAppUrl } from "@/lib/whatsapp-url";
 import { buildWhatsAppCartMessage, formatPrice, whatsappHref } from "@/lib/utils";
 
 export function CheckoutForm() {
@@ -125,19 +126,4 @@ export function CheckoutForm() {
       </div>
     </form>
   );
-}
-
-function resolveSafeWhatsAppUrl(
-  rawUrl: string | undefined,
-  fallbackUrl: string
-): string {
-  if (!rawUrl) return fallbackUrl;
-  try {
-    const parsed = new URL(rawUrl);
-    const host = parsed.hostname.toLowerCase();
-    const isWhatsAppHost = host === "wa.me" || host.endsWith(".whatsapp.com");
-    return isWhatsAppHost ? parsed.toString() : fallbackUrl;
-  } catch {
-    return fallbackUrl;
-  }
 }
