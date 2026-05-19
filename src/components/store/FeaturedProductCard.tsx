@@ -45,6 +45,7 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
       quantity: 1,
       image: getProductCoverImage(p).src,
       color: p.color,
+      colorHex: p.colorHex,
       storage: p.storage,
       condition: p.condition,
       grade: p.type === "USED" ? p.grade : undefined,
@@ -108,7 +109,9 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
             {p.name}
           </h3>
         </Link>
-        {p.color ? <ProductColorMiniSwatch color={p.color} /> : null}
+        {p.color ? (
+          <ProductColorMiniSwatch color={p.color} colorHex={p.colorHex} />
+        ) : null}
         <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-soft">
           {p.storage ? <span>{p.storage}</span> : null}
         </div>

@@ -9,6 +9,8 @@ export interface CartLine {
   quantity: number;
   image?: string;
   color?: string | null;
+  /** Hex guardado al agregar al carrito (swatch en carrito/checkout). */
+  colorHex?: string | null;
   storage?: string | null;
   condition: ProductCondition;
   /** Opcional: grado cosmético (USED) para badge en carrito. */

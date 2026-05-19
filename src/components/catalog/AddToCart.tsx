@@ -42,6 +42,7 @@ export function AddToCart({ product, quantity, onQuantityChange }: AddToCartProp
       quantity: qty,
       image: getProductCoverImage(product).src,
       color: product.color,
+      colorHex: product.colorHex,
       storage: product.storage,
       condition: product.condition,
       grade: product.type === "USED" ? product.grade : undefined,
@@ -96,7 +97,7 @@ export function AddToCart({ product, quantity, onQuantityChange }: AddToCartProp
                   : ""
               }
             >
-              <ProductColorPickerRow color={product.color} />
+              <ProductColorPickerRow color={product.color} colorHex={product.colorHex} />
             </div>
           ) : null}
         </div>

@@ -29,6 +29,11 @@ import {
   type ProductImageDraft,
 } from "@/components/admin/ProductImagesEditor";
 import { AdminProductColorPicker } from "@/components/admin/AdminProductColorPicker";
+import {
+  isCatalogProductColor,
+  isValidColorHex,
+  resolveProductColorHexForPayload,
+} from "@/lib/product-color-map";
 import { ProductFormSkeleton } from "@/components/admin/ProductFormSkeleton";
 import type { ProductCreateInput } from "@/types/admin-product";
 import type { Brand, Category, PhoneModel, ProductCondition, ProductType } from "@/types/product";
@@ -80,6 +85,7 @@ export function ProductForm({ productId }: Props) {
   const [modelId, setModelId] = useState("");
   const [storage, setStorage] = useState("");
   const [color, setColor] = useState("");
+  const [colorHex, setColorHex] = useState("");
   const [batteryHealth, setBatteryHealth] = useState("");
   const [grade, setGrade] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
@@ -163,6 +169,7 @@ export function ProductForm({ productId }: Props) {
         setModelId(p.modelId ?? "");
         setStorage(p.storage ?? "");
         setColor(p.color ?? "");
+        setColorHex(p.colorHex ?? "");
         setBatteryHealth(p.batteryHealth != null ? String(p.batteryHealth) : "");
         setGrade(normalizeUsedGrade(p.grade) ?? "");
         setIsFeatured(p.isFeatured);
@@ -234,6 +241,7 @@ export function ProductForm({ productId }: Props) {
         modelId: modelId || null,
         storage: storage.trim() || null,
         color: color.trim() || null,
+        colorHex: resolveProductColorHexForPayload(color, colorHex),
         batteryHealth: batteryHealth === "" ? null : Number(batteryHealth),
         grade: type === "USED" ? (grade.trim() || null) : null,
         isFeatured,
@@ -245,6 +253,14 @@ export function ProductForm({ productId }: Props) {
 
       if (!payload.brandId || !payload.categoryId) {
         throw new Error("Selecciona marca y categoría.");
+      }
+
+      if (
+        payload.color &&
+        !isCatalogProductColor(payload.color) &&
+        !isValidColorHex(colorHex)
+      ) {
+        throw new Error("Indica un color visual válido (HEX) para el color personalizado.");
       }
 
       if (isEdit && productId) {
@@ -538,10 +554,18 @@ export function ProductForm({ productId }: Props) {
           <div className="sm:col-span-2">
             <span className="text-sm font-medium text-zinc-700">Color</span>
             <p className="mt-1 text-xs text-zinc-500">
-              Selecciona el acabado comercial; se guarda el nombre en el producto.
+              Presets rápidos o color personalizado con nombre y tono visual (HEX).
             </p>
             <div className="mt-3">
-              <AdminProductColorPicker value={color} onChange={setColor} />
+              <AdminProductColorPicker
+                color={color}
+                colorHex={colorHex}
+                resetKey={productId ?? "new"}
+                onChange={(nextColor, nextHex) => {
+                  setColor(nextColor);
+                  setColorHex(nextHex ?? "");
+                }}
+              />
             </div>
           </div>
           <label>

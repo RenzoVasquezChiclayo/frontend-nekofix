@@ -15,6 +15,9 @@ export const PRODUCT_COLOR_OPTIONS = [
   "Green",
   "Red",
   "Pink",
+  "Blue",
+  "Black",
+  "White",
 ] as const;
 
 export type ProductColorOption = (typeof PRODUCT_COLOR_OPTIONS)[number];
@@ -146,6 +149,41 @@ function warnMissingColor(original: string): void {
  * Hex para pintar el swatch. Nombres equivalentes (inglés / español / variantes)
  * resuelven al mismo valor.
  */
+/** Normaliza HEX (#RGB → #RRGGBB). Devuelve null si no es válido. */
+export function normalizeColorHex(hex: string | null | undefined): string | null {
+  if (hex == null || !String(hex).trim()) return null;
+  const raw = String(hex).trim();
+  if (/^#[0-9A-Fa-f]{6}$/.test(raw)) return raw.toLowerCase();
+  if (/^#[0-9A-Fa-f]{3}$/.test(raw)) {
+    const r = raw[1];
+    const g = raw[2];
+    const b = raw[3];
+    return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+  }
+  return null;
+}
+
+export function isValidColorHex(hex: string | null | undefined): boolean {
+  return normalizeColorHex(hex) != null;
+}
+
+/** Hex de un preset del catálogo admin (por nombre canónico). */
+export function getPresetProductColorHex(presetName: ProductColorOption): string {
+  return getProductColorHex(presetName);
+}
+
+/**
+ * Hex para UI: `colorHex` del API tiene prioridad; si no, mapa por nombre (legacy).
+ */
+export function resolveProductColorHex(
+  color: string | null | undefined,
+  colorHex?: string | null
+): string {
+  const fromApi = normalizeColorHex(colorHex);
+  if (fromApi) return fromApi;
+  return getProductColorHex(color);
+}
+
 export function getProductColorHex(color: string | null | undefined): string {
   if (color == null) {
     return PRODUCT_COLOR_UNKNOWN_HEX;
@@ -197,9 +235,38 @@ export function resolveProductColorLabel(color: string | null | undefined): stri
   return String(color).trim();
 }
 
-/** Indica si el valor coincide con una opción del catálogo admin (picker). */
+/** Indica si el nombre coincide con un preset del picker admin. */
 export function isCatalogProductColor(color: string | null | undefined): boolean {
   if (color == null || !String(color).trim()) return false;
   const t = normalizeColorKeyForLookup(String(color));
   return PRODUCT_COLOR_OPTIONS.some((opt) => normalizeColorKeyForLookup(opt) === t);
+}
+
+/** Nombre canónico del preset si el valor coincide; si no, null. */
+export function matchCatalogPresetName(
+  color: string | null | undefined
+): ProductColorOption | null {
+  if (color == null || !String(color).trim()) return null;
+  const t = normalizeColorKeyForLookup(String(color));
+  return (
+    PRODUCT_COLOR_OPTIONS.find((opt) => normalizeColorKeyForLookup(opt) === t) ?? null
+  );
+}
+
+/** Hex a enviar al API en create/update (preset, personalizado o legacy por nombre). */
+export function resolveProductColorHexForPayload(
+  color: string,
+  colorHex: string | null | undefined
+): string | null {
+  const name = color.trim();
+  if (!name) return null;
+
+  const fromField = normalizeColorHex(colorHex);
+  if (fromField) return fromField;
+
+  const preset = matchCatalogPresetName(name);
+  if (preset) return getPresetProductColorHex(preset);
+
+  const mapped = getProductColorHex(name);
+  return mapped !== PRODUCT_COLOR_UNKNOWN_HEX ? mapped : null;
 }

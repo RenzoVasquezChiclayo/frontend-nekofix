@@ -64,6 +64,8 @@ export interface Product {
   modelId: string | null;
   storage: string | null;
   color: string | null;
+  /** Hex del acabado (#RGB o #RRGGBB). Prioridad en UI sobre el mapa por nombre. */
+  colorHex?: string | null;
   batteryHealth: number | null;
   grade: string | null;
   isFeatured: boolean;
