@@ -90,4 +90,6 @@ export const env = {
 
   mapEmbedUrl: getEnv("NEXT_PUBLIC_MAP_EMBED_URL"),
   googleReviewsListingUrl: getEnv("NEXT_PUBLIC_GOOGLE_REVIEWS_URL"),
+  /** Dirección visible en la sección Ubicación de la landing */
+  storeAddress: getEnv("NEXT_PUBLIC_STORE_ADDRESS", "Jr. Estete 480, Trujillo"),
 } as const;

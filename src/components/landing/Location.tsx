@@ -1,12 +1,11 @@
+import { env } from "@/config/env";
 import { SectionTitle } from "@/components/shared/SectionTitle";
 
 type Props = {
-  address?: string;
   hours?: string;
 };
 
 export function Location({
-  address = "Jr. Estete 480, Trujillo",
   hours = "Lun–Sáb 10:00–20:00 · Dom cerrado",
 }: Props) {
   return (
@@ -18,7 +17,7 @@ export function Location({
           subtitle={hours}
         />
         <p className="mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-ink-muted">
-          {address}
+          {env.storeAddress}
         </p>
       </div>
     </section>
