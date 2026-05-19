@@ -58,7 +58,11 @@ export default function CarritoPage() {
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-soft">
                 {line.color ? (
-                  <ProductColorMiniSwatch color={line.color} className="mt-0" />
+                  <ProductColorMiniSwatch
+                    color={line.color}
+                    colorHex={line.colorHex}
+                    className="mt-0"
+                  />
                 ) : null}
                 {line.storage ? (
                   <span className={line.color ? "text-ink-soft" : ""}>{line.storage}</span>

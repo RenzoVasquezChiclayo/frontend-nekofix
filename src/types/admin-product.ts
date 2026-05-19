@@ -25,6 +25,7 @@ export interface ProductCreateInput {
   modelId?: string | null;
   storage?: string | null;
   color?: string | null;
+  colorHex?: string | null;
   batteryHealth?: number | null;
   grade?: string | null;
   isFeatured: boolean;

@@ -13,6 +13,7 @@ export function productToCartLine(product: Product, quantity: number): CartLine 
     unitPrice: product.price,
     quantity,
     color: product.color,
+    colorHex: product.colorHex,
     storage: product.storage,
     condition: product.condition,
     grade: product.type === "USED" ? product.grade : undefined,

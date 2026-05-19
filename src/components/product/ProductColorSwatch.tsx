@@ -1,8 +1,12 @@
 import { cn } from "@/lib/utils";
-import { getProductColorHex, resolveProductColorLabel } from "@/lib/product-color-map";
+import { resolveProductColorHex, resolveProductColorLabel } from "@/lib/product-color-map";
 
-type Props = {
+type ColorProps = {
   color: string | null | undefined;
+  colorHex?: string | null;
+};
+
+type Props = ColorProps & {
   /** Destacado estilo “seleccionado” (borde / ring). */
   selected?: boolean;
   size?: "sm" | "md" | "lg";
@@ -16,17 +20,19 @@ const sizeClass = {
 } as const;
 
 /**
- * Círculo de color para ficha y cards; nombre resuelto vía `resolveProductColorLabel`.
+ * Círculo de color para ficha y cards.
+ * Prioridad: `colorHex` del API → mapa por nombre (legacy).
  */
 export function ProductColorSwatch({
   color,
+  colorHex,
   selected = true,
   size = "md",
   className,
 }: Props) {
   const label = resolveProductColorLabel(color);
   if (!label) return null;
-  const hex = getProductColorHex(color);
+  const hex = resolveProductColorHex(color, colorHex);
   return (
     <span
       className={cn(
@@ -44,13 +50,12 @@ export function ProductColorSwatch({
   );
 }
 
-type RowProps = {
-  color: string | null | undefined;
+type RowProps = ColorProps & {
   className?: string;
 };
 
 /** Fila estilo tienda: swatch + nombre; siempre muestra estado “seleccionado” en un solo color. */
-export function ProductColorPickerRow({ color, className }: RowProps) {
+export function ProductColorPickerRow({ color, colorHex, className }: RowProps) {
   const label = resolveProductColorLabel(color);
   if (!label) return null;
   return (
@@ -58,7 +63,7 @@ export function ProductColorPickerRow({ color, className }: RowProps) {
       <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Color</p>
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex flex-col items-center gap-1.5">
-          <ProductColorSwatch color={color} selected size="lg" />
+          <ProductColorSwatch color={color} colorHex={colorHex} selected size="lg" />
           <span className="max-w-[7rem] text-center text-xs font-medium text-ink">{label}</span>
         </div>
       </div>
@@ -69,14 +74,12 @@ export function ProductColorPickerRow({ color, className }: RowProps) {
 /** Swatch compacto para cards de catálogo (debajo del nombre). */
 export function ProductColorMiniSwatch({
   color,
+  colorHex,
   className,
-}: {
-  color: string | null | undefined;
-  className?: string;
-}) {
+}: ColorProps & { className?: string }) {
   const label = resolveProductColorLabel(color);
   if (!label) return null;
-  const hex = getProductColorHex(color);
+  const hex = resolveProductColorHex(color, colorHex);
   return (
     <span className={cn("mt-2 inline-flex items-center gap-2", className)} title={label}>
       <span
