@@ -7,6 +7,8 @@ import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts";
 import { UsedGradeExplainer } from "@/components/catalog/UsedGradeExplainer";
 import { UsedGradeSelector } from "@/components/catalog/UsedGradeSelector";
+import { ProductPurchaseIncludes } from "@/components/product/ProductPurchaseIncludes";
+import { shouldShowProductPurchaseIncludes } from "@/lib/product-purchase-includes";
 import { ProductTechnicalSpecsAccordion } from "@/components/product/ProductTechnicalSpecsAccordion";
 import { ProductBadges } from "@/components/store/ProductBadges";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
@@ -106,6 +108,10 @@ export function UsedProductDetailClient({ product, variants, related }: Props) {
             <ProductDetailActions key={active.id} product={active} />
           </div>
         </div>
+
+        {shouldShowProductPurchaseIncludes(active) ? (
+          <ProductPurchaseIncludes className="mt-12 sm:mt-14" />
+        ) : null}
 
         {active.description ? (
           <section className="mt-16 border-t border-primary-100 pt-14">
