@@ -5,6 +5,8 @@ import { ProductDetailActions } from "@/components/catalog/ProductDetailActions"
 import { UsedProductDetailClient } from "@/components/catalog/UsedProductDetailClient";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts";
+import { ProductPurchaseIncludes } from "@/components/product/ProductPurchaseIncludes";
+import { shouldShowProductPurchaseIncludes } from "@/lib/product-purchase-includes";
 import { ProductTechnicalSpecsAccordion } from "@/components/product/ProductTechnicalSpecsAccordion";
 import { ProductBadges } from "@/components/store/ProductBadges";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
@@ -126,6 +128,10 @@ export default async function ProductoPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      {shouldShowProductPurchaseIncludes(product) ? (
+        <ProductPurchaseIncludes className="mt-12 sm:mt-14" />
+      ) : null}
 
       {product.description ? (
         <section className="mt-16 border-t border-primary-100 pt-14">
