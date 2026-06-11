@@ -15,6 +15,7 @@ export type ProductGradeInput = {
   name: string;
   description?: string | null;
   catalogType: ProductCatalogType;
+  sortOrder?: number;
   isActive: boolean;
 };
 

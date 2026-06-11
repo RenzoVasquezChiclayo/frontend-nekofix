@@ -27,6 +27,7 @@ export function ProductGradeModal({ open, accessToken, grade, onClose, onSaved }
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [catalogType, setCatalogType] = useState<ProductCatalogType>("DEVICE");
+  const [sortOrder, setSortOrder] = useState("0");
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,11 +39,13 @@ export function ProductGradeModal({ open, accessToken, grade, onClose, onSaved }
       setName(grade.name);
       setDescription(grade.description ?? "");
       setCatalogType(grade.catalogType);
+      setSortOrder(String(grade.sortOrder ?? 0));
       setIsActive(grade.isActive);
     } else {
       setName("");
       setDescription("");
       setCatalogType("DEVICE");
+      setSortOrder("0");
       setIsActive(true);
     }
   }, [open, grade]);
@@ -58,6 +61,7 @@ export function ProductGradeModal({ open, accessToken, grade, onClose, onSaved }
         name: name.trim(),
         description: description.trim() || null,
         catalogType,
+        sortOrder: Number(sortOrder) || 0,
         isActive,
       };
       if (!body.name) throw new Error("Indica un nombre.");
@@ -130,6 +134,16 @@ export function ProductGradeModal({ open, accessToken, grade, onClose, onSaved }
                 </option>
               ))}
             </select>
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-zinc-700">Orden</span>
+            <input
+              type="number"
+              min={0}
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            />
           </label>
           <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700">
             <input

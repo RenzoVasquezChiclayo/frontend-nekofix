@@ -13,8 +13,10 @@ import type { ProductCatalogType } from "@/types/product";
 
 export type ProductConditionInput = {
   name: string;
+  slug: string;
   description?: string | null;
   catalogType: ProductCatalogType;
+  sortOrder?: number;
   isActive: boolean;
 };
 

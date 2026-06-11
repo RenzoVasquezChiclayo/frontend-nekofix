@@ -157,6 +157,7 @@ export function ProductConditionsAdminView() {
                 <thead className="border-b border-zinc-100 bg-zinc-50/90 text-xs font-semibold uppercase tracking-wider text-zinc-500">
                   <tr>
                     <th className="px-4 py-3">Nombre</th>
+                    <th className="px-4 py-3">Slug</th>
                     <th className="px-4 py-3">Catálogo</th>
                     <th className="px-4 py-3">Estado</th>
                     <th className="px-4 py-3 text-right">Acciones</th>
@@ -166,6 +167,7 @@ export function ProductConditionsAdminView() {
                   {rows.map((row) => (
                     <tr key={row.id} className="hover:bg-zinc-50/50">
                       <td className="px-4 py-3 font-medium text-zinc-900">{row.name}</td>
+                      <td className="px-4 py-3 font-mono text-xs text-zinc-600">{row.slug}</td>
                       <td className="px-4 py-3 text-zinc-600">
                         {CATALOG_TYPE_LABELS[row.catalogType]}
                       </td>

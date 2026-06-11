@@ -17,8 +17,10 @@ export interface PhoneSeries {
 export interface ProductConditionCatalog {
   id: string;
   name: string;
+  slug: string;
   description?: string | null;
   catalogType: ProductCatalogType;
+  sortOrder?: number | null;
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -30,6 +32,7 @@ export interface ProductGradeCatalog {
   name: string;
   description?: string | null;
   catalogType: ProductCatalogType;
+  sortOrder?: number | null;
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
