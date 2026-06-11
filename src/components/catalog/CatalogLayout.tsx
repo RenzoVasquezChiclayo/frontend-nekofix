@@ -6,18 +6,26 @@ import { CatalogSort } from "@/components/catalog/CatalogSort";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { ProductFilters } from "@/components/catalog/ProductFilters";
 import { ProductSearch } from "@/components/catalog/ProductSearch";
+import type { CatalogFilterMode, CatalogFilterOptions } from "@/lib/load-catalog-filters";
 import type { PaginationMeta } from "@/types/api";
-import type { Brand, Category, PhoneModel, Product } from "@/types/product";
+import type { Product } from "@/types/product";
 
 type Props = {
   products: Product[];
   meta: PaginationMeta;
-  brands: Brand[];
-  categories: Category[];
-  models: PhoneModel[];
+  filterOptions: CatalogFilterOptions;
+  filterMode: CatalogFilterMode;
+  /** Ruta base del listado (`/catalogo` o `/repuestos`). */
+  basePath?: "/catalogo" | "/repuestos";
 };
 
-export function CatalogLayout({ products, meta, brands, categories, models }: Props) {
+export function CatalogLayout({
+  products,
+  meta,
+  filterOptions,
+  filterMode,
+  basePath = "/catalogo",
+}: Props) {
   const total = meta.total;
   const { page, limit } = meta;
   const pageSize = limit > 0 ? limit : 12;
@@ -29,7 +37,11 @@ export function CatalogLayout({ products, meta, brands, categories, models }: Pr
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[300px_1fr]">
       <aside className="hidden lg:block">
         <div className="sticky top-24">
-          <ProductFilters brands={brands} categories={categories} models={models} />
+          <ProductFilters
+            basePath={basePath}
+            filterOptions={filterOptions}
+            filterMode={filterMode}
+          />
         </div>
       </aside>
 
@@ -37,7 +49,7 @@ export function CatalogLayout({ products, meta, brands, categories, models }: Pr
         <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
-              <ProductSearch />
+              <ProductSearch basePath={basePath} />
             </div>
             <button
               type="button"
@@ -63,7 +75,7 @@ export function CatalogLayout({ products, meta, brands, categories, models }: Pr
               </>
             )}
           </p>
-          <CatalogSort />
+          <CatalogSort basePath={basePath} />
         </div>
 
         {products.length === 0 ? (
@@ -80,7 +92,7 @@ export function CatalogLayout({ products, meta, brands, categories, models }: Pr
           </ul>
         )}
 
-        <CatalogPagination meta={meta} />
+        <CatalogPagination basePath={basePath} meta={meta} />
       </div>
 
       {mobileFiltersOpen ? (
@@ -104,9 +116,9 @@ export function CatalogLayout({ products, meta, brands, categories, models }: Pr
             </div>
             <div className="flex-1 overflow-y-auto overscroll-contain p-4 pb-8">
               <ProductFilters
-                brands={brands}
-                categories={categories}
-                models={models}
+                basePath={basePath}
+                filterOptions={filterOptions}
+                filterMode={filterMode}
                 onNavigate={() => setMobileFiltersOpen(false)}
               />
             </div>

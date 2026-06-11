@@ -13,6 +13,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${base}/repuestos`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.88,
+    },
+    {
       url: `${base}/categorias`,
       lastModified: now,
       changeFrequency: "weekly",

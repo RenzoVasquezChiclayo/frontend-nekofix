@@ -1,4 +1,4 @@
-import type { ProductCondition, ProductType } from "@/types/product";
+import type { ProductCatalogType, ProductCondition, ProductType, ProductStatus } from "@/types/product";
 
 /** Payload de imágenes al crear/actualizar producto (`images` en el cuerpo). */
 export type ProductImagePayload = {
@@ -17,7 +17,11 @@ export interface ProductCreateInput {
   price: number;
   comparePrice?: number | null;
   type: ProductType;
+  catalogType: ProductCatalogType;
+  /** Legacy; el backend puede seguir requiriendo el enum durante la migración. */
   condition: ProductCondition;
+  conditionId?: string | null;
+  seriesId?: string | null;
   stock: number;
   minStock: number;
   brandId: string;
@@ -27,9 +31,12 @@ export interface ProductCreateInput {
   color?: string | null;
   colorHex?: string | null;
   batteryHealth?: number | null;
+  /** Legacy string durante migración. */
   grade?: string | null;
+  gradeId?: string | null;
   isFeatured: boolean;
   isPublished: boolean;
+  status?: ProductStatus;
   seoTitle?: string | null;
   seoDescription?: string | null;
   images?: ProductImagePayload[];

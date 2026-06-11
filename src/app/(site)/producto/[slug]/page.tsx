@@ -6,14 +6,26 @@ import { UsedProductDetailClient } from "@/components/catalog/UsedProductDetailC
 import { ProductGallery } from "@/components/catalog/ProductGallery";
 import { RelatedProducts } from "@/components/catalog/RelatedProducts";
 import { ProductPurchaseIncludes } from "@/components/product/ProductPurchaseIncludes";
+import {
+  getCatalogBasePath,
+  isDeviceCatalogType,
+  shouldUseUsedGradeDetail,
+} from "@/lib/product-catalog-type";
 import { shouldShowProductPurchaseIncludes } from "@/lib/product-purchase-includes";
+import { ProductCatalogMeta } from "@/components/product/ProductCatalogMeta";
 import { ProductTechnicalSpecsAccordion } from "@/components/product/ProductTechnicalSpecsAccordion";
 import { ProductBadges } from "@/components/store/ProductBadges";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
+import {
+  resolveProductConditionLabel,
+  resolveProductGradeLabel,
+} from "@/lib/product-field-resolvers";
 import { env } from "@/config/env";
 import { RELATED_PRODUCTS_DISPLAY_LIMIT } from "@/lib/constants";
 import { getProductCoverImage } from "@/lib/product-images";
 import { isLowStock } from "@/lib/product-ui";
+import { isProductHidden, isProductOutOfStock } from "@/lib/product-status";
+import { OutOfStockBadge } from "@/components/store/OutOfStockBadge";
 import {
   getProductBySlug,
   getRelatedProducts,
@@ -63,26 +75,31 @@ export default async function ProductoPage({ params }: Props) {
     throw e;
   }
 
+  if (isProductHidden(product)) notFound();
+
   const related = await getRelatedProducts(product, RELATED_PRODUCTS_DISPLAY_LIMIT);
 
-  if (product.type === "USED") {
+  if (shouldUseUsedGradeDetail(product)) {
     const variants = await getUsedGradeVariants(product);
     return (
       <UsedProductDetailClient product={product} variants={variants} related={related} />
     );
   }
 
+  const listPath = getCatalogBasePath(product);
+  const listLabel = listPath === "/repuestos" ? "Repuestos" : "Tienda";
   const low = isLowStock(product.stock, product.minStock) && product.stock > 0;
+  const outOfStock = isProductOutOfStock(product);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-14">
       <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-ink-soft">
-        <Link href="/catalogo" className="text-primary-600 transition hover:text-primary-800">
-          Tienda
+        <Link href={listPath} className="text-primary-600 transition hover:text-primary-800">
+          {listLabel}
         </Link>
         <span className="mx-2">/</span>
         <Link
-          href={`/catalogo?categoryId=${encodeURIComponent(product.category.id)}`}
+          href={`${listPath}?categoryId=${encodeURIComponent(product.category.id)}`}
           className="text-primary-600 transition hover:text-primary-800"
         >
           {product.category.name}
@@ -99,14 +116,24 @@ export default async function ProductoPage({ params }: Props) {
             <ProductBadges
               type={product.type}
               condition={product.condition}
+              conditionLabel={resolveProductConditionLabel(product)}
               lowStock={low}
             />
-            <UsedGradeBadge type={product.type} grade={product.grade} size="md" />
+            {isDeviceCatalogType(product) ? (
+              <UsedGradeBadge
+                type={product.type}
+                grade={product.grade}
+                gradeLabel={resolveProductGradeLabel(product)}
+                size="md"
+              />
+            ) : null}
+            {outOfStock ? <OutOfStockBadge variant="badge" /> : null}
           </div>
           <p className="text-sm text-ink-soft">
             {product.brand.name}
             {product.model ? ` · ${product.model.name}` : ""}
           </p>
+          <ProductCatalogMeta product={product} className="mt-2 space-y-0.5" />
           <h1 className="font-display mt-2 text-2xl font-extrabold tracking-tight text-ink sm:text-3xl md:text-4xl">
             {product.name}
           </h1>

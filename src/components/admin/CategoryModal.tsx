@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CATALOG_TYPE_PLURAL_LABELS } from "@/lib/catalog-labels";
+import { PRODUCT_CATALOG_TYPES, resolveCategoryCatalogType } from "@/lib/product-catalog-type";
 import { ADMIN_CATEGORY_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { getApiErrorMessage } from "@/lib/api-errors";
 import { notifyApiError, notifyError, notifySuccess } from "@/lib/toast";
 import { ApiError } from "@/services/api";
 import { adminCreateCategory, adminUpdateCategory } from "@/services/admin/category.service";
-import type { Category } from "@/types/product";
+import type { Category, ProductCatalogType } from "@/types/product";
 import type { CategoryInput } from "@/services/admin/category.service";
 
 type Props = {
@@ -29,6 +31,7 @@ function slugify(s: string) {
 export function CategoryModal({ open, accessToken, category, onClose, onSaved }: Props) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [catalogType, setCatalogType] = useState<ProductCatalogType>("DEVICE");
   const [icon, setIcon] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,10 +42,12 @@ export function CategoryModal({ open, accessToken, category, onClose, onSaved }:
     if (category) {
       setName(category.name);
       setSlug(category.slug);
+      setCatalogType(resolveCategoryCatalogType(category));
       setIcon(category.icon ?? "");
     } else {
       setName("");
       setSlug("");
+      setCatalogType("DEVICE");
       setIcon("");
     }
   }, [open, category]);
@@ -51,12 +56,17 @@ export function CategoryModal({ open, accessToken, category, onClose, onSaved }:
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!catalogType) {
+      setError("Selecciona un tipo de catálogo para la categoría.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const body: CategoryInput = {
         name: name.trim(),
         slug: slug.trim() || slugify(name),
+        catalogType,
         icon: icon.trim() || null,
       };
       if (category) {
@@ -113,6 +123,21 @@ export function CategoryModal({ open, accessToken, category, onClose, onSaved }:
               onChange={(e) => setSlug(e.target.value)}
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
             />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-zinc-700">Catálogo</span>
+            <select
+              required
+              value={catalogType}
+              onChange={(e) => setCatalogType(e.target.value as ProductCatalogType)}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            >
+              {PRODUCT_CATALOG_TYPES.map((ct) => (
+                <option key={ct} value={ct}>
+                  {CATALOG_TYPE_PLURAL_LABELS[ct]}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="block">
             <span className="text-sm font-medium text-zinc-700">Icono (URL o emoji)</span>

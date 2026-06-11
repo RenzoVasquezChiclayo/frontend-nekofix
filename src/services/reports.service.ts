@@ -59,6 +59,8 @@ export async function getReportsDashboard(
     publishedProducts: 0,
     lowStockProducts: 0,
     outOfStockProducts: 0,
+    activeProducts: 0,
+    hiddenProducts: 0,
     totalRevenue: 0,
   });
 }
@@ -108,6 +110,8 @@ export async function getReportsInventorySummary(
     publishedProducts: 0,
     lowStockProducts: 0,
     outOfStockProducts: 0,
+    activeProducts: 0,
+    hiddenProducts: 0,
   });
 }
 

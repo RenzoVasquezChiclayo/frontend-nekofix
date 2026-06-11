@@ -14,6 +14,10 @@ export interface DashboardMetrics {
   publishedProducts: number;
   lowStockProducts: number;
   outOfStockProducts: number;
+  /** Productos con status ACTIVE (si el backend lo expone). */
+  activeProducts?: number;
+  /** Productos con status HIDDEN (si el backend lo expone). */
+  hiddenProducts?: number;
   totalRevenue: number;
 }
 
@@ -40,6 +44,8 @@ export interface InventorySummary {
   publishedProducts: number;
   lowStockProducts: number;
   outOfStockProducts: number;
+  activeProducts?: number;
+  hiddenProducts?: number;
 }
 
 export interface LowStockProduct {

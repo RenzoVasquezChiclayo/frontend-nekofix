@@ -1,9 +1,11 @@
 import { toQueryParams } from "@/lib/mappers/base-query.mapper";
 import type {
+  ProductCatalogType,
   ProductCondition,
   ProductListQuery,
   ProductSortKey,
   ProductSortUI,
+  ProductStatus,
   ProductType,
 } from "@/types/product";
 
@@ -24,6 +26,8 @@ export type ProductQueryBackend = {
   model?: string;
   modelId?: string;
   type?: ProductType;
+  catalogType?: ProductCatalogType;
+  excludeCatalogType?: ProductCatalogType;
   condition?: ProductCondition;
   storage?: string;
   color?: string;
@@ -31,6 +35,7 @@ export type ProductQueryBackend = {
   maxPrice?: number;
   featured?: boolean;
   isPublished?: boolean;
+  status?: ProductStatus;
   lowStock?: boolean;
 };
 
@@ -42,6 +47,7 @@ export type ProductFiltersInput = ProductListQuery & {
   isPublished?: boolean;
   isFeatured?: boolean;
   lowStock?: boolean;
+  status?: ProductStatus;
 };
 
 export type ProductSortBackend = Pick<ProductQueryBackend, "sortBy" | "sortOrder">;
@@ -119,13 +125,20 @@ export function mapProductFiltersToQuery(
     modelId:
       rest.modelId != null && rest.modelId !== "" ? rest.modelId : undefined,
     type: rest.type,
+    catalogType: rest.catalogType,
+    excludeCatalogType: rest.excludeCatalogType,
     condition: rest.condition,
+    conditionId:
+      rest.conditionId != null && rest.conditionId !== "" ? rest.conditionId : undefined,
+    gradeId: rest.gradeId != null && rest.gradeId !== "" ? rest.gradeId : undefined,
+    seriesId: rest.seriesId != null && rest.seriesId !== "" ? rest.seriesId : undefined,
     storage: rest.storage,
     color: rest.color,
     minPrice: rest.minPrice,
     maxPrice: rest.maxPrice,
     featured: normalizeFeatured(featured, isFeatured),
     isPublished: rest.isPublished,
+    status: rest.status,
     lowStock: rest.lowStock,
   });
 }

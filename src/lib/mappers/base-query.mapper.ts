@@ -3,6 +3,9 @@
  * `sort` (UI) → `sortBy` + `sortOrder` (nunca enviar `sort` en query).
  */
 
+/** Máximo `limit` aceptado por el backend NestJS en listados paginados. */
+export const API_MAX_LIST_LIMIT = 100;
+
 export type SortOrder = "asc" | "desc";
 
 /** Orden simple por fecha de creación (marcas, categorías, historiales, etc.). */

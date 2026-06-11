@@ -1,4 +1,6 @@
 import { mapProductFiltersToQuery } from "@/lib/mappers/product-query.mapper";
+import { filterPublicCatalogProducts } from "@/lib/product-status";
+import { resolveProductCatalogType } from "@/lib/product-catalog-type";
 import { normalizeApiListResponse } from "@/lib/normalize-api-list";
 import { normalizeApiSingleResponse } from "@/lib/normalize-api-single";
 import { sortProductsByGrade } from "@/lib/used-grade";
@@ -19,7 +21,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
   const raw = await apiFetch<Product[] | { data: Product[] }>("/products/featured", {
     next: { revalidate: 60 },
   });
-  return unwrapFeatured(raw);
+  return unwrapFeatured(raw).filter((p) => filterPublicCatalogProducts([p]).length > 0);
 }
 
 /** GET /products — respuesta estándar `data` + `meta`. */
@@ -30,7 +32,8 @@ export async function getProducts(
     searchParams: mapProductFiltersToQuery(query),
     next: { revalidate: 60 },
   });
-  return normalizeApiListResponse<Product>(raw);
+  const res = normalizeApiListResponse<Product>(raw);
+  return { ...res, data: filterPublicCatalogProducts(res.data) };
 }
 
 /** GET /products/:slug */
@@ -47,11 +50,18 @@ export async function getRelatedProducts(
   limit = 6
 ): Promise<Product[]> {
   try {
+    const catalogType = resolveProductCatalogType(product);
+    const catalogFilter =
+      catalogType === "SPARE_PART"
+        ? { catalogType: "SPARE_PART" as const }
+        : { excludeCatalogType: "SPARE_PART" as const };
+
     const byBrand = await getProducts({
       brandId: product.brandId,
       limit: limit + 1,
       page: 1,
       sort: "newest",
+      ...catalogFilter,
     });
     const merged = byBrand.data.filter((p) => p.id !== product.id);
     if (merged.length >= limit) return merged.slice(0, limit);
@@ -60,6 +70,7 @@ export async function getRelatedProducts(
       limit: limit + 1,
       page: 1,
       sort: "newest",
+      ...catalogFilter,
     });
     const ids = new Set(merged.map((p) => p.id));
     for (const p of byCat.data) {
@@ -89,6 +100,7 @@ export async function getUsedGradeVariants(product: Product): Promise<Product[]>
     const res = await getProducts({
       modelId: product.modelId,
       type: "USED",
+      catalogType: "DEVICE",
       limit: 48,
       page: 1,
       sort: "newest",

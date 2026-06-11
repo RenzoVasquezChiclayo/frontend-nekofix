@@ -1,3 +1,4 @@
+import { resolveProductStatus } from "@/lib/product-status";
 import type { CartCheckoutPayload } from "@/types/lead";
 import type { CartLine } from "@/types/order";
 import type { Product } from "@/types/product";
@@ -18,6 +19,7 @@ export function productToCartLine(product: Product, quantity: number): CartLine 
     condition: product.condition,
     grade: product.type === "USED" ? product.grade : undefined,
     productType: product.type,
+    productStatus: resolveProductStatus(product),
   };
 }
 

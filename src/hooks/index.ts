@@ -1,3 +1,4 @@
 export { useDebouncedValue } from "./use-debounce";
+export { useAdminCatalogOptions } from "./use-admin-catalog-options";
 export { useCart } from "@/store/cart-context";
 export { useAuth } from "@/store/auth-context";

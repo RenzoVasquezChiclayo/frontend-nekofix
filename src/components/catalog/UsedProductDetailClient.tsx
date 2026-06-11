@@ -9,10 +9,18 @@ import { UsedGradeExplainer } from "@/components/catalog/UsedGradeExplainer";
 import { UsedGradeSelector } from "@/components/catalog/UsedGradeSelector";
 import { ProductPurchaseIncludes } from "@/components/product/ProductPurchaseIncludes";
 import { shouldShowProductPurchaseIncludes } from "@/lib/product-purchase-includes";
+import { ProductCatalogMeta } from "@/components/product/ProductCatalogMeta";
 import { ProductTechnicalSpecsAccordion } from "@/components/product/ProductTechnicalSpecsAccordion";
 import { ProductBadges } from "@/components/store/ProductBadges";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
+import { getCatalogBasePath } from "@/lib/product-catalog-type";
+import {
+  resolveProductConditionLabel,
+  resolveProductGradeLabel,
+} from "@/lib/product-field-resolvers";
+import { isProductPurchasable, isProductOutOfStock } from "@/lib/product-status";
 import { isLowStock } from "@/lib/product-ui";
+import { OutOfStockBadge } from "@/components/store/OutOfStockBadge";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/types/product";
 
@@ -24,7 +32,7 @@ type Props = {
 
 export function UsedProductDetailClient({ product, variants, related }: Props) {
   const selectable = useMemo(
-    () => variants.filter((v) => v.stock > 0),
+    () => variants.filter((v) => isProductPurchasable(v)),
     [variants]
   );
 
@@ -43,18 +51,20 @@ export function UsedProductDetailClient({ product, variants, related }: Props) {
   }, [active.slug]);
 
   const low = isLowStock(active.stock, active.minStock) && active.stock > 0;
+  const outOfStock = isProductOutOfStock(active);
   const showGradePicker = selectable.length > 1;
+  const listPath = getCatalogBasePath(active);
 
   return (
     <>
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-14">
         <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-ink-soft">
-          <Link href="/catalogo" className="text-primary-600 transition hover:text-primary-800">
+          <Link href={listPath} className="text-primary-600 transition hover:text-primary-800">
             Tienda
           </Link>
           <span className="mx-2">/</span>
           <Link
-            href={`/catalogo?categoryId=${encodeURIComponent(active.category.id)}`}
+            href={`${listPath}?categoryId=${encodeURIComponent(active.category.id)}`}
             className="text-primary-600 transition hover:text-primary-800"
           >
             {active.category.name}
@@ -68,19 +78,35 @@ export function UsedProductDetailClient({ product, variants, related }: Props) {
 
           <div>
             <div className="mb-4 flex flex-wrap items-center gap-2">
-              <ProductBadges type={active.type} condition={active.condition} lowStock={low} />
-              <UsedGradeBadge type={active.type} grade={active.grade} size="md" />
+              <ProductBadges
+                type={active.type}
+                condition={active.condition}
+                conditionLabel={resolveProductConditionLabel(active)}
+                lowStock={low}
+              />
+              <UsedGradeBadge
+                type={active.type}
+                grade={active.grade}
+                gradeLabel={resolveProductGradeLabel(active)}
+                size="md"
+              />
+              {outOfStock ? <OutOfStockBadge variant="badge" /> : null}
             </div>
             <p className="text-sm text-ink-soft">
               {active.brand.name}
               {active.model ? ` · ${active.model.name}` : ""}
             </p>
+            <ProductCatalogMeta product={active} className="mt-2 space-y-0.5" />
             <h1 className="font-display mt-2 text-2xl font-extrabold tracking-tight text-ink sm:text-3xl md:text-4xl">
               {active.name}
             </h1>
             <p className="mt-2 text-xs text-ink-caption">SKU {active.sku}</p>
 
-            {active.stock <= 0 ? (
+            {outOfStock ? (
+              <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                Producto temporalmente agotado.
+              </p>
+            ) : active.stock <= 0 ? (
               <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
                 Sin stock en este grado. Elige otro estado de uso si está disponible.
               </p>

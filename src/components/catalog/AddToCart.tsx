@@ -2,8 +2,15 @@
 
 import { useState } from "react";
 import { ProductColorPickerRow } from "@/components/product/ProductColorSwatch";
-import { notifySuccess } from "@/lib/toast";
+import { ProductOutOfStockNotice } from "@/components/product/ProductStockStatus";
+import { isDeviceCatalogType } from "@/lib/product-catalog-type";
+import {
+  isProductOutOfStock,
+  isProductPurchasable,
+  resolveProductStatus,
+} from "@/lib/product-status";
 import { getProductCoverImage } from "@/lib/product-images";
+import { notifySuccess } from "@/lib/toast";
 import { useCart } from "@/store/cart-context";
 import type { Product } from "@/types/product";
 
@@ -21,7 +28,8 @@ export function AddToCart({ product, quantity, onQuantityChange }: AddToCartProp
   const [internalQty, setInternalQty] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const canBuy = product.stock > 0;
+  const outOfStock = isProductOutOfStock(product);
+  const canBuy = isProductPurchasable(product);
   const qty = quantity ?? internalQty;
 
   function updateQty(next: number) {
@@ -47,23 +55,27 @@ export function AddToCart({ product, quantity, onQuantityChange }: AddToCartProp
       condition: product.condition,
       grade: product.type === "USED" ? product.grade : undefined,
       productType: product.type,
+      productStatus: resolveProductStatus(product),
     });
     notifySuccess("Producto agregado al carrito");
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
 
+  const isDevice = isDeviceCatalogType(product);
   const showSpecs =
     product.storage ||
     product.color ||
-    product.batteryHealth != null ||
-    (product.type === "USED" && product.grade);
+    (isDevice && product.batteryHealth != null) ||
+    (isDevice && product.type === "USED" && product.grade);
 
   return (
     <div className="space-y-4">
+      {outOfStock ? <ProductOutOfStockNotice /> : null}
+
       {showSpecs ? (
         <div className="space-y-3 rounded-xl border border-primary-100 bg-primary-50/50 px-4 py-4 text-sm text-zinc-600">
-          {product.type === "USED" && product.grade ? (
+          {isDevice && product.type === "USED" && product.grade ? (
             <p>
               <span className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
                 Grado
@@ -79,7 +91,7 @@ export function AddToCart({ product, quantity, onQuantityChange }: AddToCartProp
               <span className="mt-1 block font-medium text-ink">{product.storage}</span>
             </p>
           ) : null}
-          {product.batteryHealth != null ? (
+          {isDevice && product.batteryHealth != null ? (
             <p>
               <span className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
                 Batería
@@ -109,12 +121,13 @@ export function AddToCart({ product, quantity, onQuantityChange }: AddToCartProp
           <input
             type="number"
             min={1}
-            max={product.stock}
+            max={Math.max(1, product.stock)}
             value={qty}
+            disabled={!canBuy}
             onChange={(e) =>
               updateQty(Math.max(1, Math.min(product.stock, Number(e.target.value) || 1)))
             }
-            className="ml-2 w-20 rounded-lg border border-zinc-200 px-2 py-1.5 text-center text-sm"
+            className="ml-2 w-20 rounded-lg border border-zinc-200 px-2 py-1.5 text-center text-sm disabled:opacity-50"
           />
         </label>
       </div>
@@ -125,7 +138,13 @@ export function AddToCart({ product, quantity, onQuantityChange }: AddToCartProp
         onClick={handleAdd}
         className="w-full rounded-full bg-primary-600 py-3.5 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {canBuy ? (added ? "Agregado al carrito" : "Agregar al carrito") : "Sin stock"}
+        {outOfStock
+          ? "Agotado"
+          : canBuy
+            ? added
+              ? "Agregado al carrito"
+              : "Agregar al carrito"
+            : "Sin stock"}
       </button>
     </div>
   );
