@@ -39,13 +39,20 @@ export function mapAdminProductFiltersToQuery(
     modelId:
       rest.modelId != null && rest.modelId !== "" ? rest.modelId : undefined,
     type: rest.type,
+    catalogType: rest.catalogType,
+    excludeCatalogType: rest.excludeCatalogType,
     condition: rest.condition,
+    conditionId:
+      rest.conditionId != null && rest.conditionId !== "" ? rest.conditionId : undefined,
+    gradeId: rest.gradeId != null && rest.gradeId !== "" ? rest.gradeId : undefined,
+    seriesId: rest.seriesId != null && rest.seriesId !== "" ? rest.seriesId : undefined,
     storage: rest.storage,
     color: rest.color,
     minPrice: rest.minPrice,
     maxPrice: rest.maxPrice,
     featured: normalizeFeatured(featured, isFeatured),
     isPublished: rest.isPublished,
+    status: rest.status,
     lowStock: rest.lowStock,
   });
 }

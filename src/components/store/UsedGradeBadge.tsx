@@ -5,19 +5,22 @@ import type { ProductType } from "@/types/product";
 type Props = {
   grade: string | null | undefined;
   type: ProductType;
+  /** Etiqueta dinámica desde API (`gradeRef`); fallback al string legacy. */
+  gradeLabel?: string | null;
   className?: string;
   size?: "sm" | "md";
 };
 
 /**
- * Badge de grado cosmético (A+ / A / B) solo para productos usados.
+ * Badge de grado cosmético solo para productos usados.
  */
-export function UsedGradeBadge({ grade, type, className, size = "sm" }: Props) {
+export function UsedGradeBadge({ grade, type, gradeLabel, className, size = "sm" }: Props) {
   if (type !== "USED") return null;
-  const g = normalizeUsedGrade(grade);
+  const fromRef = gradeLabel?.trim();
+  const g = fromRef || normalizeUsedGrade(grade);
   if (!g) return null;
 
-  const label = `Grado ${g}`;
+  const label = fromRef ? `Grado ${fromRef}` : `Grado ${g}`;
   const sizeCls =
     size === "md"
       ? "px-2.5 py-1 text-[11px] ring-1"

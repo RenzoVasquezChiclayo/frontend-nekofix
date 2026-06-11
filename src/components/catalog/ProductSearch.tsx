@@ -3,7 +3,11 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export function ProductSearch() {
+type Props = {
+  basePath?: "/catalogo" | "/repuestos";
+};
+
+export function ProductSearch({ basePath = "/catalogo" }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const q = searchParams.get("search") ?? "";
@@ -19,7 +23,7 @@ export function ProductSearch() {
     if (trimmed) params.set("search", trimmed);
     else params.delete("search");
     params.set("page", "1");
-    router.push(`/catalogo?${params.toString()}`);
+    router.push(`${basePath}?${params.toString()}`);
   }
 
   return (
@@ -36,7 +40,11 @@ export function ProductSearch() {
               apply();
             }
           }}
-          placeholder="Buscar por nombre o marca…"
+          placeholder={
+            basePath === "/repuestos"
+              ? "Buscar repuesto por nombre o marca…"
+              : "Buscar por nombre o marca…"
+          }
           className="w-full rounded-xl border border-primary-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
         />
       </label>

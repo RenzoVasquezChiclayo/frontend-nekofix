@@ -16,6 +16,8 @@ export type PhoneModelListFiltersInput = {
   limit?: number;
   search?: string;
   brand?: string;
+  brandId?: string;
+  seriesId?: string;
   sort?: PhoneModelSortKey;
 };
 
@@ -39,13 +41,15 @@ export function mapPhoneModelSortUiToBackend(sort?: PhoneModelSortKey): PhoneMod
 export function mapPhoneModelFiltersToQuery(
   filters: PhoneModelListFiltersInput
 ): Record<string, string | number | boolean | undefined> {
-  const { sort: sortKey, page, limit, search, brand } = filters;
+  const { sort: sortKey, page, limit, search, brand, brandId, seriesId } = filters;
   const { sortBy, sortOrder } = mapPhoneModelSortUiToBackend(sortKey);
   return toQueryParams({
     page,
     limit,
     search,
-    brand,
+    brand: brandId ? undefined : brand,
+    brandId: brandId != null && brandId !== "" ? brandId : undefined,
+    seriesId: seriesId != null && seriesId !== "" ? seriesId : undefined,
     sortBy,
     sortOrder,
   });

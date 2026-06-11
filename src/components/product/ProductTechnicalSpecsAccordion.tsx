@@ -1,10 +1,13 @@
 "use client";
 
 import { useId, useState } from "react";
+import { PRODUCT_TYPE_LABELS } from "@/lib/catalog-labels";
+import { isDeviceCatalogType } from "@/lib/product-catalog-type";
 import {
-  PRODUCT_CONDITION_LABELS,
-  PRODUCT_TYPE_LABELS,
-} from "@/lib/catalog-labels";
+  resolveProductConditionLabel,
+  resolveProductGradeLabel,
+  resolveProductSeriesLabel,
+} from "@/lib/product-field-resolvers";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types/product";
 
@@ -15,9 +18,13 @@ export type Props = {
 /** Filas solo con valor útil para mostrar. */
 function buildSpecCards(product: Product): { label: string; value: string }[] {
   const cards: { label: string; value: string }[] = [];
+  const isDevice = isDeviceCatalogType(product);
 
   const brand = product.brand?.name?.trim();
   if (brand) cards.push({ label: "Marca", value: brand });
+
+  const series = resolveProductSeriesLabel(product);
+  if (series) cards.push({ label: "Serie", value: series });
 
   const category = product.category?.name?.trim();
   if (category) cards.push({ label: "Categoría", value: category });
@@ -30,7 +37,11 @@ function buildSpecCards(product: Product): { label: string; value: string }[] {
 
   cards.push({ label: "Stock", value: String(product.stock) });
   cards.push({ label: "Tipo", value: PRODUCT_TYPE_LABELS[product.type] });
-  cards.push({ label: "Condición", value: PRODUCT_CONDITION_LABELS[product.condition] });
+
+  const conditionLabel = resolveProductConditionLabel(product);
+  if (conditionLabel !== "—") {
+    cards.push({ label: "Condición", value: conditionLabel });
+  }
 
   const storage = product.storage?.trim();
   if (storage) cards.push({ label: "Almacenamiento", value: storage });
@@ -38,12 +49,16 @@ function buildSpecCards(product: Product): { label: string; value: string }[] {
   const color = product.color?.trim();
   if (color) cards.push({ label: "Color", value: color });
 
-  if (product.batteryHealth != null && Number.isFinite(product.batteryHealth)) {
+  if (
+    isDevice &&
+    product.batteryHealth != null &&
+    Number.isFinite(product.batteryHealth)
+  ) {
     cards.push({ label: "Batería", value: `${product.batteryHealth}%` });
   }
 
-  const grade = product.grade?.trim();
-  if (grade) cards.push({ label: "Grado", value: grade });
+  const gradeLabel = resolveProductGradeLabel(product);
+  if (isDevice && gradeLabel) cards.push({ label: "Grado", value: gradeLabel });
 
   return cards;
 }

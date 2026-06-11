@@ -1,17 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { CATALOG_TYPE_PLURAL_LABELS } from "@/lib/catalog-labels";
+import { PRODUCT_CATALOG_TYPES } from "@/lib/product-catalog-type";
 import { getApiErrorMessage } from "@/lib/api-errors";
 import { notifyApiError, notifySuccess } from "@/lib/toast";
 import { adminDeleteCategory, adminListCategories } from "@/services/admin/category.service";
 import { useAdminAuth } from "@/store/admin-auth-context";
 import { AdminHeader } from "@/components/admin/Header";
+import { CategoryCatalogTypeBadge } from "@/components/admin/CategoryCatalogTypeBadge";
 import { CategoryModal } from "@/components/admin/CategoryModal";
 import { ConfirmModal } from "@/components/admin/ConfirmModal";
 import { Pagination } from "@/components/admin/Pagination";
 import { Loader } from "@/components/shared/Loader";
 import type { PaginationMeta } from "@/types/api";
-import type { Category } from "@/types/product";
+import type { Category, ProductCatalogType } from "@/types/product";
 
 const PAGE_SIZE = 15;
 
@@ -28,6 +31,7 @@ export function CategoriesAdminView() {
   });
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [catalogTypeFilter, setCatalogTypeFilter] = useState<ProductCatalogType | "">("");
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
@@ -43,6 +47,7 @@ export function CategoriesAdminView() {
         page,
         limit: PAGE_SIZE,
         search: search.trim() || undefined,
+        catalogType: catalogTypeFilter || undefined,
         sort: "newest",
       });
       setCategories(res.data);
@@ -55,7 +60,7 @@ export function CategoriesAdminView() {
     } finally {
       setLoading(false);
     }
-  }, [accessToken, page, search]);
+  }, [accessToken, page, search, catalogTypeFilter]);
 
   useEffect(() => {
     void load();
@@ -115,6 +120,24 @@ export function CategoriesAdminView() {
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             />
           </label>
+          <label className="min-w-[160px]">
+            <span className="text-xs font-medium text-zinc-500">Catálogo</span>
+            <select
+              value={catalogTypeFilter}
+              onChange={(e) => {
+                setPage(1);
+                setCatalogTypeFilter(e.target.value as ProductCatalogType | "");
+              }}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            >
+              <option value="">Todos</option>
+              {PRODUCT_CATALOG_TYPES.map((ct) => (
+                <option key={ct} value={ct}>
+                  {CATALOG_TYPE_PLURAL_LABELS[ct]}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {loading ? (
@@ -144,7 +167,10 @@ export function CategoriesAdminView() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-zinc-900">{c.name}</p>
-                      <p className="font-mono text-xs text-zinc-600">{c.slug}</p>
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
+                        <CategoryCatalogTypeBadge category={c} />
+                        <p className="font-mono text-xs text-zinc-600">{c.slug}</p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 border-t border-zinc-100 pt-3">
@@ -175,6 +201,7 @@ export function CategoriesAdminView() {
                   <tr>
                     <th className="px-4 py-3">Icono</th>
                     <th className="px-4 py-3">Nombre</th>
+                    <th className="px-4 py-3">Catálogo</th>
                     <th className="px-4 py-3">Slug</th>
                     <th className="px-4 py-3 text-right">Acciones</th>
                   </tr>
@@ -195,6 +222,9 @@ export function CategoriesAdminView() {
                         )}
                       </td>
                       <td className="px-4 py-3 font-medium text-zinc-900">{c.name}</td>
+                      <td className="px-4 py-3">
+                        <CategoryCatalogTypeBadge category={c} />
+                      </td>
                       <td className="px-4 py-3 font-mono text-xs text-zinc-600">{c.slug}</td>
                       <td className="px-4 py-3 text-right">
                         <button

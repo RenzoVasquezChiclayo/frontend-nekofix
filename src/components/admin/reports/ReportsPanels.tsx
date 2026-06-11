@@ -68,8 +68,21 @@ export function ReportsPanels({
           : "—",
     },
     { label: "Productos publicados", value: dashboard?.publishedProducts ?? "—" },
+    {
+      label: "Productos disponibles",
+      value: dashboard?.activeProducts ?? "—",
+      tone: "success",
+    },
     { label: "Stock bajo", value: dashboard?.lowStockProducts ?? "—", tone: "warning" },
-    { label: "Productos agotados", value: dashboard?.outOfStockProducts ?? "—", tone: "warning" },
+    {
+      label: "Productos agotados",
+      value: dashboard?.outOfStockProducts ?? "—",
+      tone: "warning",
+    },
+    {
+      label: "Productos ocultos",
+      value: dashboard?.hiddenProducts ?? "—",
+    },
     { label: "Ingresos totales", value: formatCurrency(dashboard?.totalRevenue) },
   ];
 

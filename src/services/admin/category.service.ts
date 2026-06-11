@@ -9,10 +9,12 @@ import type { ApiListResponse } from "@/types/api";
 import type { Category } from "@/types/product";
 import { ApiError } from "@/services/api";
 import { adminApiFetch } from "@/services/admin/client";
+import type { ProductCatalogType } from "@/types/product";
 
 export type CategoryInput = {
   name: string;
   slug: string;
+  catalogType: ProductCatalogType;
   icon?: string | null;
 };
 

@@ -11,6 +11,9 @@ import {
 import { notifyError, notifyInfo } from "@/lib/toast";
 import { buildWhatsAppCartMessage, formatPrice, whatsappHref } from "@/lib/utils";
 import { resolveSafeWhatsAppUrl } from "@/lib/whatsapp-url";
+import {
+  isProductOutOfStock,
+} from "@/lib/product-status";
 import type { Product } from "@/types/product";
 
 type Props = {
@@ -20,10 +23,12 @@ type Props = {
 export function ProductDetailActions({ product }: Props) {
   const [quantity, setQuantity] = useState(1);
   const [waPending, startWaTransition] = useTransition();
+  const outOfStock = isProductOutOfStock(product);
 
   const total = useMemo(() => product.price * quantity, [product.price, quantity]);
 
   function handleWhatsAppConsult() {
+    if (outOfStock) return;
     startWaTransition(async () => {
       const line = productToCartLine(product, quantity);
       const result = await submitWhatsAppCheckout(
@@ -49,7 +54,7 @@ export function ProductDetailActions({ product }: Props) {
       <AddToCart product={product} quantity={quantity} onQuantityChange={setQuantity} />
       <button
         type="button"
-        disabled={waPending}
+        disabled={waPending || outOfStock}
         onClick={handleWhatsAppConsult}
         className="flex min-h-12 w-full items-center justify-center rounded-full border border-primary-200 py-3.5 text-sm font-semibold text-primary-800 transition hover:bg-primary-50 disabled:opacity-50"
       >

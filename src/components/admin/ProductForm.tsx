@@ -1,14 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  PRODUCT_CONDITION_LABELS,
+  CATALOG_TYPE_LABELS,
   PRODUCT_TYPE_LABELS,
 } from "@/lib/catalog-labels";
+import { PRODUCT_CATALOG_TYPES, filterCategoriesByCatalogType, resolveProductCatalogType } from "@/lib/product-catalog-type";
+import { PRODUCT_STATUSES, PRODUCT_STATUS_LABELS } from "@/lib/product-status";
+import {
+  matchConditionFromLegacy,
+  matchGradeFromLegacy,
+  resolveProductConditionId,
+  resolveProductGradeId,
+  resolveProductSeriesId,
+} from "@/lib/product-field-resolvers";
+import { useAdminCatalogOptions } from "@/hooks/use-admin-catalog-options";
 import { ADMIN_PRODUCT_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { coerceAdminProductForForm } from "@/lib/coerce-admin-product";
-import { normalizeUsedGrade, USED_GRADE_ORDER } from "@/lib/used-grade";
+import { normalizeUsedGrade } from "@/lib/used-grade";
 import { getApiErrorMessage } from "@/lib/api-errors";
 import { notifyApiError, notifyError, notifySuccess, notifyWarning } from "@/lib/toast";
 import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
@@ -36,12 +46,20 @@ import {
 } from "@/lib/product-color-map";
 import { ProductFormSkeleton } from "@/components/admin/ProductFormSkeleton";
 import type { ProductCreateInput } from "@/types/admin-product";
-import type { Brand, Category, PhoneModel, ProductCondition, ProductType } from "@/types/product";
+import type {
+  Brand,
+  Category,
+  PhoneModel,
+  Product,
+  ProductCatalogType,
+  ProductCondition,
+  ProductType,
+  ProductStatus,
+} from "@/types/product";
 
 type EditLoadPhase = "loading" | "ready" | "not_found" | "load_error";
 
 const TYPES = Object.keys(PRODUCT_TYPE_LABELS) as ProductType[];
-const CONDITIONS = Object.keys(PRODUCT_CONDITION_LABELS) as ProductCondition[];
 
 type Props = {
   productId?: string;
@@ -68,6 +86,7 @@ export function ProductForm({ productId }: Props) {
 
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [models, setModels] = useState<PhoneModel[]>([]);
 
   const [name, setName] = useState("");
@@ -78,8 +97,13 @@ export function ProductForm({ productId }: Props) {
   const [comparePrice, setComparePrice] = useState("");
   const [stock, setStock] = useState("0");
   const [minStock, setMinStock] = useState("0");
+  const [catalogType, setCatalogType] = useState<ProductCatalogType>("DEVICE");
   const [type, setType] = useState<ProductType>("NEW");
   const [condition, setCondition] = useState<ProductCondition>("NEW");
+  const [conditionId, setConditionId] = useState("");
+  const [gradeId, setGradeId] = useState("");
+  const [seriesId, setSeriesId] = useState("");
+  const [productSnapshot, setProductSnapshot] = useState<Product | null>(null);
   const [brandId, setBrandId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [modelId, setModelId] = useState("");
@@ -90,23 +114,54 @@ export function ProductForm({ productId }: Props) {
   const [grade, setGrade] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
   const [isPublished, setIsPublished] = useState(true);
+  const [status, setStatus] = useState<ProductStatus>("ACTIVE");
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
   const [imageDrafts, setImageDrafts] = useState<ProductImageDraft[]>([]);
 
-  const loadRefs = useCallback(async () => {
-    if (!accessToken) return;
-    try {
-      const [b, c, m] = await Promise.all([
-        fetchAllAdminPages((p) =>
-          adminListBrands(accessToken, {
+  const {
+    activeConditions,
+    activeGrades,
+    seriesForBrand,
+    loading: catalogsLoading,
+    error: catalogsError,
+  } = useAdminCatalogOptions({
+    accessToken,
+    catalogType,
+    brandId,
+    loadSeries: catalogType === "DEVICE",
+  });
+
+  const loadCategoriesForCatalog = useCallback(
+    async (targetCatalogType: ProductCatalogType) => {
+      if (!accessToken) return;
+      setCategoriesLoading(true);
+      try {
+        const rows = await fetchAllAdminPages((p) =>
+          adminListCategories(accessToken, {
             page: p,
             limit: ADMIN_SELECT_PAGE_SIZE,
             sort: "newest",
+            catalogType: targetCatalogType,
           })
-        ),
+        );
+        const sorted = rows.sort((a, z) => a.name.localeCompare(z.name, "es"));
+        setCategories(filterCategoriesByCatalogType(sorted, targetCatalogType));
+      } catch {
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    },
+    [accessToken]
+  );
+
+  const loadRefs = useCallback(async () => {
+    if (!accessToken) return;
+    try {
+      const [b, m] = await Promise.all([
         fetchAllAdminPages((p) =>
-          adminListCategories(accessToken, {
+          adminListBrands(accessToken, {
             page: p,
             limit: ADMIN_SELECT_PAGE_SIZE,
             sort: "newest",
@@ -121,7 +176,6 @@ export function ProductForm({ productId }: Props) {
         ),
       ]);
       setBrands(b.sort((a, z) => a.name.localeCompare(z.name, "es")));
-      setCategories(c.sort((a, z) => a.name.localeCompare(z.name, "es")));
       setModels(m.sort((a, z) => a.name.localeCompare(z.name, "es")));
     } catch {
       /* empty */
@@ -131,6 +185,21 @@ export function ProductForm({ productId }: Props) {
   useEffect(() => {
     void loadRefs();
   }, [loadRefs]);
+
+  useEffect(() => {
+    void loadCategoriesForCatalog(catalogType);
+  }, [catalogType, loadCategoriesForCatalog]);
+
+  const categoriesForCatalog = useMemo(
+    () => filterCategoriesByCatalogType(categories, catalogType),
+    [categories, catalogType]
+  );
+
+  useEffect(() => {
+    if (categoriesLoading || !categoryId) return;
+    const stillValid = categoriesForCatalog.some((c) => c.id === categoryId);
+    if (!stillValid) setCategoryId("");
+  }, [catalogType, categoriesForCatalog, categoryId, categoriesLoading]);
 
   useEffect(() => {
     if (!isEdit) {
@@ -162,8 +231,10 @@ export function ProductForm({ productId }: Props) {
         setComparePrice(p.comparePrice != null ? String(p.comparePrice) : "");
         setStock(String(p.stock));
         setMinStock(String(p.minStock));
+        setCatalogType(resolveProductCatalogType(p));
         setType(p.type);
         setCondition(p.condition);
+        setProductSnapshot(p);
         setBrandId(p.brandId);
         setCategoryId(p.categoryId);
         setModelId(p.modelId ?? "");
@@ -174,6 +245,7 @@ export function ProductForm({ productId }: Props) {
         setGrade(normalizeUsedGrade(p.grade) ?? "");
         setIsFeatured(p.isFeatured);
         setIsPublished(p.isPublished);
+        setStatus(p.status ?? "ACTIVE");
         setSeoTitle(p.seoTitle ?? "");
         setSeoDescription(p.seoDescription ?? "");
         setImageDrafts(draftsFromProductImages(p.productImages));
@@ -203,12 +275,49 @@ export function ProductForm({ productId }: Props) {
     return () => window.clearTimeout(t);
   }, [editPhase, router]);
 
-  /** `grade` solo aplica a `USED`; si el tipo deja de ser usado, limpiar. */
+  /** Hidrata IDs de catálogo desde producto cargado (refs o legacy). */
   useEffect(() => {
-    if (type !== "USED") {
-      setGrade("");
+    if (!productSnapshot || catalogsLoading) return;
+    const p = productSnapshot;
+    const condId =
+      resolveProductConditionId(p) ||
+      matchConditionFromLegacy(activeConditions, p.condition)?.id ||
+      "";
+    const gId =
+      resolveProductGradeId(p) || matchGradeFromLegacy(activeGrades, p.grade)?.id || "";
+    const sId = resolveProductSeriesId(p) || "";
+    setConditionId(condId);
+    setGradeId(gId);
+    setSeriesId(sId);
+  }, [productSnapshot, catalogsLoading, activeConditions, activeGrades]);
+
+  useEffect(() => {
+    if (!isEdit && !conditionId && activeConditions.length > 0) {
+      setConditionId(activeConditions[0].id);
     }
-  }, [type]);
+  }, [isEdit, conditionId, activeConditions]);
+
+  function handleCatalogTypeChange(next: ProductCatalogType) {
+    setCatalogType(next);
+    setConditionId("");
+    setGradeId("");
+    setSeriesId("");
+    setCategoryId("");
+    setProductSnapshot(null);
+  }
+
+  useEffect(() => {
+    if (!seriesId) return;
+    const valid = seriesForBrand.some((s) => s.id === seriesId);
+    if (!valid) setSeriesId("");
+  }, [brandId, seriesForBrand, seriesId]);
+
+  useEffect(() => {
+    if (catalogType !== "DEVICE") {
+      setGradeId("");
+      setSeriesId("");
+    }
+  }, [catalogType]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -225,6 +334,12 @@ export function ProductForm({ productId }: Props) {
       const images = draftsToPayload(
         imageDrafts.filter((d) => d.url.trim() && !d.uploading && !d.error)
       );
+      const selectedGrade = activeGrades.find((g) => g.id === gradeId);
+      const legacyGrade =
+        catalogType === "DEVICE"
+          ? selectedGrade?.name ?? (normalizeUsedGrade(grade) || null)
+          : null;
+
       const payload: ProductCreateInput = {
         name: name.trim(),
         slug: slug.trim() || slugify(name),
@@ -233,7 +348,10 @@ export function ProductForm({ productId }: Props) {
         price: Number(price) || 0,
         comparePrice: comparePrice === "" ? null : Number(comparePrice),
         type,
+        catalogType,
         condition,
+        conditionId: conditionId || null,
+        seriesId: catalogType === "DEVICE" && seriesId ? seriesId : null,
         stock: Math.max(0, Number(stock) || 0),
         minStock: Math.max(0, Number(minStock) || 0),
         brandId,
@@ -243,9 +361,11 @@ export function ProductForm({ productId }: Props) {
         color: color.trim() || null,
         colorHex: resolveProductColorHexForPayload(color, colorHex),
         batteryHealth: batteryHealth === "" ? null : Number(batteryHealth),
-        grade: type === "USED" ? (grade.trim() || null) : null,
+        grade: legacyGrade,
+        gradeId: catalogType === "DEVICE" && gradeId ? gradeId : null,
         isFeatured,
         isPublished,
+        status,
         seoTitle: seoTitle.trim() || null,
         seoDescription: seoDescription.trim() || null,
         images,
@@ -253,6 +373,10 @@ export function ProductForm({ productId }: Props) {
 
       if (!payload.brandId || !payload.categoryId) {
         throw new Error("Selecciona marca y categoría.");
+      }
+
+      if (!conditionId) {
+        throw new Error("Selecciona una condición del catálogo.");
       }
 
       if (
@@ -446,6 +570,23 @@ export function ProductForm({ productId }: Props) {
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <label>
+            <span className="text-sm font-medium text-zinc-700">Catálogo</span>
+            <select
+              value={catalogType}
+              onChange={(e) => handleCatalogTypeChange(e.target.value as ProductCatalogType)}
+              className={input}
+            >
+              {PRODUCT_CATALOG_TYPES.map((ct) => (
+                <option key={ct} value={ct}>
+                  {CATALOG_TYPE_LABELS[ct]}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1.5 text-xs text-zinc-500">
+              Equipo, repuesto o accesorio en tienda (independiente del tipo nuevo/usado).
+            </p>
+          </label>
+          <label>
             <span className="text-sm font-medium text-zinc-700">Tipo</span>
             <select
               value={type}
@@ -462,38 +603,51 @@ export function ProductForm({ productId }: Props) {
           <label>
             <span className="text-sm font-medium text-zinc-700">Condición</span>
             <select
-              value={condition}
-              onChange={(e) => setCondition(e.target.value as ProductCondition)}
+              required
+              value={conditionId}
+              onChange={(e) => setConditionId(e.target.value)}
+              disabled={catalogsLoading}
               className={input}
             >
-              {CONDITIONS.map((c) => (
-                <option key={c} value={c}>
-                  {PRODUCT_CONDITION_LABELS[c]}
+              <option value="">Seleccionar</option>
+              {activeConditions.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
                 </option>
               ))}
             </select>
+            {catalogsLoading ? (
+              <p className="mt-1.5 text-xs text-zinc-500">Cargando condiciones…</p>
+            ) : catalogsError ? (
+              <p className="mt-1.5 text-xs text-red-700">{catalogsError}</p>
+            ) : activeConditions.length === 0 ? (
+              <p className="mt-1.5 text-xs text-amber-800">
+                No hay condiciones activas para {CATALOG_TYPE_LABELS[catalogType]}. Créelas en
+                Catálogos → Condiciones.
+              </p>
+            ) : null}
           </label>
-          {type === "USED" ? (
-            <label className="sm:col-span-2">
-              <span className="text-sm font-medium text-zinc-700">Grado del equipo</span>
+          {catalogType === "DEVICE" ? (
+            <label>
+              <span className="text-sm font-medium text-zinc-700">Grado</span>
               <select
-                value={grade}
-                onChange={(e) => setGrade(e.target.value)}
+                value={gradeId}
+                onChange={(e) => setGradeId(e.target.value)}
+                disabled={catalogsLoading}
                 className={input}
               >
                 <option value="">Seleccionar grado</option>
-                {USED_GRADE_ORDER.map((g) => (
-                  <option key={g} value={g}>
-                    {g}
+                {activeGrades.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
                   </option>
                 ))}
-                {grade && !(USED_GRADE_ORDER as readonly string[]).includes(grade) ? (
-                  <option value={grade}>{grade}</option>
-                ) : null}
               </select>
-              <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
-                Estado cosmético del equipo usado. Solo aplica cuando el tipo es &quot;Usado&quot;.
-              </p>
+              {activeGrades.length === 0 && !catalogsLoading ? (
+                <p className="mt-1.5 text-xs text-amber-800">
+                  No hay grados activos. Créelos en Catálogos → Grados.
+                </p>
+              ) : null}
             </label>
           ) : null}
           <label>
@@ -512,21 +666,61 @@ export function ProductForm({ productId }: Props) {
               ))}
             </select>
           </label>
+          {catalogType === "DEVICE" ? (
+            <label>
+              <span className="text-sm font-medium text-zinc-700">Serie</span>
+              <select
+                value={seriesId}
+                onChange={(e) => setSeriesId(e.target.value)}
+                disabled={catalogsLoading || !brandId}
+                className={input}
+              >
+                <option value="">Ninguna</option>
+                {seriesForBrand.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              {!brandId ? (
+                <p className="mt-1.5 text-xs text-zinc-500">
+                  Selecciona una marca para filtrar series.
+                </p>
+              ) : seriesForBrand.length === 0 && !catalogsLoading ? (
+                <p className="mt-1.5 text-xs text-zinc-500">
+                  No hay series activas para esta marca.
+                </p>
+              ) : null}
+            </label>
+          ) : null}
           <label>
             <span className="text-sm font-medium text-zinc-700">Categoría</span>
             <select
               required
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
+              disabled={categoriesLoading}
               className={input}
             >
               <option value="">Seleccionar</option>
-              {categories.map((c) => (
+              {categoriesForCatalog.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
             </select>
+            {categoriesLoading ? (
+              <p className="mt-1.5 text-xs text-zinc-500">Cargando categorías del catálogo…</p>
+            ) : categoriesForCatalog.length === 0 ? (
+              <p className="mt-1.5 text-xs text-amber-800">
+                No existen categorías para «{CATALOG_TYPE_LABELS[catalogType]}». Créelas desde el
+                panel de categorías.
+              </p>
+            ) : (
+              <p className="mt-1.5 text-xs text-zinc-500">
+                Solo categorías de catálogo «{CATALOG_TYPE_LABELS[catalogType]}».
+              </p>
+            )}
           </label>
           <label className="sm:col-span-2">
             <span className="text-sm font-medium text-zinc-700">Modelo (teléfono)</span>
@@ -604,6 +798,20 @@ export function ProductForm({ productId }: Props) {
             Publicado
           </label>
         </div>
+        <label className="block max-w-xs">
+          <span className="text-sm font-medium text-zinc-700">Estado</span>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as ProductStatus)}
+            className={`${input} mt-1`}
+          >
+            {PRODUCT_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {PRODUCT_STATUS_LABELS[s]}
+              </option>
+            ))}
+          </select>
+        </label>
       </section>
 
       {accessToken ? (

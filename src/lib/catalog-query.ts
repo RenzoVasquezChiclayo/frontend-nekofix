@@ -1,4 +1,6 @@
+import { isProductCatalogType } from "@/lib/product-catalog-type";
 import type {
+  ProductCatalogType,
   ProductCondition,
   ProductListQuery,
   ProductType,
@@ -21,8 +23,14 @@ const CONDITIONS: ProductCondition[] = [
   "FOR_PARTS",
 ];
 
+export type ParseProductListQueryOptions = {
+  /** Valores por defecto (p. ej. `catalogType` o `excludeCatalogType` por ruta). */
+  defaults?: Partial<ProductListQuery>;
+};
+
 export function parseProductListQuery(
-  sp: Record<string, string | string[] | undefined>
+  sp: Record<string, string | string[] | undefined>,
+  options?: ParseProductListQueryOptions
 ): ProductListQuery {
   const search = pick(sp, "search");
   const brandId = pick(sp, "brandId");
@@ -31,7 +39,12 @@ export function parseProductListQuery(
   const category = pick(sp, "category");
   const modelId = pick(sp, "modelId");
   const model = pick(sp, "model");
+  const seriesId = pick(sp, "seriesId");
+  const conditionId = pick(sp, "conditionId");
+  const gradeId = pick(sp, "gradeId");
   const typeRaw = pick(sp, "type");
+  const catalogTypeRaw = pick(sp, "catalogType");
+  const excludeCatalogTypeRaw = pick(sp, "excludeCatalogType");
   const conditionRaw = pick(sp, "condition");
   const storage = pick(sp, "storage");
   const color = pick(sp, "color");
@@ -44,6 +57,10 @@ export function parseProductListQuery(
 
   const type = TYPES.includes(typeRaw as ProductType)
     ? (typeRaw as ProductType)
+    : undefined;
+  const catalogType = isProductCatalogType(catalogTypeRaw) ? catalogTypeRaw : undefined;
+  const excludeCatalogType = isProductCatalogType(excludeCatalogTypeRaw)
+    ? excludeCatalogTypeRaw
     : undefined;
   const condition = CONDITIONS.includes(conditionRaw as ProductCondition)
     ? (conditionRaw as ProductCondition)
@@ -73,7 +90,7 @@ export function parseProductListQuery(
   if (featuredRaw === "true") featured = true;
   else if (featuredRaw === "false") featured = false;
 
-  return {
+  const parsed: ProductListQuery = {
     search,
     brandId: brandId || undefined,
     brand: brandId ? undefined : brand || undefined,
@@ -81,8 +98,13 @@ export function parseProductListQuery(
     category: categoryId ? undefined : category || undefined,
     modelId: modelId || undefined,
     model: modelId ? undefined : model || undefined,
+    seriesId: seriesId || undefined,
     type,
+    catalogType,
+    excludeCatalogType,
     condition,
+    conditionId: conditionId || undefined,
+    gradeId: gradeId || undefined,
     storage,
     color,
     minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
@@ -92,4 +114,36 @@ export function parseProductListQuery(
     page: Number.isFinite(page) && page! > 0 ? page : 1,
     limit: Number.isFinite(limit) && limit! > 0 ? limit : 12,
   };
+
+  const defaults = options?.defaults;
+  if (defaults) {
+    if (parsed.catalogType == null && defaults.catalogType != null) {
+      parsed.catalogType = defaults.catalogType;
+    }
+    if (parsed.excludeCatalogType == null && defaults.excludeCatalogType != null) {
+      parsed.excludeCatalogType = defaults.excludeCatalogType;
+    }
+  }
+
+  return parsed;
+}
+
+export type CatalogQueryMode = "store" | "spare_parts";
+
+/** Elimina filtros incompatibles según la ruta de catálogo. */
+export function sanitizeQueryForCatalogMode(
+  query: ProductListQuery,
+  mode: CatalogQueryMode
+): ProductListQuery {
+  if (mode === "spare_parts") {
+    return {
+      ...query,
+      seriesId: undefined,
+      gradeId: undefined,
+      color: undefined,
+      storage: undefined,
+      type: undefined,
+    };
+  }
+  return query;
 }

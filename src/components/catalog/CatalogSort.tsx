@@ -2,7 +2,11 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-export function CatalogSort() {
+type Props = {
+  basePath?: "/catalogo" | "/repuestos";
+};
+
+export function CatalogSort({ basePath = "/catalogo" }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sort = searchParams.get("sort") ?? "newest";
@@ -16,7 +20,7 @@ export function CatalogSort() {
           const next = new URLSearchParams(searchParams.toString());
           next.set("sort", e.target.value);
           next.set("page", "1");
-          router.push(`/catalogo?${next.toString()}`);
+          router.push(`${basePath}?${next.toString()}`);
         }}
         className="rounded-full border border-primary-200 bg-white px-4 py-2.5 text-sm font-medium text-primary-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/25"
       >

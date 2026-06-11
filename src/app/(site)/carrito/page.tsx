@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useCartProductStatus } from "@/hooks/use-cart-product-status";
 import { useCart } from "@/store/cart-context";
 import { ProductColorMiniSwatch } from "@/components/product/ProductColorSwatch";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
@@ -10,6 +11,7 @@ import { formatPrice } from "@/lib/utils";
 
 export default function CarritoPage() {
   const { lines, subtotal, setQuantity, removeLine, itemCount } = useCart();
+  const { outOfStockLines, loading: statusLoading } = useCartProductStatus(lines);
 
   if (itemCount === 0) {
     return (
@@ -28,11 +30,33 @@ export default function CarritoPage() {
     );
   }
 
+  const outOfStockIds = new Set(outOfStockLines.map((l) => l.productId));
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
       <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink">Carrito</h1>
+
+      {outOfStockLines.length > 0 ? (
+        <div
+          className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+          role="alert"
+        >
+          {statusLoading ? (
+            <p>Verificando disponibilidad…</p>
+          ) : (
+            <p>
+              {outOfStockLines.length === 1
+                ? "Un producto de tu carrito está agotado y no podrá incluirse en el checkout."
+                : `${outOfStockLines.length} productos de tu carrito están agotados y no podrán incluirse en el checkout.`}
+            </p>
+          )}
+        </div>
+      ) : null}
+
       <ul className="mt-8 divide-y divide-zinc-100 border-y border-zinc-100">
-        {lines.map((line) => (
+        {lines.map((line) => {
+          const isOut = outOfStockIds.has(line.productId);
+          return (
           <li
             key={`${line.productId}-${line.condition}-${line.storage}-${line.color}`}
             className="flex flex-wrap gap-4 py-6 sm:flex-nowrap sm:items-center"
@@ -55,6 +79,11 @@ export default function CarritoPage() {
                   {line.name}
                 </Link>
                 {line.grade ? <UsedGradeBadge type="USED" grade={line.grade} /> : null}
+                {isOut ? (
+                  <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-red-800">
+                    Agotado
+                  </span>
+                ) : null}
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-soft">
                 {line.color ? (
@@ -80,6 +109,7 @@ export default function CarritoPage() {
                   type="number"
                   min={1}
                   value={line.quantity}
+                  disabled={isOut}
                   onChange={(e) =>
                     setQuantity({
                       productId: line.productId,
@@ -89,7 +119,7 @@ export default function CarritoPage() {
                       quantity: Number(e.target.value) || 1,
                     })
                   }
-                  className="w-16 rounded-xl border border-primary-200 px-2 py-1.5 text-center text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                  className="w-16 rounded-xl border border-primary-200 px-2 py-1.5 text-center text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50"
                 />
               </label>
               <button
@@ -108,7 +138,8 @@ export default function CarritoPage() {
               </button>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
       <div className="mt-8 flex flex-col items-end gap-4 border-t border-zinc-100 pt-8">
         <p className="text-lg">

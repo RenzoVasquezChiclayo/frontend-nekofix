@@ -4,6 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { submitWhatsAppCheckout } from "@/app/(site)/checkout/actions";
+import { OutOfStockBadge } from "@/components/store/OutOfStockBadge";
+import {
+  isProductOutOfStock,
+  isProductPurchasable,
+  resolveProductStatus,
+} from "@/lib/product-status";
 import { ProductBadges } from "@/components/store/ProductBadges";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { notifyError, notifyInfo, notifySuccess } from "@/lib/toast";
@@ -31,7 +37,8 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
   const [added, setAdded] = useState(false);
   const [waPending, startWaTransition] = useTransition();
   const low = isLowStock(p.stock, p.minStock) && p.stock > 0;
-  const canBuy = p.stock > 0;
+  const outOfStock = isProductOutOfStock(p);
+  const canBuy = isProductPurchasable(p);
 
   function handleCart(e: React.MouseEvent) {
     e.preventDefault();
@@ -50,6 +57,7 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
       condition: p.condition,
       grade: p.type === "USED" ? p.grade : undefined,
       productType: p.type,
+      productStatus: resolveProductStatus(p),
     });
     notifySuccess("Agregado al carrito");
     setAdded(true);
@@ -98,6 +106,7 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
           <ProductBadges type={p.type} condition={p.condition} lowStock={low} />
           <UsedGradeBadge type={p.type} grade={p.grade} />
         </div>
+        {outOfStock ? <OutOfStockBadge /> : null}
       </Link>
       <div className="flex flex-1 flex-col p-4">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-caption">
@@ -130,11 +139,11 @@ export function FeaturedProductCard({ product: p, imageSizes }: Props) {
             onClick={handleCart}
             className="w-full rounded-full bg-primary-600 py-2.5 text-xs font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {!canBuy ? "Sin stock" : added ? "Agregado" : "Agregar al carrito"}
+            {!canBuy ? (outOfStock ? "Agotado" : "Sin stock") : added ? "Agregado" : "Agregar al carrito"}
           </button>
           <button
             type="button"
-            disabled={waPending}
+            disabled={waPending || outOfStock}
             onClick={handleWhatsAppConsult}
             className="w-full rounded-full border border-primary-200 py-2.5 text-center text-xs font-semibold text-primary-800 transition hover:bg-primary-50 disabled:opacity-50"
           >

@@ -7,15 +7,20 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   meta: PaginationMeta;
+  basePath?: "/catalogo" | "/repuestos";
   className?: string;
 };
 
-export function catalogPageHref(searchParams: URLSearchParams, page: number): string {
+export function catalogPageHref(
+  searchParams: URLSearchParams,
+  page: number,
+  basePath: "/catalogo" | "/repuestos" = "/catalogo"
+): string {
   const next = new URLSearchParams(searchParams.toString());
   if (page <= 1) next.delete("page");
   else next.set("page", String(page));
   const qs = next.toString();
-  return qs ? `/catalogo?${qs}` : "/catalogo";
+  return qs ? `${basePath}?${qs}` : basePath;
 }
 
 function visiblePageItems(current: number, totalPages: number): (number | "gap")[] {
@@ -36,7 +41,7 @@ function visiblePageItems(current: number, totalPages: number): (number | "gap")
   return out;
 }
 
-export function CatalogPagination({ meta, className }: Props) {
+export function CatalogPagination({ meta, basePath = "/catalogo", className }: Props) {
   const searchParams = useSearchParams();
   const { page, totalPages, total, limit } = meta;
 
@@ -71,7 +76,12 @@ export function CatalogPagination({ meta, className }: Props) {
 
       <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
         {canPrev ? (
-          <Link href={catalogPageHref(searchParams, page - 1)} scroll prefetch={false} className={linkClass}>
+          <Link
+            href={catalogPageHref(searchParams, page - 1, basePath)}
+            scroll
+            prefetch={false}
+            className={linkClass}
+          >
             Anterior
           </Link>
         ) : (
@@ -89,7 +99,7 @@ export function CatalogPagination({ meta, className }: Props) {
             ) : (
               <li key={item}>
                 <Link
-                  href={catalogPageHref(searchParams, item)}
+                  href={catalogPageHref(searchParams, item, basePath)}
                   scroll
                   prefetch={false}
                   className={cn(linkClass, item === page && activeClass)}
@@ -106,7 +116,12 @@ export function CatalogPagination({ meta, className }: Props) {
         </p>
 
         {canNext ? (
-          <Link href={catalogPageHref(searchParams, page + 1)} scroll prefetch={false} className={linkClass}>
+          <Link
+            href={catalogPageHref(searchParams, page + 1, basePath)}
+            scroll
+            prefetch={false}
+            className={linkClass}
+          >
             Siguiente
           </Link>
         ) : (

@@ -13,3 +13,12 @@ export const ADMIN_PHONE_MODEL_NOT_FOUND_MESSAGE =
 
 export const ADMIN_INVENTORY_PRODUCT_NOT_FOUND_MESSAGE =
   "El producto ya no está disponible para ajustar inventario.";
+
+export const ADMIN_PHONE_SERIES_NOT_FOUND_MESSAGE =
+  "La serie no existe o fue eliminada";
+
+export const ADMIN_PRODUCT_CONDITION_NOT_FOUND_MESSAGE =
+  "La condición no existe o fue eliminada";
+
+export const ADMIN_PRODUCT_GRADE_NOT_FOUND_MESSAGE =
+  "El grado no existe o fue eliminado";

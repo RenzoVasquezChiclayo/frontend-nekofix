@@ -4,6 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useTransition } from "react";
 import { submitWhatsAppCheckout } from "@/app/(site)/checkout/actions";
+import { OutOfStockBadge } from "@/components/store/OutOfStockBadge";
+import {
+  isProductOutOfStock,
+  isProductPurchasable,
+  resolveProductStatus,
+} from "@/lib/product-status";
 import { ProductBadges } from "@/components/store/ProductBadges";
 import { UsedGradeBadge } from "@/components/store/UsedGradeBadge";
 import { getProductCoverImage } from "@/lib/product-images";
@@ -27,7 +33,8 @@ export function ProductCard({ product: p }: Props) {
   const { addLine } = useCart();
   const [waPending, startWaTransition] = useTransition();
   const [added, setAdded] = useState(false);
-  const canAdd = p.stock > 0;
+  const outOfStock = isProductOutOfStock(p);
+  const canAdd = isProductPurchasable(p);
   const cover = getProductCoverImage(p);
 
   function handleAdd() {
@@ -45,6 +52,7 @@ export function ProductCard({ product: p }: Props) {
       condition: p.condition,
       grade: p.type === "USED" ? p.grade : undefined,
       productType: p.type,
+      productStatus: resolveProductStatus(p),
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
@@ -87,6 +95,7 @@ export function ProductCard({ product: p }: Props) {
           <ProductBadges type={p.type} condition={p.condition} lowStock={low} />
           <UsedGradeBadge type={p.type} grade={p.grade} />
         </div>
+        {outOfStock ? <OutOfStockBadge /> : null}
         </div>
       </Link>
       <div className="flex flex-1 flex-col p-4 sm:p-5">
@@ -128,11 +137,11 @@ export function ProductCard({ product: p }: Props) {
             onClick={handleAdd}
             className="rounded-xl bg-primary-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {canAdd ? (added ? "Agregado" : "Agregar carrito") : "Sin stock"}
+            {outOfStock ? "Agotado" : canAdd ? (added ? "Agregado" : "Agregar carrito") : "Sin stock"}
           </button>
           <button
             type="button"
-            disabled={waPending}
+            disabled={waPending || outOfStock}
             onClick={handleWhatsAppConsult}
             className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-sm font-medium text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50"
           >

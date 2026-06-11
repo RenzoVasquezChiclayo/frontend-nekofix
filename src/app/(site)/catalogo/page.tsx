@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { CatalogLayout } from "@/components/catalog/CatalogLayout";
-import { parseProductListQuery } from "@/lib/catalog-query";
+import { parseProductListQuery, sanitizeQueryForCatalogMode } from "@/lib/catalog-query";
 import { emptyListResponse } from "@/lib/normalize-api-list";
-import { getBrands } from "@/services/brand.service";
-import { getCategories } from "@/services/category.service";
-import { getPhoneModels } from "@/services/phone-model.service";
+import { loadCatalogFilterOptions } from "@/lib/load-catalog-filters";
 import { getProducts } from "@/services/product.service";
-import type { Brand, Category, PhoneModel, Product } from "@/types/product";
+import type { Product } from "@/types/product";
 import { SITE_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -21,17 +19,17 @@ export default async function CatalogoPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
-  const query = parseProductListQuery(sp);
+  const query = sanitizeQueryForCatalogMode(
+    parseProductListQuery(sp, {
+      defaults: { excludeCatalogType: "SPARE_PART" },
+    }),
+    "store"
+  );
 
-  const [brandsRes, categoriesRes, modelsRes, result] = await Promise.all([
-    getBrands().catch(() => emptyListResponse<Brand>()),
-    getCategories().catch(() => emptyListResponse<Category>()),
-    getPhoneModels().catch(() => emptyListResponse<PhoneModel>()),
+  const [filterOptions, result] = await Promise.all([
+    loadCatalogFilterOptions("store"),
     getProducts(query).catch(() => emptyListResponse<Product>()),
   ]);
-  const brands = brandsRes.data;
-  const categories = categoriesRes.data;
-  const models = modelsRes.data;
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 sm:py-14">
@@ -46,11 +44,11 @@ export default async function CatalogoPage({
       </header>
       <Suspense fallback={null}>
         <CatalogLayout
+          basePath="/catalogo"
+          filterMode="store"
+          filterOptions={filterOptions}
           products={result.data}
           meta={result.meta}
-          brands={brands}
-          categories={categories}
-          models={models}
         />
       </Suspense>
     </div>

@@ -7,7 +7,13 @@ import {
 import { normalizeApiListResponse } from "@/lib/normalize-api-list";
 import { normalizeApiSingleResponse } from "@/lib/normalize-api-single";
 import type { ApiListResponse } from "@/types/api";
-import type { Product, ProductCondition, ProductType } from "@/types/product";
+import {
+  resolveProductConditionId,
+  resolveProductGradeId,
+  resolveProductSeriesId,
+} from "@/lib/product-field-resolvers";
+import { resolveProductStatus } from "@/lib/product-status";
+import type { Product, ProductCondition, ProductType, ProductStatus } from "@/types/product";
 import { ApiError } from "@/services/api";
 import { adminApiFetch } from "@/services/admin/client";
 
@@ -156,16 +162,30 @@ export function filterProductsClient(
     isFeatured?: boolean;
     type?: ProductType;
     condition?: ProductCondition;
+    conditionId?: string;
+    gradeId?: string;
+    seriesId?: string;
+    status?: ProductStatus;
   }
 ): Product[] {
   return products.filter((p) => {
     if (filters.lowStock === true && !(p.stock <= p.minStock)) return false;
+    if (filters.status && resolveProductStatus(p) !== filters.status) return false;
     if (filters.isPublished === true && !p.isPublished) return false;
     if (filters.isPublished === false && p.isPublished) return false;
     if (filters.isFeatured === true && !p.isFeatured) return false;
     if (filters.isFeatured === false && p.isFeatured) return false;
     if (filters.type && p.type !== filters.type) return false;
     if (filters.condition && p.condition !== filters.condition) return false;
+    if (filters.conditionId && resolveProductConditionId(p) !== filters.conditionId) {
+      return false;
+    }
+    if (filters.gradeId && resolveProductGradeId(p) !== filters.gradeId) {
+      return false;
+    }
+    if (filters.seriesId && resolveProductSeriesId(p) !== filters.seriesId) {
+      return false;
+    }
     return true;
   });
 }

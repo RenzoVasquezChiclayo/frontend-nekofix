@@ -3,9 +3,14 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  PRODUCT_CONDITION_LABELS,
+  CATALOG_TYPE_LABELS,
   PRODUCT_TYPE_LABELS,
 } from "@/lib/catalog-labels";
+import { PRODUCT_CATALOG_TYPES } from "@/lib/product-catalog-type";
+import {
+  sortCatalogByName,
+  sortSeriesByName,
+} from "@/lib/product-field-resolvers";
 import { getApiErrorMessage } from "@/lib/api-errors";
 import { notifyApiError, notifySuccess } from "@/lib/toast";
 import {
@@ -19,6 +24,9 @@ import {
 import { adminListBrands } from "@/services/admin/brand.service";
 import { adminListCategories } from "@/services/admin/category.service";
 import { adminListPhoneModels, type AdminPhoneModel } from "@/services/admin/phone-model.service";
+import { adminListProductConditions } from "@/services/admin/product-conditions.service";
+import { adminListProductGrades } from "@/services/admin/product-grades.service";
+import { adminListSeries } from "@/services/admin/series.service";
 import { useAdminAuth } from "@/store/admin-auth-context";
 import { AdminHeader } from "@/components/admin/Header";
 import { ConfirmModal } from "@/components/admin/ConfirmModal";
@@ -28,7 +36,20 @@ import { Pagination } from "@/components/admin/Pagination";
 import { Loader } from "@/components/shared/Loader";
 import { ADMIN_SELECT_PAGE_SIZE, fetchAllAdminPages } from "@/lib/admin-paginate-list";
 import type { PaginationMeta } from "@/types/api";
-import type { Brand, Category, Product, ProductCondition, ProductType } from "@/types/product";
+import type {
+  Brand,
+  Category,
+  Product,
+  ProductCatalogType,
+  ProductType,
+  ProductStatus,
+} from "@/types/product";
+import { PRODUCT_STATUSES, PRODUCT_STATUS_LABELS } from "@/lib/product-status";
+import type {
+  ProductConditionCatalog,
+  ProductGradeCatalog,
+  PhoneSeries,
+} from "@/types/catalog-admin";
 
 const PAGE_SIZE = 15;
 
@@ -52,10 +73,17 @@ export function ProductsAdminView() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [phoneModels, setPhoneModels] = useState<AdminPhoneModel[]>([]);
+  const [catalogType, setCatalogType] = useState<ProductCatalogType | "">("");
   const [type, setType] = useState<ProductType | "">("");
-  const [condition, setCondition] = useState<ProductCondition | "">("");
+  const [conditionId, setConditionId] = useState("");
+  const [gradeId, setGradeId] = useState("");
+  const [seriesId, setSeriesId] = useState("");
+  const [catalogConditions, setCatalogConditions] = useState<ProductConditionCatalog[]>([]);
+  const [catalogGrades, setCatalogGrades] = useState<ProductGradeCatalog[]>([]);
+  const [phoneSeries, setPhoneSeries] = useState<PhoneSeries[]>([]);
   const [lowStock, setLowStock] = useState(false);
   const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<ProductStatus | "">("");
 
   const modelsForSelect = useMemo(() => {
     if (!brandId) return phoneModels;
@@ -66,10 +94,25 @@ export function ProductsAdminView() {
   const [deleting, setDeleting] = useState(false);
   const [inventoryProduct, setInventoryProduct] = useState<Product | null>(null);
 
+  const seriesForFilter = useMemo(() => {
+    if (!brandId) return phoneSeries;
+    return phoneSeries.filter((s) => s.brandId === brandId);
+  }, [phoneSeries, brandId]);
+
+  const conditionsForFilter = useMemo(() => {
+    if (!catalogType) return catalogConditions;
+    return catalogConditions.filter((c) => c.catalogType === catalogType);
+  }, [catalogConditions, catalogType]);
+
+  const gradesForFilter = useMemo(() => {
+    if (!catalogType) return catalogGrades;
+    return catalogGrades.filter((g) => g.catalogType === catalogType);
+  }, [catalogGrades, catalogType]);
+
   const loadRefs = useCallback(async () => {
     if (!accessToken) return;
     try {
-      const [b, c, m] = await Promise.all([
+      const [b, c, m, conditions, grades, series] = await Promise.all([
         fetchAllAdminPages((p) =>
           adminListBrands(accessToken, {
             page: p,
@@ -91,10 +134,34 @@ export function ProductsAdminView() {
             sort: "newest",
           })
         ),
+        fetchAllAdminPages((p) =>
+          adminListProductConditions(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            isActive: true,
+          })
+        ),
+        fetchAllAdminPages((p) =>
+          adminListProductGrades(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            isActive: true,
+          })
+        ),
+        fetchAllAdminPages((p) =>
+          adminListSeries(accessToken, {
+            page: p,
+            limit: ADMIN_SELECT_PAGE_SIZE,
+            isActive: true,
+          })
+        ),
       ]);
       setBrands([...b].sort((a, z) => a.name.localeCompare(z.name, "es")));
       setCategories([...c].sort((a, z) => a.name.localeCompare(z.name, "es")));
       setPhoneModels([...m].sort((a, z) => a.name.localeCompare(z.name, "es")));
+      setCatalogConditions(sortCatalogByName(conditions));
+      setCatalogGrades(sortCatalogByName(grades));
+      setPhoneSeries(sortSeriesByName(series));
     } catch {
       /* refs opcionales */
     }
@@ -103,6 +170,12 @@ export function ProductsAdminView() {
   useEffect(() => {
     void loadRefs();
   }, [loadRefs]);
+
+  useEffect(() => {
+    if (!seriesId) return;
+    const valid = seriesForFilter.some((s) => s.id === seriesId);
+    if (!valid) setSeriesId("");
+  }, [brandId, seriesForFilter, seriesId]);
 
   const load = useCallback(async () => {
     if (!accessToken) return;
@@ -116,18 +189,23 @@ export function ProductsAdminView() {
         brandId: brandId || undefined,
         categoryId: categoryId || undefined,
         modelId: modelId || undefined,
+        catalogType: catalogType || undefined,
         type: type || undefined,
-        condition: condition || undefined,
+        conditionId: conditionId || undefined,
+        gradeId: gradeId || undefined,
+        seriesId: seriesId || undefined,
         sort: "newest",
         isFeatured: featuredOnly || undefined,
         lowStock: lowStock || undefined,
+        status: statusFilter || undefined,
       };
       const res = await adminListProducts(accessToken, q);
       let rows = res.data;
-      if (lowStock || featuredOnly) {
+      if (lowStock || featuredOnly || statusFilter) {
         rows = filterProductsClient(rows, {
           lowStock: lowStock || undefined,
           isFeatured: featuredOnly ? true : undefined,
+          status: statusFilter || undefined,
         });
       }
       setProducts(rows);
@@ -147,10 +225,14 @@ export function ProductsAdminView() {
     brandId,
     categoryId,
     modelId,
+    catalogType,
     type,
-    condition,
+    conditionId,
+    gradeId,
+    seriesId,
     lowStock,
     featuredOnly,
+    statusFilter,
   ]);
 
   useEffect(() => {
@@ -295,6 +377,24 @@ export function ProductsAdminView() {
               ))}
             </select>
           </label>
+          <label className="min-w-[140px]">
+            <span className="text-xs font-medium text-zinc-500">Catálogo</span>
+            <select
+              value={catalogType}
+              onChange={(e) => {
+                setPage(1);
+                setCatalogType(e.target.value as ProductCatalogType | "");
+              }}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            >
+              <option value="">Todos</option>
+              {PRODUCT_CATALOG_TYPES.map((ct) => (
+                <option key={ct} value={ct}>
+                  {CATALOG_TYPE_LABELS[ct]}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="min-w-[130px]">
             <span className="text-xs font-medium text-zinc-500">Tipo</span>
             <select
@@ -314,19 +414,73 @@ export function ProductsAdminView() {
             </select>
           </label>
           <label className="min-w-[140px]">
-            <span className="text-xs font-medium text-zinc-500">Condición</span>
+            <span className="text-xs font-medium text-zinc-500">Serie</span>
             <select
-              value={condition}
+              value={seriesId}
               onChange={(e) => {
                 setPage(1);
-                setCondition(e.target.value as ProductCondition | "");
+                setSeriesId(e.target.value);
               }}
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
             >
               <option value="">Todas</option>
-              {(Object.keys(PRODUCT_CONDITION_LABELS) as ProductCondition[]).map((c) => (
-                <option key={c} value={c}>
-                  {PRODUCT_CONDITION_LABELS[c]}
+              {seriesForFilter.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="min-w-[140px]">
+            <span className="text-xs font-medium text-zinc-500">Condición</span>
+            <select
+              value={conditionId}
+              onChange={(e) => {
+                setPage(1);
+                setConditionId(e.target.value);
+              }}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            >
+              <option value="">Todas</option>
+              {conditionsForFilter.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="min-w-[130px]">
+            <span className="text-xs font-medium text-zinc-500">Grado</span>
+            <select
+              value={gradeId}
+              onChange={(e) => {
+                setPage(1);
+                setGradeId(e.target.value);
+              }}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            >
+              <option value="">Todos</option>
+              {gradesForFilter.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="min-w-[140px]">
+            <span className="text-xs font-medium text-zinc-500">Estado</span>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setPage(1);
+                setStatusFilter(e.target.value as ProductStatus | "");
+              }}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            >
+              <option value="">Todos</option>
+              {PRODUCT_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {PRODUCT_STATUS_LABELS[s]}
                 </option>
               ))}
             </select>

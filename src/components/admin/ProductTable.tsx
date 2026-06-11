@@ -2,19 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { CatalogTypeBadge } from "@/components/admin/CatalogTypeBadge";
+import { ProductStatusBadge } from "@/components/admin/ProductStatusBadge";
+import { PRODUCT_TYPE_LABELS } from "@/lib/catalog-labels";
 import {
-  PRODUCT_CONDITION_LABELS,
-  PRODUCT_TYPE_LABELS,
-} from "@/lib/catalog-labels";
+  resolveProductConditionLabel,
+  resolveProductGradeLabel,
+  resolveProductSeriesLabel,
+} from "@/lib/product-field-resolvers";
 import { getProductCoverImage } from "@/lib/product-images";
 import { cn, formatPrice } from "@/lib/utils";
-import { normalizeUsedGrade } from "@/lib/used-grade";
 import type { Product } from "@/types/product";
-
-function formatGradeCell(grade: string | null | undefined): string | null {
-  const g = normalizeUsedGrade(grade);
-  return g && g.length > 0 ? g : null;
-}
 
 type Props = {
   products: Product[];
@@ -45,7 +43,9 @@ export function ProductTable({
         {products.map((p) => {
           const low = p.stock <= p.minStock;
           const cover = getProductCoverImage(p);
-          const gradeLabel = formatGradeCell(p.grade);
+          const gradeLabel = resolveProductGradeLabel(p);
+          const conditionLabel = resolveProductConditionLabel(p);
+          const seriesLabel = resolveProductSeriesLabel(p);
           return (
             <li
               key={p.id}
@@ -76,8 +76,15 @@ export function ProductTable({
                       Stock {p.stock}
                     </span>
                   </div>
+                  <div className="mt-2">
+                    <CatalogTypeBadge product={p} />
+                  </div>
+                  <div className="mt-2">
+                    <ProductStatusBadge product={p} />
+                  </div>
                   <p className="mt-1 text-xs text-zinc-500">
-                    {p.brand?.name ?? "—"} · {PRODUCT_CONDITION_LABELS[p.condition]}
+                    {p.brand?.name ?? "—"}
+                    {seriesLabel ? ` · ${seriesLabel}` : ""} · {conditionLabel}
                     {gradeLabel ? (
                       <span className="text-zinc-600"> · Grado {gradeLabel}</span>
                     ) : null}
@@ -127,21 +134,24 @@ export function ProductTable({
 
       <div className="hidden overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm lg:block">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1180px] text-left text-sm">
+          <table className="w-full min-w-[1340px] text-left text-sm">
             <thead className="border-b border-zinc-100 bg-zinc-50/90 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
               <tr>
                 <th className="px-3 py-3">Producto</th>
                 <th className="px-3 py-3">SKU</th>
                 <th className="px-3 py-3">Marca</th>
+                <th className="px-3 py-3">Serie</th>
                 <th className="px-3 py-3">Categoría</th>
                 <th className="px-3 py-3">Modelo</th>
                 <th className="px-3 py-3">Precio</th>
                 <th className="px-3 py-3">Stock</th>
                 <th className="px-3 py-3">Cond.</th>
                 <th className="px-3 py-3">Grado</th>
+                <th className="px-3 py-3">Catálogo</th>
                 <th className="px-3 py-3">Tipo</th>
                 <th className="px-3 py-3">Dest.</th>
                 <th className="px-3 py-3">Pub.</th>
+                <th className="px-3 py-3">Estado</th>
                 <th className="px-3 py-3">Creado</th>
                 <th className="px-3 py-3 text-right">Acciones</th>
               </tr>
@@ -149,7 +159,9 @@ export function ProductTable({
             <tbody className="divide-y divide-zinc-100">
               {products.map((p) => {
                 const low = p.stock <= p.minStock;
-                const gradeLabel = formatGradeCell(p.grade);
+                const gradeLabel = resolveProductGradeLabel(p);
+                const conditionLabel = resolveProductConditionLabel(p);
+                const seriesLabel = resolveProductSeriesLabel(p) ?? "—";
                 return (
                   <tr key={p.id} className="hover:bg-zinc-50/60">
                     <td className="max-w-[200px] px-3 py-3">
@@ -159,6 +171,7 @@ export function ProductTable({
                       {p.sku}
                     </td>
                     <td className="px-3 py-3 text-zinc-700">{p.brand?.name ?? "—"}</td>
+                    <td className="px-3 py-3 text-zinc-600">{seriesLabel}</td>
                     <td className="px-3 py-3 text-zinc-700">{p.category?.name ?? "—"}</td>
                     <td className="px-3 py-3 text-zinc-600">{p.model?.name ?? "—"}</td>
                     <td className="whitespace-nowrap px-3 py-3 font-medium text-primary-800">
@@ -176,11 +189,10 @@ export function ProductTable({
                         {p.stock}
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-xs text-zinc-600">
-                      {PRODUCT_CONDITION_LABELS[p.condition]}
-                    </td>
-                    <td className="px-3 py-3 text-xs text-zinc-600">
-                      {gradeLabel ?? "—"}
+                    <td className="px-3 py-3 text-xs text-zinc-600">{conditionLabel}</td>
+                    <td className="px-3 py-3 text-xs text-zinc-600">{gradeLabel ?? "—"}</td>
+                    <td className="px-3 py-3">
+                      <CatalogTypeBadge product={p} />
                     </td>
                     <td className="px-3 py-3 text-xs text-zinc-600">
                       {PRODUCT_TYPE_LABELS[p.type]}
@@ -212,6 +224,9 @@ export function ProductTable({
                       >
                         {p.isPublished ? "Sí" : "No"}
                       </button>
+                    </td>
+                    <td className="px-3 py-3">
+                      <ProductStatusBadge product={p} />
                     </td>
                     <td className="whitespace-nowrap px-3 py-3 text-xs text-zinc-500">
                       {p.createdAt
