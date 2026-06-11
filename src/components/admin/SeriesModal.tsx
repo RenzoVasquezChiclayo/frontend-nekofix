@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { resolveAdminSlug, slugify, validateKebabSlug } from "@/lib/admin-slug";
 import { ADMIN_PHONE_SERIES_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { getApiErrorMessage } from "@/lib/api-errors";
 import { notifyApiError, notifyError, notifySuccess } from "@/lib/toast";
@@ -22,18 +23,11 @@ type Props = {
   onSaved: () => void;
 };
 
-function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
 export function SeriesModal({ open, accessToken, series, brands, onClose, onSaved }: Props) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [slugTouched, setSlugTouched] = useState(false);
+  const [slugInlineError, setSlugInlineError] = useState<string | null>(null);
   const [brandId, setBrandId] = useState("");
   const [description, setDescription] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -43,15 +37,18 @@ export function SeriesModal({ open, accessToken, series, brands, onClose, onSave
   useEffect(() => {
     if (!open) return;
     setError(null);
+    setSlugInlineError(null);
     if (series) {
       setName(series.name);
       setSlug(series.slug);
+      setSlugTouched(true);
       setBrandId(series.brandId);
       setDescription(series.description ?? "");
       setIsActive(series.isActive);
     } else {
       setName("");
       setSlug("");
+      setSlugTouched(false);
       setBrandId(brands[0]?.id ?? "");
       setDescription("");
       setIsActive(true);
@@ -60,14 +57,35 @@ export function SeriesModal({ open, accessToken, series, brands, onClose, onSave
 
   if (!open) return null;
 
+  function handleNameChange(value: string) {
+    setName(value);
+    if (!slugTouched) {
+      setSlug(slugify(value));
+      setSlugInlineError(null);
+    }
+  }
+
+  function handleSlugChange(value: string) {
+    setSlugTouched(true);
+    setSlug(value);
+    setSlugInlineError(validateKebabSlug(value));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const resolvedSlug = resolveAdminSlug(name, slug);
+    const slugErr = validateKebabSlug(resolvedSlug);
+    if (slugErr) {
+      setSlugInlineError(slugErr);
+      setError(slugErr);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const body: SeriesInput = {
         name: name.trim(),
-        slug: slug.trim() || slugify(name),
+        slug: resolvedSlug,
         brandId,
         description: description.trim() || null,
         isActive,
@@ -116,7 +134,7 @@ export function SeriesModal({ open, accessToken, series, brands, onClose, onSave
             <input
               required
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => handleNameChange(e.target.value)}
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
             />
           </label>
@@ -124,10 +142,14 @@ export function SeriesModal({ open, accessToken, series, brands, onClose, onSave
             <span className="text-sm font-medium text-zinc-700">Slug</span>
             <input
               value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              placeholder="auto desde nombre"
+              onChange={(e) => handleSlugChange(e.target.value)}
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
             />
+            {slugInlineError ? (
+              <p className="mt-1 text-xs text-red-600" role="alert">
+                {slugInlineError}
+              </p>
+            ) : null}
           </label>
           <label className="block">
             <span className="text-sm font-medium text-zinc-700">Marca</span>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CATALOG_TYPE_LABELS } from "@/lib/catalog-labels";
+import { resolveAdminSlug, slugify, validateKebabSlug } from "@/lib/admin-slug";
 import { PRODUCT_CATALOG_TYPES } from "@/lib/product-catalog-type";
 import { ADMIN_PRODUCT_CONDITION_NOT_FOUND_MESSAGE } from "@/lib/admin-resource-messages";
 import { getApiErrorMessage } from "@/lib/api-errors";
@@ -25,8 +26,12 @@ type Props = {
 
 export function ProductConditionModal({ open, accessToken, condition, onClose, onSaved }: Props) {
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [slugTouched, setSlugTouched] = useState(false);
+  const [slugInlineError, setSlugInlineError] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const [catalogType, setCatalogType] = useState<ProductCatalogType>("DEVICE");
+  const [sortOrder, setSortOrder] = useState("0");
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,30 +39,60 @@ export function ProductConditionModal({ open, accessToken, condition, onClose, o
   useEffect(() => {
     if (!open) return;
     setError(null);
+    setSlugInlineError(null);
     if (condition) {
       setName(condition.name);
+      setSlug(condition.slug);
+      setSlugTouched(true);
       setDescription(condition.description ?? "");
       setCatalogType(condition.catalogType);
+      setSortOrder(String(condition.sortOrder ?? 0));
       setIsActive(condition.isActive);
     } else {
       setName("");
+      setSlug("");
+      setSlugTouched(false);
       setDescription("");
       setCatalogType("DEVICE");
+      setSortOrder("0");
       setIsActive(true);
     }
   }, [open, condition]);
 
   if (!open) return null;
 
+  function handleNameChange(value: string) {
+    setName(value);
+    if (!slugTouched) {
+      setSlug(slugify(value));
+      setSlugInlineError(null);
+    }
+  }
+
+  function handleSlugChange(value: string) {
+    setSlugTouched(true);
+    setSlug(value);
+    setSlugInlineError(validateKebabSlug(value));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const resolvedSlug = resolveAdminSlug(name, slug);
+    const slugErr = validateKebabSlug(resolvedSlug);
+    if (slugErr) {
+      setSlugInlineError(slugErr);
+      setError(slugErr);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const body: ProductConditionInput = {
         name: name.trim(),
+        slug: resolvedSlug,
         description: description.trim() || null,
         catalogType,
+        sortOrder: Number(sortOrder) || 0,
         isActive,
       };
       if (!body.name) throw new Error("Indica un nombre.");
@@ -104,9 +139,22 @@ export function ProductConditionModal({ open, accessToken, condition, onClose, o
             <input
               required
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => handleNameChange(e.target.value)}
               className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
             />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-zinc-700">Slug</span>
+            <input
+              value={slug}
+              onChange={(e) => handleSlugChange(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            />
+            {slugInlineError ? (
+              <p className="mt-1 text-xs text-red-600" role="alert">
+                {slugInlineError}
+              </p>
+            ) : null}
           </label>
           <label className="block">
             <span className="text-sm font-medium text-zinc-700">Descripción</span>
@@ -130,6 +178,16 @@ export function ProductConditionModal({ open, accessToken, condition, onClose, o
                 </option>
               ))}
             </select>
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium text-zinc-700">Orden</span>
+            <input
+              type="number"
+              min={0}
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm"
+            />
           </label>
           <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700">
             <input
